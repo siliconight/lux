@@ -12,6 +12,8 @@ var _save_override_button: Button
 var _validate_button: Button
 var _status_label: RichTextLabel
 var _slider_box: VBoxContainer
+var _lights_path_edit: LineEdit
+var _lights_dialog: EditorFileDialog
 
 var _presets: Array[LuxPreset] = []
 var _preset_paths: Array[String] = []
@@ -124,6 +126,46 @@ func _build_ui() -> void:
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.pressed.connect(_on_role_pressed.bind(r[1]))
 		role_row2.add_child(b)
+
+	root.add_child(HSeparator.new())
+
+	# --- Bake level lights from a Deli Counter .lights.json --------------
+	var lights_label := Label.new()
+	lights_label.text = "Level Lights (.lights.json)"
+	root.add_child(lights_label)
+	var lights_hint := Label.new()
+	lights_hint.text = "Bake Deli Counter light anchors into Lux rigs."
+	lights_hint.modulate = Color(1, 1, 1, 0.6)
+	root.add_child(lights_hint)
+
+	_lights_path_edit = LineEdit.new()
+	_lights_path_edit.placeholder_text = "res://.../<name>.lights.json"
+	_lights_path_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.add_child(_lights_path_edit)
+
+	var lights_row := HBoxContainer.new()
+	root.add_child(lights_row)
+	var browse_b := Button.new()
+	browse_b.text = "Browse"
+	browse_b.pressed.connect(_on_lights_browse)
+	lights_row.add_child(browse_b)
+	var bake_b := Button.new()
+	bake_b.text = "Bake Lights"
+	bake_b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bake_b.pressed.connect(_on_bake_lights)
+	lights_row.add_child(bake_b)
+	var clear_b := Button.new()
+	clear_b.text = "Clear"
+	clear_b.pressed.connect(_on_clear_lights)
+	lights_row.add_child(clear_b)
+
+	_lights_dialog = EditorFileDialog.new()
+	_lights_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
+	_lights_dialog.access = EditorFileDialog.ACCESS_RESOURCES
+	_lights_dialog.add_filter("*.lights.json", "Lux / Deli Counter lights")
+	_lights_dialog.add_filter("*.json", "JSON")
+	_lights_dialog.file_selected.connect(_on_lights_selected)
+	add_child(_lights_dialog)
 
 	root.add_child(HSeparator.new())
 
@@ -342,3 +384,38 @@ func _on_validate_pressed() -> void:
 func _set_status(bbcode: String) -> void:
 	if _status_label != null:
 		_status_label.text = bbcode
+
+
+func _on_lights_browse() -> void:
+	if _lights_dialog != null:
+		_lights_dialog.popup_centered_ratio(0.6)
+
+
+func _on_lights_selected(path: String) -> void:
+	if _lights_path_edit != null:
+		_lights_path_edit.text = path
+
+
+func _on_bake_lights() -> void:
+	var scene_root: Node = _editor.get_edited_scene_root() if _editor != null else null
+	if scene_root == null:
+		_set_status("[color=orange]Open a scene first.[/color]")
+		return
+	var path := _lights_path_edit.text.strip_edges()
+	if path.is_empty():
+		_set_status("[color=orange]Pick a .lights.json first (Browse).[/color]")
+		return
+	var res := LuxLightLoader.bake(path, scene_root)
+	if res.get("ok", false):
+		_set_status("[color=lightgreen]%s[/color]" % res.get("msg", "Baked."))
+	else:
+		_set_status("[color=orange]%s[/color]" % res.get("msg", "Bake failed."))
+
+
+func _on_clear_lights() -> void:
+	var scene_root: Node = _editor.get_edited_scene_root() if _editor != null else null
+	if scene_root == null:
+		_set_status("[color=orange]Open a scene first.[/color]")
+		return
+	var n := LuxLightLoader.clear(scene_root)
+	_set_status("[color=gray]Cleared %d light bake(s).[/color]" % n)

@@ -7,6 +7,30 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.8.0] - Light loader: bake a Deli Counter .lights.json into Lux rigs
+
+### Added
+- `LuxLightLoader` (runtime/lux_light_loader.gd): reads a Deli Counter
+  `<name>.lights.json` and bakes one Lux rig per light anchor into the open
+  scene -- `fluorescent` -> LuxFluorescentRig, `window`/`sign` ->
+  LuxAreaLightRig, `streetlight` -> LuxStreetlightRig. Fluorescent rows use the
+  anchor's count/spacing; windows use the anchor's size. `sun` is left to the
+  preset. Rigs self-register with a LuxRoot, so presets and the alarm pulse
+  drive the baked lights.
+- Coordinate conversion: Deli Counter emits Blender Z-up; the level GLB imports
+  as Godot Y-up, so anchor positions are swapped `(x, y, z_up) -> (x, z_up, -y)`
+  to align with the imported level.
+- Lux dock "Level Lights" section: Browse a `.lights.json`, Bake, and Clear.
+  Editor-time -- lights are baked into the scene so they save and can be hand-
+  tweaked.
+- samples/foundry_heist_vertical.lights.json (26 anchors) to bake against.
+
+### Notes
+- MVP is light-only (emission, no fixture geometry). Visible tubes/poles/frames
+  are a later Zoo-prop pass co-located with the anchors.
+- If a bake looks mirrored/rotated, the axis swap and yaw sign in
+  `LuxLightLoader._place` are the two flip points.
+
 ## [Unreleased]
 
 ## [0.7.0] — 2026-07-05
