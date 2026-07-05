@@ -1,0 +1,92 @@
+{
+  "light_manifest_version": "1.0.0",
+  "building_id": "sample_building",
+  "theme": "greybox",
+  "space": "Blender Z-up, meters; rot_y = degrees about up; pos is the fixture location",
+  "rig_library": "lux",
+  "anchors": [
+    {
+      "id": "room_a_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        -4.5,
+        -3.0,
+        3.4
+      ],
+      "rot_y": 0.0,
+      "room": "room_a",
+      "row": {
+        "count": 2,
+        "spacing": 3.5
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "room_b_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        4.5,
+        -3.0,
+        3.4
+      ],
+      "rot_y": 0.0,
+      "room": "room_b",
+      "row": {
+        "count": 2,
+        "spacing": 3.5
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "hall_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        0.0,
+        2.5,
+        3.4
+      ],
+      "rot_y": 0.0,
+      "room": "hall",
+      "row": {
+        "count": 5,
+        "spacing": 3.2
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "ext_0_S_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        -4.5,
+        -6.0,
+        1.6
+      ],
+      "rot_y": 90.0,
+      "size": [
+        1.4,
+        1.2
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_0_S_window_2",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        4.5,
+        -6.0,
+        1.6
+      ],
+      "rot_y": 90.0,
+      "size": [
+        1.4,
+        1.2
+      ],
+      "reacts_to_alarm": false
+    }
+  ]
+}

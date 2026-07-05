@@ -7,6 +7,14 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.8.3] - IP-neutral sample lights
+
+### Changed
+- Replaced the DELCO-specific `samples/foundry_heist_vertical.lights.json`
+  (shipped in 0.8.0) with a generic `samples/sample_building.lights.json`
+  (5 anchors: 3 fluorescent rooms + 2 windows), keeping Lux IP-neutral while
+  still shipping something to bake against and demonstrate the loader format.
+
 ## [0.8.2] - Fix: same get_surface_count crash in the sample scene ([P] key)
 
 ### Fixed
