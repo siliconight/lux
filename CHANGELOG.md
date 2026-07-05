@@ -7,6 +7,30 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.8.2] - Fix: same get_surface_count crash in the sample scene ([P] key)
+
+### Fixed
+- lux_sample_scene.gd `_set_ps2_lighting` had the same nonexistent
+  `MeshInstance3D.get_surface_count()` call fixed in 0.8.1 elsewhere, so pressing
+  [P] (PS2 Gouraud toggle) crashed. Now `get_surface_override_material_count()`.
+  (The `mi.mesh.get_surface_count()` calls in the material applier/profile are
+  correct -- Mesh has that method -- and were left as-is.)
+
+## [0.8.1] - Fixes: preset-apply crash + post-FX shader compile
+
+### Fixed
+- `LuxRoot._push_material_state` called `MeshInstance3D.get_surface_count()`,
+  which doesn't exist -> preset apply threw "Invalid call" and aborted mid-walk
+  of the lux_materials group. Now uses `get_surface_override_material_count()`
+  (two sites). This was the "Parameter 'version' is null" cascade's root.
+- The ordered-dither post-FX shader declared `hint_depth_texture`, which Godot
+  4.7 rejects in `canvas_item` shaders -> the shader failed to compile and any
+  scene with a LuxRoot flooded the log with null-shader errors every frame.
+  Removed the depth path; dither now applies uniformly (the distance-fade
+  falloff would need a spatial post pass -- tracked as future work). Fade
+  uniforms are kept for compatibility. Both pre-existing, unrelated to 0.8.0's
+  light loader.
+
 ## [0.8.0] - Light loader: bake a Deli Counter .lights.json into Lux rigs
 
 ### Added

@@ -128,7 +128,7 @@ func _set_ps2_lighting(amount: float) -> void:
 	var per_vertex := amount > 0.5
 	for mi in get_tree().get_nodes_in_group(&"lux_materials"):
 		if mi is MeshInstance3D:
-			for s in (mi as MeshInstance3D).get_surface_count():
+			for s in (mi as MeshInstance3D).get_surface_override_material_count():
 				var mat := (mi as MeshInstance3D).get_surface_override_material(s)
 				if mat is ShaderMaterial:
 					(mat as ShaderMaterial).set_shader_parameter(&"ps2_lighting", amount)

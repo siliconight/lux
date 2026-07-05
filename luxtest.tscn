@@ -1,0 +1,1076 @@
+[gd_scene format=3 uid="uid://ekahyta70rrq"]
+
+[ext_resource type="Script" uid="uid://guo0dm43k605" path="res://addons/lux/runtime/lux_root.gd" id="1_igvkk"]
+[ext_resource type="Shader" uid="uid://y236j7yj8hno" path="res://addons/lux/shaders/post/lux_ordered_dither.gdshader" id="2_cnky6"]
+[ext_resource type="Shader" uid="uid://bul6omakpyqxe" path="res://addons/lux/shaders/post/lux_crt_mask.gdshader" id="3_poef0"]
+[ext_resource type="Script" uid="uid://oy0e28u3p065" path="res://addons/lux/runtime/rigs/lux_fluorescent_rig.gd" id="4_xv2ql"]
+[ext_resource type="Script" uid="uid://claguse8125tp" path="res://addons/lux/resources/lux_light_rig.gd" id="5_j0pqb"]
+[ext_resource type="Script" uid="uid://bpssrscydy3t4" path="res://addons/lux/runtime/rigs/lux_area_light_rig.gd" id="6_mpw8x"]
+[ext_resource type="PackedScene" uid="uid://40frbdp5ckmm" path="res://foundry_heist_vertical.glb" id="7_n8urs"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bt1pm"]
+shader = ExtResource("2_cnky6")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xaxiv"]
+shader = ExtResource("3_poef0")
+shader_parameter/mask_type = 1
+shader_parameter/mask_strength = 0.0
+shader_parameter/mask_scale = 3.0
+shader_parameter/mask_brightness = 1.35
+shader_parameter/scanline_strength = 0.0
+shader_parameter/scanline_count = 480.0
+
+[sub_resource type="Resource" id="Resource_lfjol"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_fmtul"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_f7uw8"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_ittke"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 3.2
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_4l5fx"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+spacing = 2.75
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_1g8sd"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 3.2
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_fubmi"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 3.8
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_kl1dp"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 3.8
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_7yjhb"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 3.8
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_3us7b"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 8.4
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_ohrra"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 4.0
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_pk756"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 4.0
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_dw2rb"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 4.0
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_p6vcr"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 4.2
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_y3e3k"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 4.2
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_h01j2"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 4.2
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_mceft"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Fluorescent (baked)"
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+energy = 2.2
+light_range = 10.0
+count = 5
+spacing = 4.2
+mount_height = 0.0
+flicker_amount = 0.12
+flicker_speed = 9.0
+
+[sub_resource type="Resource" id="Resource_wm74r"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Window (baked)"
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+energy = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gjvuw"]
+shading_mode = 0
+albedo_color = Color(1, 0.99651015, 0.9805565, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_jhxm0"]
+size = Vector2(1.4, 1.4)
+
+[sub_resource type="Resource" id="Resource_f7tdu"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Window (baked)"
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+energy = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pjbq4"]
+shading_mode = 0
+albedo_color = Color(1, 0.99651015, 0.9805565, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_rxwmu"]
+size = Vector2(1.4, 1.4)
+
+[sub_resource type="Resource" id="Resource_46nv7"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Window (baked)"
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+energy = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ege5l"]
+shading_mode = 0
+albedo_color = Color(1, 0.99651015, 0.9805565, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_po2uv"]
+size = Vector2(1.4, 1.4)
+
+[sub_resource type="Resource" id="Resource_qivue"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Window (baked)"
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+energy = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ke7mo"]
+shading_mode = 0
+albedo_color = Color(1, 0.99651015, 0.9805565, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_wue41"]
+size = Vector2(1.4, 1.4)
+
+[sub_resource type="Resource" id="Resource_kk4fb"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Window (baked)"
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+energy = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3o1hk"]
+shading_mode = 0
+albedo_color = Color(1, 0.99651015, 0.9805565, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ys5hn"]
+size = Vector2(1.4, 1.4)
+
+[sub_resource type="Resource" id="Resource_tub1c"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Window (baked)"
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+energy = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_irok0"]
+shading_mode = 0
+albedo_color = Color(1, 0.99651015, 0.9805565, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_0cn6y"]
+size = Vector2(1.4, 1.4)
+
+[sub_resource type="Resource" id="Resource_yogfa"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Window (baked)"
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+energy = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yafif"]
+shading_mode = 0
+albedo_color = Color(1, 0.99651015, 0.9805565, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_2e3g6"]
+size = Vector2(1.4, 1.4)
+
+[sub_resource type="Resource" id="Resource_wtv6g"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Window (baked)"
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+energy = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s2ltw"]
+shading_mode = 0
+albedo_color = Color(1, 0.99651015, 0.9805565, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_y125r"]
+size = Vector2(1.8, 1.4)
+
+[sub_resource type="Resource" id="Resource_4egho"]
+script = ExtResource("5_j0pqb")
+rig_name = &"Window (baked)"
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+energy = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pw2y0"]
+shading_mode = 0
+albedo_color = Color(1, 0.99651015, 0.9805565, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_swj7h"]
+size = Vector2(1.6, 1.4)
+
+[node name="Luxtest" type="Node3D" unique_id=1543246685]
+
+[node name="LuxRoot" type="Node3D" parent="." unique_id=280135441]
+script = ExtResource("1_igvkk")
+metadata/_custom_type_script = "uid://guo0dm43k605"
+
+[node name="LuxWorldEnvironment" type="WorldEnvironment" parent="LuxRoot" unique_id=958905945]
+
+[node name="LuxSun" type="DirectionalLight3D" parent="LuxRoot" unique_id=707629227]
+
+[node name="@CanvasLayer@20675" type="CanvasLayer" parent="LuxRoot" unique_id=1629027217]
+layer = -1
+
+[node name="@BackBufferCopy@20676" type="BackBufferCopy" parent="LuxRoot/@CanvasLayer@20675" unique_id=769069421]
+copy_mode = 2
+
+[node name="LuxPostRect" type="ColorRect" parent="LuxRoot/@CanvasLayer@20675" unique_id=753342655]
+material = SubResource("ShaderMaterial_bt1pm")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="LuxCRTBackBuffer" type="BackBufferCopy" parent="LuxRoot/@CanvasLayer@20675" unique_id=1700066345]
+copy_mode = 2
+
+[node name="LuxCRTRect" type="ColorRect" parent="LuxRoot/@CanvasLayer@20675" unique_id=1314868039]
+material = SubResource("ShaderMaterial_xaxiv")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="LuxLights" type="Node3D" parent="." unique_id=1559213745]
+
+[node name="sewer_entry_ceiling" type="Node3D" parent="LuxLights" unique_id=1074191012]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -13, 0, 0)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_lfjol")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/sewer_entry_ceiling" unique_id=2104467978]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/sewer_entry_ceiling" unique_id=1703420598]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/sewer_entry_ceiling" unique_id=572734824]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/sewer_entry_ceiling" unique_id=1517339314]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/sewer_entry_ceiling" unique_id=572161268]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="vault_approach_ceiling" type="Node3D" parent="LuxLights" unique_id=797058767]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 1, 0, 0)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_fmtul")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/vault_approach_ceiling" unique_id=993840515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/vault_approach_ceiling" unique_id=788800438]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/vault_approach_ceiling" unique_id=1327291855]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/vault_approach_ceiling" unique_id=1801655702]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/vault_approach_ceiling" unique_id=1379099226]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="vault_cage_ceiling" type="Node3D" parent="LuxLights" unique_id=2067664805]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 14, 0, 0)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_f7uw8")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/vault_cage_ceiling" unique_id=2055370280]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/vault_cage_ceiling" unique_id=158202326]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/vault_cage_ceiling" unique_id=1151700927]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/vault_cage_ceiling" unique_id=957468373]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/vault_cage_ceiling" unique_id=813511426]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="lobby_ceiling" type="Node3D" parent="LuxLights" unique_id=652154014]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 3.4, 9.5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_ittke")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/lobby_ceiling" unique_id=503611455]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/lobby_ceiling" unique_id=784064674]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/lobby_ceiling" unique_id=1446907952]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/lobby_ceiling" unique_id=619197863]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/lobby_ceiling" unique_id=44006907]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="south_machine_ceiling" type="Node3D" parent="LuxLights" unique_id=565105172]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 3.4, 9.5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_4l5fx")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/south_machine_ceiling" unique_id=2136394093]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.125, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/south_machine_ceiling" unique_id=817704555]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.375, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/south_machine_ceiling" unique_id=1826585729]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.375, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/south_machine_ceiling" unique_id=311300490]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.125, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="loading_dock_ceiling" type="Node3D" parent="LuxLights" unique_id=1580902970]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 3.4, 9.5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_1g8sd")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/loading_dock_ceiling" unique_id=2117567782]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/loading_dock_ceiling" unique_id=386486385]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/loading_dock_ceiling" unique_id=337124431]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/loading_dock_ceiling" unique_id=108862793]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/loading_dock_ceiling" unique_id=2123221889]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="west_maintenance_ceiling" type="Node3D" parent="LuxLights" unique_id=322624195]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -13, 3.4, -5.5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_fubmi")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/west_maintenance_ceiling" unique_id=1383972146]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/west_maintenance_ceiling" unique_id=1526416975]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/west_maintenance_ceiling" unique_id=723007345]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/west_maintenance_ceiling" unique_id=411139051]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/west_maintenance_ceiling" unique_id=1384626521]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="central_floor_ceiling" type="Node3D" parent="LuxLights" unique_id=146420809]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 3.4, -5.5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_kl1dp")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/central_floor_ceiling" unique_id=345049583]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/central_floor_ceiling" unique_id=1732373244]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/central_floor_ceiling" unique_id=2074464562]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/central_floor_ceiling" unique_id=2083906298]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/central_floor_ceiling" unique_id=404770947]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="east_floor_ceiling" type="Node3D" parent="LuxLights" unique_id=1773888157]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 13, 3.4, -5.5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_7yjhb")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/east_floor_ceiling" unique_id=1965504994]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/east_floor_ceiling" unique_id=1773808159]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/east_floor_ceiling" unique_id=1043514273]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/east_floor_ceiling" unique_id=2128325348]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/east_floor_ceiling" unique_id=1198588865]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="catwalk_south_ceiling" type="Node3D" parent="LuxLights" unique_id=795641171]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.8, 10)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_3us7b")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/catwalk_south_ceiling" unique_id=987050487]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/catwalk_south_ceiling" unique_id=342778596]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/catwalk_south_ceiling" unique_id=1279698079]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/catwalk_south_ceiling" unique_id=148958437]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/catwalk_south_ceiling" unique_id=1011657243]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="control_room_ceiling" type="Node3D" parent="LuxLights" unique_id=1422893544]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -13, 6.8, -5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_ohrra")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/control_room_ceiling" unique_id=702860220]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/control_room_ceiling" unique_id=1238511872]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/control_room_ceiling" unique_id=623923786]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/control_room_ceiling" unique_id=1170130339]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/control_room_ceiling" unique_id=391342905]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="bridge_core_ceiling" type="Node3D" parent="LuxLights" unique_id=70793411]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 6.8, -5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_pk756")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/bridge_core_ceiling" unique_id=1938536633]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/bridge_core_ceiling" unique_id=444520532]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/bridge_core_ceiling" unique_id=261562702]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/bridge_core_ceiling" unique_id=1124355242]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/bridge_core_ceiling" unique_id=639549426]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="archive_room_ceiling" type="Node3D" parent="LuxLights" unique_id=1614367885]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 13, 6.8, -5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_dw2rb")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/archive_room_ceiling" unique_id=62065976]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/archive_room_ceiling" unique_id=1232218766]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/archive_room_ceiling" unique_id=749233730]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/archive_room_ceiling" unique_id=308595191]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/archive_room_ceiling" unique_id=8847564]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="roof_south_ceiling" type="Node3D" parent="LuxLights" unique_id=1588243152]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 10.2, 7.5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_p6vcr")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/roof_south_ceiling" unique_id=71948754]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/roof_south_ceiling" unique_id=772970895]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/roof_south_ceiling" unique_id=703340987]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/roof_south_ceiling" unique_id=739325824]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/roof_south_ceiling" unique_id=464308698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="roof_north_ceiling" type="Node3D" parent="LuxLights" unique_id=1562718904]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 10.2, -7.5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_y3e3k")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/roof_north_ceiling" unique_id=1725384712]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/roof_north_ceiling" unique_id=2060426859]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/roof_north_ceiling" unique_id=612676164]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/roof_north_ceiling" unique_id=1415981364]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/roof_north_ceiling" unique_id=204762035]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="comms_room_ceiling" type="Node3D" parent="LuxLights" unique_id=1897007685]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 10.2, 7.5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_h01j2")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/comms_room_ceiling" unique_id=745706077]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/comms_room_ceiling" unique_id=1954191407]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/comms_room_ceiling" unique_id=1387860370]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/comms_room_ceiling" unique_id=236010956]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/comms_room_ceiling" unique_id=873346526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="skylight_room_ceiling" type="Node3D" parent="LuxLights" unique_id=1430461670]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 10.2, -7.5)
+script = ExtResource("4_xv2ql")
+rig = SubResource("Resource_mceft")
+
+[node name="Fluoro_0" type="OmniLight3D" parent="LuxLights/skylight_room_ceiling" unique_id=954851938]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_1" type="OmniLight3D" parent="LuxLights/skylight_room_ceiling" unique_id=1728600613]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_2" type="OmniLight3D" parent="LuxLights/skylight_room_ceiling" unique_id=2086321506]
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_3" type="OmniLight3D" parent="LuxLights/skylight_room_ceiling" unique_id=195214310]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="Fluoro_4" type="OmniLight3D" parent="LuxLights/skylight_room_ceiling" unique_id=477049731]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.4, 0, 0)
+light_color = Color(0.965, 0.8739275, 0.64569217, 1)
+light_energy = 2.1811435
+omni_range = 10.0
+
+[node name="ext_0_S_window_1" type="Node3D" parent="LuxLights" unique_id=1914606129]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 13.44, 1.85, 15)
+script = ExtResource("6_mpw8x")
+rig = SubResource("Resource_wm74r")
+panel_size = Vector2(1.4, 1.4)
+
+[node name="AreaPanel" type="AreaLight3D" parent="LuxLights/ext_0_S_window_1" unique_id=2025462289]
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+light_energy = 3.0
+
+[node name="AreaPanel_Surface" type="MeshInstance3D" parent="LuxLights/ext_0_S_window_1" unique_id=1823129596]
+material_override = SubResource("StandardMaterial3D_gjvuw")
+mesh = SubResource("QuadMesh_jhxm0")
+
+[node name="ext_1_N_window_1" type="Node3D" parent="LuxLights" unique_id=1931253966]
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, -12.6, 5.25, -15)
+script = ExtResource("6_mpw8x")
+rig = SubResource("Resource_f7tdu")
+panel_size = Vector2(1.4, 1.4)
+
+[node name="AreaPanel" type="AreaLight3D" parent="LuxLights/ext_1_N_window_1" unique_id=101954630]
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+light_energy = 3.0
+
+[node name="AreaPanel_Surface" type="MeshInstance3D" parent="LuxLights/ext_1_N_window_1" unique_id=1942334856]
+material_override = SubResource("StandardMaterial3D_pjbq4")
+mesh = SubResource("QuadMesh_rxwmu")
+
+[node name="ext_1_N_window_2" type="Node3D" parent="LuxLights" unique_id=393479176]
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 12.6, 5.25, -15)
+script = ExtResource("6_mpw8x")
+rig = SubResource("Resource_46nv7")
+panel_size = Vector2(1.4, 1.4)
+
+[node name="AreaPanel" type="AreaLight3D" parent="LuxLights/ext_1_N_window_2" unique_id=1307447435]
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+light_energy = 3.0
+
+[node name="AreaPanel_Surface" type="MeshInstance3D" parent="LuxLights/ext_1_N_window_2" unique_id=12979821]
+material_override = SubResource("StandardMaterial3D_ege5l")
+mesh = SubResource("QuadMesh_po2uv")
+
+[node name="ext_1_S_window_1" type="Node3D" parent="LuxLights" unique_id=39653097]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -12.6, 5.25, 15)
+script = ExtResource("6_mpw8x")
+rig = SubResource("Resource_qivue")
+panel_size = Vector2(1.4, 1.4)
+
+[node name="AreaPanel" type="AreaLight3D" parent="LuxLights/ext_1_S_window_1" unique_id=845912042]
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+light_energy = 3.0
+
+[node name="AreaPanel_Surface" type="MeshInstance3D" parent="LuxLights/ext_1_S_window_1" unique_id=858393512]
+material_override = SubResource("StandardMaterial3D_ke7mo")
+mesh = SubResource("QuadMesh_wue41")
+
+[node name="ext_1_S_window_2" type="Node3D" parent="LuxLights" unique_id=1885659631]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 12.6, 5.25, 15)
+script = ExtResource("6_mpw8x")
+rig = SubResource("Resource_kk4fb")
+panel_size = Vector2(1.4, 1.4)
+
+[node name="AreaPanel" type="AreaLight3D" parent="LuxLights/ext_1_S_window_2" unique_id=401410476]
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+light_energy = 3.0
+
+[node name="AreaPanel_Surface" type="MeshInstance3D" parent="LuxLights/ext_1_S_window_2" unique_id=606879304]
+material_override = SubResource("StandardMaterial3D_3o1hk")
+mesh = SubResource("QuadMesh_ys5hn")
+
+[node name="ext_1_E_window_1" type="Node3D" parent="LuxLights" unique_id=521739116]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 21, 5.25, -6)
+script = ExtResource("6_mpw8x")
+rig = SubResource("Resource_tub1c")
+panel_size = Vector2(1.4, 1.4)
+
+[node name="AreaPanel" type="AreaLight3D" parent="LuxLights/ext_1_E_window_1" unique_id=986681401]
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+light_energy = 3.0
+
+[node name="AreaPanel_Surface" type="MeshInstance3D" parent="LuxLights/ext_1_E_window_1" unique_id=111521440]
+material_override = SubResource("StandardMaterial3D_irok0")
+mesh = SubResource("QuadMesh_0cn6y")
+
+[node name="ext_1_W_window_1" type="Node3D" parent="LuxLights" unique_id=1345925450]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 5.25, -6)
+script = ExtResource("6_mpw8x")
+rig = SubResource("Resource_yogfa")
+panel_size = Vector2(1.4, 1.4)
+
+[node name="AreaPanel" type="AreaLight3D" parent="LuxLights/ext_1_W_window_1" unique_id=1669859509]
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+light_energy = 3.0
+
+[node name="AreaPanel_Surface" type="MeshInstance3D" parent="LuxLights/ext_1_W_window_1" unique_id=1138457470]
+material_override = SubResource("StandardMaterial3D_yafif")
+mesh = SubResource("QuadMesh_2e3g6")
+
+[node name="ext_2_S_window_1" type="Node3D" parent="LuxLights" unique_id=2064669598]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 8.65, 15)
+script = ExtResource("6_mpw8x")
+rig = SubResource("Resource_wtv6g")
+panel_size = Vector2(1.8, 1.4)
+
+[node name="AreaPanel" type="AreaLight3D" parent="LuxLights/ext_2_S_window_1" unique_id=1355387411]
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+light_energy = 3.0
+
+[node name="AreaPanel_Surface" type="MeshInstance3D" parent="LuxLights/ext_2_S_window_1" unique_id=1403175694]
+material_override = SubResource("StandardMaterial3D_s2ltw")
+mesh = SubResource("QuadMesh_y125r")
+
+[node name="ext_2_E_window_1" type="Node3D" parent="LuxLights" unique_id=2088812410]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 21, 8.65, -3)
+script = ExtResource("6_mpw8x")
+rig = SubResource("Resource_4egho")
+panel_size = Vector2(1.6, 1.4)
+
+[node name="AreaPanel" type="AreaLight3D" parent="LuxLights/ext_2_E_window_1" unique_id=1654758693]
+light_color = Color(1, 0.99651015, 0.9805565, 1)
+light_energy = 3.0
+
+[node name="AreaPanel_Surface" type="MeshInstance3D" parent="LuxLights/ext_2_E_window_1" unique_id=1378284330]
+material_override = SubResource("StandardMaterial3D_pw2y0")
+mesh = SubResource("QuadMesh_swj7h")
+
+[node name="foundry_heist_vertical" parent="." unique_id=1914045437 instance=ExtResource("7_n8urs")]

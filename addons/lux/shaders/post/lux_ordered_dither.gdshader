@@ -6,11 +6,11 @@ shader_type canvas_item;
 // art-directable. Strength, cell size, color levels, and distance fade are all
 // exposed. UI is excluded by keeping this pass on the world viewport only.
 
-// hint_screen_texture / hint_depth_texture bind Godot's rendered frame and depth
-// buffer automatically — no manual ViewportTexture wiring needed. The BackBufferCopy
-// under the post layer guarantees the screen texture is populated for this pass.
+// hint_screen_texture binds Godot's rendered frame automatically -- no manual
+// ViewportTexture wiring needed. The BackBufferCopy under the post layer
+// guarantees the screen texture is populated for this pass. (canvas_item shaders
+// cannot read the depth buffer in 4.7, so the distance-fade path is disabled.)
 uniform sampler2D screen_tex : hint_screen_texture, filter_nearest;
-uniform sampler2D depth_tex : hint_depth_texture, filter_nearest;
 
 uniform float strength : hint_range(0.0, 1.0) = 0.3;
 uniform int color_levels : hint_range(2, 64) = 24;
@@ -58,12 +58,6 @@ float bayer4(vec2 pix) {
 	return BAYER4[y * 4 + x] / 16.0 - 0.5;
 }
 
-float linearize_depth(float d) {
-	// Godot Forward+ depth is 0..1 non-linear; reconstruct view-space distance.
-	float ndc = d * 2.0 - 1.0;
-	return (2.0 * cam_near * cam_far) / (cam_far + cam_near - ndc * (cam_far - cam_near));
-}
-
 float luma(vec3 c) {
 	return dot(c, vec3(0.2126, 0.7152, 0.0722));
 }
@@ -94,13 +88,10 @@ void fragment() {
 	}
 
 	// --- Dither + quantize ---
+	// Distance fade needs the depth buffer, which canvas_item (2D) shaders can't
+	// read in Godot 4.7 -- so dither applies uniformly. A depth-aware falloff
+	// would need a spatial post pass; the fade uniforms are kept for compat.
 	float amt = strength;
-	if (distance_fade_enabled) {
-		float depth_raw = texture(depth_tex, uv).r;
-		float dist = linearize_depth(depth_raw);
-		float fade = 1.0 - smoothstep(fade_start, fade_end, dist);
-		amt *= fade;
-	}
 	if (amt > 0.0001) {
 		float levels = float(color_levels);
 		vec2 cell = floor(FRAGCOORD.xy / float(max(cell_size, 1)));

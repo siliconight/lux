@@ -410,7 +410,7 @@ func _track_sun_light() -> void:
 func _push_sun_to_materials(key_dir: Vector3, key_col: Vector3) -> void:
 	for mi in get_tree().get_nodes_in_group(&"lux_materials"):
 		if mi is MeshInstance3D:
-			for s in (mi as MeshInstance3D).get_surface_count():
+			for s in (mi as MeshInstance3D).get_surface_override_material_count():
 				var mat := (mi as MeshInstance3D).get_surface_override_material(s)
 				if mat is ShaderMaterial:
 					var sm := mat as ShaderMaterial
@@ -525,7 +525,7 @@ func _push_material_state(preset: LuxPreset) -> void:
 	var want_native := preset.vertex_shading_mode == 1
 	for mi in get_tree().get_nodes_in_group(&"lux_materials"):
 		if mi is MeshInstance3D:
-			for s in (mi as MeshInstance3D).get_surface_count():
+			for s in (mi as MeshInstance3D).get_surface_override_material_count():
 				var mat := (mi as MeshInstance3D).get_surface_override_material(s)
 				if mat is ShaderMaterial:
 					var sm := mat as ShaderMaterial
