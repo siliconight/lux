@@ -96,6 +96,32 @@ Lux takes advantage of three things new in Godot 4.7:
   to the SDR range and the dithered levels reach the screen exactly as authored.
   Turn it off if you want a preset's highlights to use the display's HDR range.
 
+## Sun Link — a moving sun that relights the vertex world
+
+Vertex lighting is only convincing if the world relights when the sun moves. Lux
+can track a live `DirectionalLight3D` and feed its direction, color, and energy
+into the vertex-lighting path every frame — so a day/night cycle (or any driven
+sun) lights your PS2 surfaces correctly as it sweeps.
+
+**How to wire it:**
+
+- Drag a `DirectionalLight3D` into **LuxRoot → Sun Link → Sun Light**, or
+- leave it empty and keep **Auto Find SkyMint** on. If a [SkyMint](https://github.com/siliconight/skymint)
+  node is in the scene, Lux borrows its sun automatically.
+- Or call `lux.set_sun_light(light)` at runtime (e.g. after spawning the sky).
+
+There's **no hard dependency on SkyMint** — Lux finds the sun by duck-typing a
+`sun_light` field, so it compiles and runs whether or not the addon is present,
+and works with a hand-placed light just as well.
+
+**Why it's multiplayer-safe and cheap.** The vertex look is a pure function of
+the light's current state, and SkyMint already syncs time-of-day across clients,
+so every client's sun — and therefore every client's lighting — lines up with no
+Lux networking at all. Per frame, Lux reads one transform and compares three
+values; it only writes shader uniforms when the sun actually changed, so a static
+sun costs effectively nothing. When a sun link is active it owns the key light,
+so applying or blending presets won't stomp a moving sun.
+
 ## PS2 hardware lighting (two paths)
 
 Godot 4.4 added native per-vertex shading (the real thing PS2 did), and Lux uses

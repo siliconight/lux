@@ -9,6 +9,22 @@ and the API; these are called out under **Changed** / **Breaking**.
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-07-05
+### Added
+- **Sun Link** — LuxRoot can track a live `DirectionalLight3D` and feed its world
+  direction, color, and energy into the vertex/PS2 lighting path every frame, so
+  a moving or driven sun relights the vertex-lit world. Set it explicitly
+  (`sun_light`), let `auto_find_skymint` borrow a [SkyMint](https://github.com/siliconight/skymint)
+  sun automatically, or call `set_sun_light()` at runtime.
+  - No hard dependency on SkyMint: the sun is found by duck-typing a `sun_light`
+    field, so Lux runs with or without the addon and with a hand-placed light.
+  - Multiplayer-safe and cheap: the look is a pure function of the (already
+    synced) light state — no Lux networking — and uniforms are pushed only when
+    the sun actually changes, so a static sun costs one transform read plus three
+    compares per frame. When a link is active it owns the key light, so preset
+    applies/blends don't stomp a moving sun.
+- Validator reports Sun Link status when a vertex-lighting mode is active.
+
 ## [0.5.1] — 2026-07-05
 ### Changed
 - README facelift: rewritten to present Lux as the shipped framework it now is —
@@ -127,7 +143,8 @@ and the API; these are called out under **Changed** / **Breaking**.
 - Editor dock (apply/preview, art sliders, save level override, validate),
   validation panel, before/after sample scene, and docs.
 
-[Unreleased]: https://github.com/siliconight/lux/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/siliconight/lux/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/siliconight/lux/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/siliconight/lux/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/siliconight/lux/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/siliconight/lux/compare/v0.4.0...v0.4.1

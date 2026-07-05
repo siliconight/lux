@@ -67,6 +67,12 @@ look over time for weather shifts and mission escalation.
 - **Lux Stylized Gouraud** — Lux's own per-vertex shader path, for keeping the
   banding, palette, and Mach-band character on stylized surfaces.
 
+**Sun Link.** Point LuxRoot at a live `DirectionalLight3D` (or let it borrow a
+[SkyMint](https://github.com/siliconight/skymint) sun automatically) and the
+vertex-lit world relights as the sun moves — multiplayer-consistent, since the
+look is a pure function of the already-synced light, and near-free, since Lux
+only pushes uniforms when the sun actually changes.
+
 ### Lighting rigs
 Four drop-in, self-registering rigs with physically-grounded colour temperatures
 (via `LuxColorTemp`): **sun/moon**, **fluorescent interior** (cool-white ~4100K
@@ -121,4 +127,4 @@ trailers.
 
 ---
 
-GabagoolStudios · v0.5.1 · [CHANGELOG](CHANGELOG.md)
+GabagoolStudios · v0.6.0 · [CHANGELOG](CHANGELOG.md)

@@ -155,6 +155,35 @@ static func validate(root: LuxRoot) -> Array:
 			)
 		)
 
+	# --- Sun link (vertex world relight) ---
+	if preset != null and (preset.vertex_shading_mode > 0 or preset.ps2_lighting_global >= 0.0):
+		if root.sun_light != null:
+			(
+				findings
+				. append(
+					(
+						Finding
+						. new(
+							Severity.INFO,
+							"Sun Link active: the vertex-lit look tracks a live DirectionalLight3D (e.g. SkyMint), so a moving/synced sun relights the world."
+						)
+					)
+				)
+			)
+		elif root.auto_find_skymint:
+			(
+				findings
+				. append(
+					(
+						Finding
+						. new(
+							Severity.INFO,
+							"No Sun Link assigned; Lux will borrow a SkyMint sun if present, else use the preset's static sun for vertex lighting."
+						)
+					)
+				)
+			)
+
 	# --- Expensive post combinations ---
 	if preset != null:
 		if preset.dither_enabled and preset.dither_cell_size == 1 and preset.color_levels < 8:

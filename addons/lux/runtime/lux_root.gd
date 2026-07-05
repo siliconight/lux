@@ -36,6 +36,22 @@ signal blend_finished(preset_name: StringName)
 @export_group("Startup")
 @export var apply_on_ready: bool = true
 
+@export_group("Sun Link")
+## Track a live DirectionalLight3D as the key light instead of the preset's
+## static sun. When set, Lux reads this light's world direction, color, and
+## energy every frame and feeds them to the PS2/vertex lighting path — so a
+## driven sun (e.g. a SkyMint day/night cycle) relights the vertex-lit world as
+## it moves. Leave empty to use the preset sun. See also auto_find_skymint.
+@export var sun_light: DirectionalLight3D:
+	set(value):
+		sun_light = value
+		_sun_link_resolved = value != null
+## If no sun_light is assigned, look for a SkyMint node in the scene on ready and
+## borrow its sun. SkyMint syncs time-of-day across clients, so the borrowed sun
+## is automatically consistent in multiplayer. No hard dependency — if SkyMint
+## isn't present, Lux falls back to the preset sun.
+@export var auto_find_skymint: bool = true
+
 # Modules
 var _env: LuxEnvironment
 var _lighting: LuxLighting
@@ -44,6 +60,12 @@ var _post: LuxPostFX
 var _quality: LuxQualityProfile
 var _current: LuxPreset
 var _initialized: bool = false
+
+# Sun link
+var _sun_link_resolved: bool = false
+var _last_sun_dir := Vector3.ZERO
+var _last_sun_col := Color.BLACK
+var _last_sun_energy := -1.0
 
 # Blend state
 var _blending: bool = false
@@ -70,12 +92,58 @@ func _ready() -> void:
 	_quality = LuxQualityProfile.make_tier(quality_tier)
 	_build_modules()
 	_load_default_library()
+	_resolve_sun_link()
 	_initialized = true
 	set_process(true)
 	if apply_on_ready:
 		var start := local_override if local_override != null else active_preset
 		if start != null:
 			apply_preset(start)
+
+
+## Resolves which DirectionalLight3D drives the vertex-lighting key. Priority:
+## an explicitly assigned sun_light, else (if auto_find_skymint) a SkyMint node's
+## sun, else the preset's static sun. No hard dependency on SkyMint — it's found
+## duck-typed by class name so Lux compiles and runs without the addon present.
+func _resolve_sun_link() -> void:
+	if sun_light != null:
+		_sun_link_resolved = true
+		return
+	if not auto_find_skymint:
+		_sun_link_resolved = false
+		return
+	var skymint := _find_skymint()
+	if skymint != null and skymint.get(&"sun_light") is DirectionalLight3D:
+		sun_light = skymint.get(&"sun_light")
+		_sun_link_resolved = sun_light != null
+
+
+func _find_skymint() -> Node:
+	# Duck-typed: match any node that carries a `sun_light` property holding a
+	# DirectionalLight3D (SkyMint's public field). We don't check the class name,
+	# because get_class() returns the native base ("WorldEnvironment") for script
+	# classes — the property is the reliable, dependency-free signal.
+	var root := get_tree().current_scene
+	if root == null:
+		return null
+	var stack: Array[Node] = [root]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if n == null:
+			continue
+		if n != self and "sun_light" in n and n.get(&"sun_light") is DirectionalLight3D:
+			return n
+		stack.append_array(n.get_children())
+	return null
+
+
+## Assign a sun to track at runtime (e.g. after spawning a SkyMint). Pass null to
+## fall back to the preset sun.
+func set_sun_light(light: DirectionalLight3D) -> void:
+	sun_light = light
+	_sun_link_resolved = light != null
+	if _current != null:
+		_push_material_state(_current)
 
 
 func _build_modules() -> void:
@@ -298,6 +366,7 @@ func _process(delta: float) -> void:
 		_lighting.process(delta)
 	if _post != null:
 		_post.process(delta)
+	_track_sun_light()
 	if _blending:
 		_blend_t += delta / _blend_dur
 		var k := clampf(_blend_t, 0.0, 1.0)
@@ -312,6 +381,41 @@ func _process(delta: float) -> void:
 			_current = _blend_to
 			_push_material_state(_blend_to)
 			blend_finished.emit(_blend_to.preset_name)
+
+
+## Reads the tracked sun each frame and, only when it actually changed, pushes the
+## new key direction/color/energy to Lux vertex materials. A static sun costs one
+## transform read + three compares per frame and zero uniform writes, so this is
+## cheap enough for multiplayer. The look is a pure function of the (already
+## synced) light state, so clients stay consistent without any Lux networking.
+func _track_sun_light() -> void:
+	if not _sun_link_resolved or sun_light == null or not is_instance_valid(sun_light):
+		return
+	# DirectionalLight3D emits along -Z; direction TO the light is +Z of its basis.
+	var dir := sun_light.global_transform.basis.z.normalized()
+	var col := sun_light.light_color
+	var energy := sun_light.light_energy
+	if (
+		dir.is_equal_approx(_last_sun_dir)
+		and col.is_equal_approx(_last_sun_col)
+		and is_equal_approx(energy, _last_sun_energy)
+	):
+		return
+	_last_sun_dir = dir
+	_last_sun_col = col
+	_last_sun_energy = energy
+	_push_sun_to_materials(dir, Vector3(col.r, col.g, col.b) * energy)
+
+
+func _push_sun_to_materials(key_dir: Vector3, key_col: Vector3) -> void:
+	for mi in get_tree().get_nodes_in_group(&"lux_materials"):
+		if mi is MeshInstance3D:
+			for s in (mi as MeshInstance3D).get_surface_count():
+				var mat := (mi as MeshInstance3D).get_surface_override_material(s)
+				if mat is ShaderMaterial:
+					var sm := mat as ShaderMaterial
+					sm.set_shader_parameter(&"ps2_key_dir", key_dir)
+					sm.set_shader_parameter(&"ps2_key_color", key_col)
 
 
 # Interpolates the numeric/color look fields between two presets for smooth
@@ -393,10 +497,22 @@ func _push_material_state(preset: LuxPreset) -> void:
 	# Also push the PS2-lighting key direction derived from the preset's sun, so
 	# the per-vertex Gouraud path knows where the key light is.
 	var pal := preset.get_palette_or_neutral()
+	# When a live sun is linked (e.g. SkyMint), it owns the key light — use its
+	# current direction/color so preset applies and blends don't stomp a moving
+	# sun. Otherwise fall back to the preset's static sun.
 	var key_dir := _preset_key_dir(preset)
 	var key_col := (
 		Vector3(preset.sun_color.r, preset.sun_color.g, preset.sun_color.b) * preset.sun_energy
 	)
+	if _sun_link_resolved and sun_light != null and is_instance_valid(sun_light):
+		key_dir = sun_light.global_transform.basis.z.normalized()
+		key_col = (
+			Vector3(sun_light.light_color.r, sun_light.light_color.g, sun_light.light_color.b)
+			* sun_light.light_energy
+		)
+		_last_sun_dir = key_dir
+		_last_sun_col = sun_light.light_color
+		_last_sun_energy = sun_light.light_energy
 	var amb := (
 		Vector3(preset.ambient_color.r, preset.ambient_color.g, preset.ambient_color.b)
 		* preset.ambient_energy
