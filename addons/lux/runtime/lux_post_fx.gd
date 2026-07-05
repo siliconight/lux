@@ -12,11 +12,19 @@ extends Node
 ## layers is untouched. See docs/getting_started.md for the SubViewport variant.
 
 const DITHER_SHADER := preload("res://addons/lux/shaders/post/lux_ordered_dither.gdshader")
+const CRT_SHADER := preload("res://addons/lux/shaders/post/lux_crt_mask.gdshader")
 
 var layer: CanvasLayer
 var rect: ColorRect
 var back_buffer: BackBufferCopy
 var _mat: ShaderMaterial
+
+# Second pass: CRT mask, stacked above the dither pass on the same low layer so
+# it samples the already-dithered/graded image and stays off the UI.
+var crt_back_buffer: BackBufferCopy
+var crt_rect: ColorRect
+var _crt_mat: ShaderMaterial
+
 var _enabled: bool = true
 var _time: float = 0.0
 
@@ -52,6 +60,30 @@ func ensure_pass(parent: Node) -> void:
 	# The dither shader binds Godot's screen/depth textures via hint_screen_texture
 	# and hint_depth_texture, so no manual ViewportTexture wiring is needed here.
 
+	# --- Second pass: CRT mask ---
+	# A fresh BackBufferCopy captures the dither pass's output, then a second
+	# ColorRect applies the phosphor mask on top. Both live under the same low
+	# CanvasLayer, so UI on layer >= 0 is still untouched.
+	crt_back_buffer = BackBufferCopy.new()
+	crt_back_buffer.name = &"LuxCRTBackBuffer"
+	crt_back_buffer.copy_mode = BackBufferCopy.COPY_MODE_VIEWPORT
+	layer.add_child(crt_back_buffer)
+
+	crt_rect = ColorRect.new()
+	crt_rect.name = &"LuxCRTRect"
+	crt_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	crt_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_crt_mat = ShaderMaterial.new()
+	_crt_mat.shader = CRT_SHADER
+	crt_rect.material = _crt_mat
+	crt_rect.color = Color(0, 0, 0, 0)
+	layer.add_child(crt_rect)
+
+	if Engine.is_editor_hint() and parent.get_tree() != null:
+		var root2 := parent.get_tree().edited_scene_root
+		crt_back_buffer.owner = root2
+		crt_rect.owner = root2
+
 
 func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 	if preset == null or _mat == null:
@@ -86,6 +118,19 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 	_mat.set_shader_parameter(
 		&"palette_highlight", Vector3(pal.highlight.r, pal.highlight.g, pal.highlight.b)
 	)
+
+	# --- CRT mask second pass ---
+	if _crt_mat != null:
+		var crt_on := preset.crt_mask_type > 0 and preset.crt_mask_strength > 0.0
+		# mask_type: preset 1=Aperture Grille -> shader 1; 2=Shadow Mask -> shader 2
+		_crt_mat.set_shader_parameter(&"mask_type", preset.crt_mask_type if crt_on else 0)
+		_crt_mat.set_shader_parameter(&"mask_strength", preset.crt_mask_strength if crt_on else 0.0)
+		_crt_mat.set_shader_parameter(&"mask_scale", preset.crt_mask_scale)
+		_crt_mat.set_shader_parameter(&"scanline_strength", preset.scanline_strength)
+		if crt_rect != null:
+			crt_rect.visible = crt_on or preset.scanline_strength > 0.0
+		if crt_back_buffer != null:
+			crt_back_buffer.visible = crt_on or preset.scanline_strength > 0.0
 
 
 func set_camera_planes(near: float, far: float) -> void:

@@ -96,6 +96,28 @@ Lux takes advantage of three things new in Godot 4.7:
   to the SDR range and the dithered levels reach the screen exactly as authored.
   Turn it off if you want a preset's highlights to use the display's HDR range.
 
+## The PS2/CRT look
+
+Beyond dithering and low-res scaling, Lux has two levers aimed squarely at the
+sixth-gen console aesthetic:
+
+- **CRT mask.** `crt_mask_type` (Off / Aperture Grille / Shadow Mask) plus
+  `crt_mask_strength`, `crt_mask_scale`, and `scanline_strength` simulate a CRT
+  phosphor layout — Trinitron-style vertical RGB stripes or staggered dot triads,
+  with optional soft scanlines. It runs as a second post pass above the dither
+  pass and stays off the UI. Keep strength subtle (0.15–0.25); the point is a
+  "played on a TV in 2002" texture, not an eye chart. *Gas Station Fluorescent*
+  ships with a light aperture-grille mask and faint scanlines.
+- **Flat ambient.** `ambient_mode` (Sky / Flat Color / Disabled) lets a preset
+  drop Godot's sky-sampled ambient for a single uniform fill — the honest way
+  PS2-era scenes were lit (a key light plus flat ambient, no GI). Flat Color is
+  the natural choice for tight interiors like the gas-station and row-home
+  presets.
+
+Light-rig colors are grounded in real color temperatures via `LuxColorTemp`
+(sodium vapor ~2000K amber, cool-white fluorescent ~4100K with the mercury-spike
+green cast, mercury vapor ~5000K), so a scene's fixtures read as the real thing.
+
 ## Validate
 
 Press **Validate Scene** in the dock to check for a missing WorldEnvironment,

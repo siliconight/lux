@@ -50,4 +50,4 @@ compatibility fallbacks, split-screen co-op passes, generated-level auto-tagging
 and a capture mode for trailers.
 
 ---
-GabagoolStudios · v0.1.0
+GabagoolStudios · v0.3.0 · see [CHANGELOG](../../CHANGELOG.md)

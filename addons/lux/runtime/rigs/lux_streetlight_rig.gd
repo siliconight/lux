@@ -49,7 +49,7 @@ func _rebuild() -> void:
 func _default_rig() -> LuxLightRig:
 	var r := LuxLightRig.new()
 	r.rig_name = &"Streetlight Row"
-	r.light_color = Color(1.0, 0.72, 0.42)  # sodium vapor
+	r.light_color = LuxColorTemp.kelvin(LuxColorTemp.SODIUM_VAPOR)  # ~2000K amber
 	r.energy = 6.0
 	r.light_range = 14.0
 	r.count = 5

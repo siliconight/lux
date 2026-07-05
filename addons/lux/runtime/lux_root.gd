@@ -332,8 +332,10 @@ func _lerp_preset(a: LuxPreset, b: LuxPreset, k: float) -> LuxPreset:
 	p.sun_energy = lerpf(a.sun_energy, b.sun_energy, k)
 	p.sun_shadows = b.sun_shadows if k >= 0.5 else a.sun_shadows
 
+	p.ambient_mode = b.ambient_mode if k >= 0.5 else a.ambient_mode
 	p.ambient_color = a.ambient_color.lerp(b.ambient_color, k)
 	p.ambient_energy = lerpf(a.ambient_energy, b.ambient_energy, k)
+	p.ambient_sky_contribution = lerpf(a.ambient_sky_contribution, b.ambient_sky_contribution, k)
 
 	p.tonemap_mode = b.tonemap_mode if k >= 0.5 else a.tonemap_mode
 	p.exposure = lerpf(a.exposure, b.exposure, k)
@@ -365,6 +367,11 @@ func _lerp_preset(a: LuxPreset, b: LuxPreset, k: float) -> LuxPreset:
 	p.grain_strength = lerpf(a.grain_strength, b.grain_strength, k)
 	p.palette_influence = lerpf(a.palette_influence, b.palette_influence, k)
 	p.palette = b.palette if k >= 0.5 else a.palette
+
+	p.crt_mask_type = b.crt_mask_type if k >= 0.5 else a.crt_mask_type
+	p.crt_mask_strength = lerpf(a.crt_mask_strength, b.crt_mask_strength, k)
+	p.crt_mask_scale = lerpf(a.crt_mask_scale, b.crt_mask_scale, k)
+	p.scanline_strength = lerpf(a.scanline_strength, b.scanline_strength, k)
 
 	# Viewport-wide settings can't interpolate — snap them at the midpoint.
 	p.render_scale = b.render_scale if k >= 0.5 else a.render_scale

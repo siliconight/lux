@@ -62,7 +62,8 @@ func _process(delta: float) -> void:
 func _default_rig() -> LuxLightRig:
 	var r := LuxLightRig.new()
 	r.rig_name = &"Fluorescent Interior"
-	r.light_color = Color(0.85, 0.92, 1.0)
+	# Cool-white tube ~4100K with the mercury-spike green cast.
+	r.light_color = LuxColorTemp.cool_fluorescent()
 	r.energy = 2.2
 	r.light_range = 10.0
 	r.count = 4

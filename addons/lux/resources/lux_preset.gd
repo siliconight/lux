@@ -22,8 +22,14 @@ extends Resource
 @export var sun_shadows: bool = true
 
 @export_group("Ambient")
+## Sky = gather ambient from the sky (softer, modern). Flat Color = a single
+## uniform ambient fill with no directional/GI cues — the honest PS2-era look,
+## where scenes were lit by a key light plus flat ambient. Disabled = no ambient.
+@export_enum("Sky", "Flat Color", "Disabled") var ambient_mode: int = 0
 @export var ambient_color: Color = Color(0.55, 0.55, 0.6)
 @export_range(0.0, 4.0) var ambient_energy: float = 1.0
+## How much the sky contributes when ambient_mode is Sky (0 = pure color).
+@export_range(0.0, 1.0) var ambient_sky_contribution: float = 0.5
 
 @export_group("Tonemap & Grade")
 @export_enum("Linear", "Reinhard", "Filmic", "ACES") var tonemap_mode: int = 2
@@ -65,6 +71,14 @@ extends Resource
 ## Use nearest-neighbor upscaling (Godot 4.7) instead of bilinear, for crisp
 ## PS1/PS2-style pixels. Only applied when render_scale < 1.0.
 @export var nearest_neighbor_scaling: bool = true
+
+@export_group("CRT Mask")
+## Simulate a CRT phosphor layout — the "played on a TV in 2002" finish.
+## Off / Aperture Grille (Trinitron vertical RGB stripes) / Shadow Mask (dot triads).
+@export_enum("Off", "Aperture Grille", "Shadow Mask") var crt_mask_type: int = 0
+@export_range(0.0, 1.0) var crt_mask_strength: float = 0.0
+@export_range(1.0, 8.0) var crt_mask_scale: float = 3.0
+@export_range(0.0, 1.0) var scanline_strength: float = 0.0
 
 @export_group("HDR Output")
 ## When the display/window is in HDR output mode, dithering and 8-bit-style

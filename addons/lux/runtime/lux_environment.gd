@@ -49,10 +49,18 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 	env.background_mode = Environment.BG_SKY
 
 	# --- Ambient ---
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_color = preset.ambient_color
-	env.ambient_light_energy = preset.ambient_energy
-	env.ambient_light_sky_contribution = 0.5
+	match preset.ambient_mode:
+		1:  # Flat Color — GI-free uniform fill, the honest PS2-era look
+			env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+			env.ambient_light_color = preset.ambient_color
+			env.ambient_light_energy = preset.ambient_energy
+		2:  # Disabled
+			env.ambient_light_source = Environment.AMBIENT_SOURCE_DISABLED
+		_:  # Sky
+			env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+			env.ambient_light_color = preset.ambient_color
+			env.ambient_light_energy = preset.ambient_energy
+			env.ambient_light_sky_contribution = preset.ambient_sky_contribution
 
 	# --- Tonemap / exposure ---
 	env.tonemap_mode = _tonemap_mode(preset.tonemap_mode)
