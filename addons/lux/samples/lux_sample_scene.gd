@@ -79,33 +79,18 @@ func _box(size: Vector3, pos: Vector3, col: Color) -> MeshInstance3D:
 	mi.position = pos
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = col
-	mi.material_override = mat
+	mi.set_surface_override_material(0, mat)
 	mi.set_meta(&"lux_albedo", col)
 	return mi
 
 
 func _apply_lux_materials() -> void:
-	# Swap the plain StandardMaterial3D placeholders for Lux stylized materials so
-	# the sample also demonstrates material response, not just environment/post.
-	var profile := LuxMaterialProfile.new()
-	profile.band_count = 3.0
-	profile.shade_min = 0.2
+	# Demonstrate the role-based applier: the blockout is level geometry, so give
+	# it the LEVEL role (native vertex shading, cheapest multi-light path). A real
+	# game would tag characters/guns/props with their own roles.
 	var pal := lux.active_preset.get_palette_or_neutral() if lux.active_preset else null
-	for mi in _all_mesh_instances(self):
-		if not mi.has_meta(&"lux_albedo"):
-			continue
-		mi.material_override = null
-		var col: Color = mi.get_meta(&"lux_albedo")
-		profile.albedo_tint = col
-		profile.apply_to_mesh_instance(mi, null, pal)
-
-
-func _all_mesh_instances(node: Node, acc: Array = []) -> Array:
-	if node is MeshInstance3D:
-		acc.append(node)
-	for c in node.get_children():
-		_all_mesh_instances(c, acc)
-	return acc
+	var count := LuxMaterialApplier.apply_role($Blockout, LuxRole.Role.LEVEL, pal)
+	print("[Lux sample] Applied LEVEL role to %d surfaces." % count)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -135,9 +120,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	_update_hint()
 
 
-## Force all Lux stylized materials in the scene to a PS2 per-vertex blend, to
-## demonstrate the Gouraud path against the default per-pixel shading.
+## Toggle the vertex-lit look on the sample's LEVEL-role surfaces. The LEVEL role
+## uses native engine vertex shading (StandardMaterial3D), so this flips
+## SHADING_MODE_PER_VERTEX to show per-vertex vs per-pixel. (Stylized ShaderMaterials,
+## if any, get the ps2_lighting blend instead.)
 func _set_ps2_lighting(amount: float) -> void:
+	var per_vertex := amount > 0.5
 	for mi in get_tree().get_nodes_in_group(&"lux_materials"):
 		if mi is MeshInstance3D:
 			for s in (mi as MeshInstance3D).get_surface_count():
@@ -145,6 +133,8 @@ func _set_ps2_lighting(amount: float) -> void:
 				if mat is ShaderMaterial:
 					(mat as ShaderMaterial).set_shader_parameter(&"ps2_lighting", amount)
 					(mat as ShaderMaterial).set_shader_parameter(&"mach_band_emphasis", amount)
+				elif mat is BaseMaterial3D:
+					LuxVertexShading.set_material_per_vertex(mat, per_vertex)
 
 
 func _toggle_lux() -> void:

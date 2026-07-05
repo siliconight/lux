@@ -100,6 +100,33 @@ func _build_ui() -> void:
 
 	root.add_child(HSeparator.new())
 
+	var role_label := Label.new()
+	role_label.text = "Apply Role (to selected)"
+	root.add_child(role_label)
+	var role_hint := Label.new()
+	role_hint.text = "Select mesh nodes, then click a role."
+	role_hint.modulate = Color(1, 1, 1, 0.6)
+	root.add_child(role_hint)
+
+	var role_row1 := HBoxContainer.new()
+	root.add_child(role_row1)
+	for r in [["Level", 0], ["Character", 1]]:
+		var b := Button.new()
+		b.text = r[0]
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.pressed.connect(_on_role_pressed.bind(r[1]))
+		role_row1.add_child(b)
+	var role_row2 := HBoxContainer.new()
+	root.add_child(role_row2)
+	for r in [["Gun", 2], ["Prop", 3], ["Unlit", 4]]:
+		var b := Button.new()
+		b.text = r[0]
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.pressed.connect(_on_role_pressed.bind(r[1]))
+		role_row2.add_child(b)
+
+	root.add_child(HSeparator.new())
+
 	_validate_button = Button.new()
 	_validate_button.text = "Validate Scene"
 	_validate_button.pressed.connect(_on_validate_pressed)
@@ -255,6 +282,34 @@ func _on_save_override_pressed() -> void:
 			_editor.get_resource_filesystem().scan()
 	else:
 		_set_status("[color=red]Failed to save override (error %d).[/color]" % err)
+
+
+func _on_role_pressed(role: int) -> void:
+	if _editor == null:
+		_set_status("[color=orange]No editor interface.[/color]")
+		return
+	var nodes := _editor.get_selection().get_selected_nodes()
+	if nodes.is_empty():
+		_set_status("[color=orange]Select one or more nodes first.[/color]")
+		return
+	# Pull the palette from the found LuxRoot's current preset, if any.
+	var palette: LuxPalette = null
+	var lux := _get_selected_root()
+	if lux != null:
+		var preset = lux.get_current_preset()
+		if preset == null:
+			preset = lux.active_preset
+		if preset != null:
+			palette = preset.palette
+	var total := 0
+	for n in nodes:
+		total += LuxMaterialApplier.apply_role(n, role, palette)
+	_set_status(
+		(
+			"[color=lightgreen]Applied '%s' role to %d surface(s).[/color]"
+			% [LuxRole.role_name(role), total]
+		)
+	)
 
 
 func _on_validate_pressed() -> void:

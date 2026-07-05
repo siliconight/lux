@@ -96,6 +96,40 @@ Lux takes advantage of three things new in Godot 4.7:
   to the SDR range and the dithered levels reach the screen exactly as authored.
   Turn it off if you want a preset's highlights to use the display's HDR range.
 
+## Roles — one-click PS2 materials by object type
+
+The fastest way to give something a good PS2 look is to tell Lux *what it is*.
+Each role picks the right vertex-lighting path and quality for that kind of
+object, so you don't hand-dial sliders per surface:
+
+| Role | Path | Why |
+| --- | --- | --- |
+| **Level** | Native vertex shading | Bulk static world geo — the cheapest multi-light path, so most of the scene stays fast. Subtle affine. |
+| **Character** | Native vertex shading | Animated, must read clearly. No jitter (breaks on skinned meshes), a touch more banding/rim. |
+| **Gun** | Lux Stylized Gouraud | First-person viewmodel, always close and on screen — can afford the nicer stylized path since only one exists. Zero jitter. |
+| **Prop** | Native vertex shading | Small, numerous, mid-distance. Tolerates more jitter/affine for authenticity. |
+| **Unlit** | Unshaded | Decals, screens, UI-in-world that shouldn't be lit. |
+
+**Three ways to apply, easiest first:**
+
+- **Dock buttons** — select mesh nodes in the scene, then click **Level /
+  Character / Gun / Prop / Unlit** in the Lux dock.
+- **LuxRoleTag node** — drop a `LuxRoleTag` under an object, pick a role in the
+  inspector; it applies to the parent's whole mesh subtree on ready (zero code).
+- **From code**:
+  ```gdscript
+  LuxMaterialApplier.apply_role(level_root, LuxRole.Role.LEVEL)
+  LuxMaterialApplier.apply_role(viewmodel, LuxRole.Role.GUN)
+  LuxMaterialApplier.apply_role_name(spawned, "prop")   # or by string
+  ```
+
+Applied surfaces join the `lux_materials` group, so LuxRoot's palette, wetness,
+and live [Sun Link](#sun-link--a-moving-sun-that-relights-the-vertex-world) key
+light all flow to them automatically. The role choice is deliberately
+performance-aware: only the gun uses the shader path, so a scene full of level
+geometry, characters, and props runs on the cheap native vertex path — which is
+what keeps it viable in multiplayer.
+
 ## Sun Link — a moving sun that relights the vertex world
 
 Vertex lighting is only convincing if the world relights when the sun moves. Lux

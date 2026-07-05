@@ -9,6 +9,30 @@ and the API; these are called out under **Changed** / **Breaking**.
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-07-05
+### Added
+- **Role-based material applier** — one-click PS2 material setup by object type.
+  Tell Lux what something is (Level / Character / Gun / Prop / Unlit) and it picks
+  the right vertex-lighting path and quality:
+  - **Level / Character / Prop** → native engine vertex shading (cheapest,
+    multi-light, shadows) — the bulk of a scene stays on the fast path.
+  - **Gun** → Lux Stylized Gouraud (nicer banding/palette; only one viewmodel is
+    ever on screen).
+  - **Unlit** → unshaded, for decals/screens.
+  This performance split is deliberate: keeping level/character/prop on the cheap
+  native path is what makes the look viable in multiplayer.
+- **`LuxRole`** (role definitions + pre-tuned profile factory) and
+  **`LuxMaterialApplier`** (`apply_role(node, role)` / `apply_role_name`) walk a
+  subtree, set up each surface, and register it in `lux_materials` so palette,
+  wetness, and the live Sun Link key light flow to it.
+- **`LuxRoleTag`** node — drop it under an object, pick a role in the inspector,
+  and it applies to the parent's mesh subtree on ready (zero code). Registered as
+  a custom node type.
+- **Dock role buttons** — select mesh nodes, click Level / Character / Gun / Prop
+  / Unlit to apply.
+- Sample scene now uses `apply_role(..., LEVEL)` and its **P** toggle flips the
+  level's native per-vertex shading.
+
 ## [0.6.0] — 2026-07-05
 ### Added
 - **Sun Link** — LuxRoot can track a live `DirectionalLight3D` and feed its world
@@ -143,7 +167,8 @@ and the API; these are called out under **Changed** / **Breaking**.
 - Editor dock (apply/preview, art sliders, save level override, validate),
   validation panel, before/after sample scene, and docs.
 
-[Unreleased]: https://github.com/siliconight/lux/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/siliconight/lux/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/siliconight/lux/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/siliconight/lux/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/siliconight/lux/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/siliconight/lux/compare/v0.4.1...v0.5.0

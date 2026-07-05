@@ -38,6 +38,16 @@ PS2 stylized lighting.
 
 ## What's in the box
 
+### Roles — one-click PS2 materials
+Tell Lux *what an object is* and it picks the right vertex path and quality:
+**Level / Character / Prop** get the cheap native vertex-shading path, **Gun**
+gets the nicer stylized Gouraud path (only one viewmodel is ever on screen), and
+**Unlit** covers decals and screens. Apply from the dock (select + click), by
+dropping a `LuxRoleTag` node, or from code
+(`LuxMaterialApplier.apply_role(node, LuxRole.Role.LEVEL)`). Because only the gun
+uses the shader path, a scene full of level/character/prop geometry stays on the
+cheap native path — which is what keeps the look viable in multiplayer.
+
 ### Look presets
 Complete, blendable looks in one resource — sky, sun, ambient, tonemap/grade,
 fog, glow, dithering, CRT mask, palette, and material response. Five ship ready
@@ -127,4 +137,4 @@ trailers.
 
 ---
 
-GabagoolStudios · v0.6.0 · [CHANGELOG](../../CHANGELOG.md)
+GabagoolStudios · v0.7.0 · [CHANGELOG](../../CHANGELOG.md)
