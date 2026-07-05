@@ -40,6 +40,15 @@ const STYLIZED_SHADER := preload("res://addons/lux/shaders/spatial/lux_stylized_
 @export_range(32.0, 512.0) var vertex_snap_resolution: float = 160.0
 @export_range(0.0, 1.0) var affine_amount: float = 0.0
 
+@export_group("PS2 Lighting")
+## 0 = modern per-pixel shading, 1 = full per-vertex Gouraud PS2 hardware feel.
+## The key light direction/color are pushed by LuxRoot from the active preset.
+@export_range(0.0, 1.0) var ps2_lighting: float = 0.0
+## Drop the N.L angle term for flat, angle-blind lighting (PS2 world-geo style).
+@export var ps2_skip_ndl: bool = false
+## Sharpen vertex-gradient edges so Mach banding reads as intentional.
+@export_range(0.0, 1.0) var mach_band_emphasis: float = 0.0
+
 
 ## Builds a ready-to-use ShaderMaterial from this profile.
 func make_material(albedo_texture: Texture2D = null, palette: LuxPalette = null) -> ShaderMaterial:
@@ -73,6 +82,9 @@ func apply_to_material(mat: ShaderMaterial, palette: LuxPalette = null) -> void:
 	mat.set_shader_parameter(&"vertex_snap_enabled", vertex_snap_enabled)
 	mat.set_shader_parameter(&"vertex_snap_resolution", vertex_snap_resolution)
 	mat.set_shader_parameter(&"affine_amount", affine_amount)
+	mat.set_shader_parameter(&"ps2_lighting", ps2_lighting)
+	mat.set_shader_parameter(&"ps2_skip_ndl", ps2_skip_ndl)
+	mat.set_shader_parameter(&"mach_band_emphasis", mach_band_emphasis)
 	if palette != null:
 		mat.set_shader_parameter(
 			&"palette_shadow", Vector3(palette.shadow.r, palette.shadow.g, palette.shadow.b)

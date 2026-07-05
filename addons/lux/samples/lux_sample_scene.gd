@@ -29,6 +29,7 @@ const PRESETS := [
 var _lux_enabled := true
 var _fallback_env: Environment
 var _damage := 0.0
+var _ps2 := false
 
 
 func _ready() -> void:
@@ -128,7 +129,22 @@ func _unhandled_input(event: InputEvent) -> void:
 		KEY_D:
 			_damage = clampf(_damage + 0.25, 0.0, 1.0)
 			lux.set_player_damage_intensity(_damage)
+		KEY_P:
+			_ps2 = not _ps2
+			_set_ps2_lighting(1.0 if _ps2 else 0.0)
 	_update_hint()
+
+
+## Force all Lux stylized materials in the scene to a PS2 per-vertex blend, to
+## demonstrate the Gouraud path against the default per-pixel shading.
+func _set_ps2_lighting(amount: float) -> void:
+	for mi in get_tree().get_nodes_in_group(&"lux_materials"):
+		if mi is MeshInstance3D:
+			for s in (mi as MeshInstance3D).get_surface_count():
+				var mat := (mi as MeshInstance3D).get_surface_override_material(s)
+				if mat is ShaderMaterial:
+					(mat as ShaderMaterial).set_shader_parameter(&"ps2_lighting", amount)
+					(mat as ShaderMaterial).set_shader_parameter(&"mach_band_emphasis", amount)
 
 
 func _toggle_lux() -> void:
@@ -155,7 +171,8 @@ func _update_hint() -> void:
 	if hint == null:
 		return
 	var state := "ON" if _lux_enabled else "OFF (raw scene)"
+	var ps2 := "  |  PS2 lighting: %s" % ("ON" if _ps2 else "off")
 	hint.text = (
-		"LUX SAMPLE — Lux: %s\n[Space] before/after   [1-5] presets   [H] mission hot   [C] calm   [A] alarm   [D] damage"
-		% state
+		"LUX SAMPLE — Lux: %s%s\n[Space] before/after   [1-5] presets   [H] hot   [C] calm   [A] alarm   [D] damage   [P] PS2 Gouraud"
+		% [state, ps2]
 	)

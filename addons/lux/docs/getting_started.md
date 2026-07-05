@@ -96,6 +96,32 @@ Lux takes advantage of three things new in Godot 4.7:
   to the SDR range and the dithered levels reach the screen exactly as authored.
   Turn it off if you want a preset's highlights to use the display's HDR range.
 
+## PS2 hardware lighting (Gouraud)
+
+The stylized material has two lighting personalities. By default it shades
+per-fragment — clean, readable, modern. The **PS2 path** instead evaluates
+lighting per *vertex* and interpolates it across the polygon, the way PS2
+hardware did (it had no pixel shaders, and only textures were
+perspective-correct — vertex colour was interpolated affinely). The result is the
+soft, slightly-wrong gradients and visible polygon-edge banding that read as
+"this is running on a PS2."
+
+Controls, on `LuxMaterialProfile` (per surface) or `LuxPreset.ps2_lighting_global`
+(whole scene):
+
+- `ps2_lighting` / `ps2_lighting_global` — 0 = modern per-pixel, 1 = full PS2
+  Gouraud. Blend in between. The scene-wide value is `-1` to leave each material's
+  own setting alone.
+- `ps2_skip_ndl` — drop the surface-angle (N·L) term for the flat, angle-blind
+  lighting PS2 world geometry often used (distance falloff only).
+- `mach_band_emphasis` — sharpen the interpolated gradient so the Mach-band edges
+  at polygon boundaries read as intentional character rather than being smoothed.
+
+LuxRoot pushes the key light direction, color, and ambient (from the active
+preset's sun) into every Lux material, so the Gouraud path is lit consistently
+with the rest of the scene. In the sample scene, press **P** to flip the whole
+blockout between per-pixel and PS2 lighting.
+
 ## The PS2/CRT look
 
 Beyond dithering and low-res scaling, Lux has two levers aimed squarely at the

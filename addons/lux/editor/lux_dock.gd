@@ -96,6 +96,7 @@ func _build_ui() -> void:
 	_add_slider("Sun Energy", "sun_energy", 0.0, 8.0, 0.05)
 	_add_slider("CRT Mask", "crt_mask_strength", 0.0, 1.0, 0.01)
 	_add_slider("Scanlines", "scanline_strength", 0.0, 1.0, 0.01)
+	_add_slider("PS2 Lighting", "ps2_lighting_global", -1.0, 1.0, 0.01)
 
 	root.add_child(HSeparator.new())
 

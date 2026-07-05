@@ -6,7 +6,7 @@ scene gets a cohesive stylized identity — banded diffuse lighting with warm,
 readable shadows, palette-tinted grading, subtle ordered dithering, and a
 mission-state-aware post stack.
 
-Built for **DELCO_DANGEROUS** and any Godot 4.7 game. Forward+ primary; Mobile
+Built for any Godot 4.7 game that wants a cohesive retro-modern look. Forward+ primary; Mobile
 and Compatibility supported as reduced tiers. No paid external tools.
 
 ## MVP contents (TDD §16)

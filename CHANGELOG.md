@@ -9,6 +9,40 @@ and the API; these are called out under **Changed** / **Breaking**.
 
 ## [Unreleased]
 
+## [0.4.1] — 2026-07-05
+### Changed
+- Removed the direct project title reference from the README so the addon reads
+  as a standalone, reusable framework. Scene-mood preset names are unchanged.
+
+## [0.4.0] — 2026-07-05
+### Added
+- **PS2 per-vertex (Gouraud) lighting path** in the stylized shader. A
+  `ps2_lighting` blend (0 = modern per-pixel, 1 = full PS2 feel) switches the
+  material from clean per-fragment banded shading to lighting evaluated at
+  vertices and interpolated affinely — the soft, slightly-wrong gradients real
+  PS2 hardware produced (it had no pixel shaders; only textures were
+  perspective-correct). Includes `ps2_skip_ndl` for the flat, angle-blind
+  world-geo look and clamped additive accumulation, mirroring VU lighting.
+- **Mach-band emphasis** (`mach_band_emphasis`) — sharpens gradient edges so the
+  perceptual banding at polygon boundaries reads as intentional retro character
+  instead of being smoothed away.
+- **Scene-wide PS2 override** — `LuxPreset.ps2_lighting_global` (-1 = per-material,
+  0..1 = force all Lux materials), plus a dock slider, so a whole level can flip
+  into the PS2 hardware look from one preset. LuxRoot pushes the key light
+  direction/color/ambient (derived from the preset's sun) into all Lux materials
+  so the Gouraud path is lit correctly.
+- Sample scene: **[P]** toggles scene-wide PS2 Gouraud lighting for a direct
+  before/after against the default per-pixel shading.
+
+### Changed
+- `LuxMaterialProfile` gained a **PS2 Lighting** group (`ps2_lighting`,
+  `ps2_skip_ndl`, `mach_band_emphasis`).
+
+### Notes
+- Deliberately skipped from the shared references: spherical-harmonics ambient +
+  HDR (opposite of the PS2 look; flat ambient added in 0.3.0 is the period-correct
+  answer) and the engine-specific Unity forum thread.
+
 ## [0.3.0] — 2026-07-05
 ### Added
 - **CRT mask post pass** (`shaders/post/lux_crt_mask.gdshader`) — an optional
@@ -60,7 +94,9 @@ and the API; these are called out under **Changed** / **Breaking**.
 - Editor dock (apply/preview, art sliders, save level override, validate),
   validation panel, before/after sample scene, and docs.
 
-[Unreleased]: https://github.com/siliconight/lux/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/siliconight/lux/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/siliconight/lux/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/siliconight/lux/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/siliconight/lux/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/siliconight/lux/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/siliconight/lux/releases/tag/v0.1.0
