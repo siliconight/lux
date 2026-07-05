@@ -381,6 +381,7 @@ func _lerp_preset(a: LuxPreset, b: LuxPreset, k: float) -> LuxPreset:
 	p.force_sdr_retro_on_hdr = b.force_sdr_retro_on_hdr if k >= 0.5 else a.force_sdr_retro_on_hdr
 
 	p.default_wetness = lerpf(a.default_wetness, b.default_wetness, k)
+	p.vertex_shading_mode = b.vertex_shading_mode if k >= 0.5 else a.vertex_shading_mode
 	p.ps2_lighting_global = (b.ps2_lighting_global if k >= 0.5 else a.ps2_lighting_global)
 	p.alarm_color = a.alarm_color.lerp(b.alarm_color, k)
 	return p
@@ -400,6 +401,12 @@ func _push_material_state(preset: LuxPreset) -> void:
 		Vector3(preset.ambient_color.r, preset.ambient_color.g, preset.ambient_color.b)
 		* preset.ambient_energy
 	)
+	# Resolve the effective stylized PS2 amount from the preset. In "Lux Stylized
+	# Gouraud" mode a scene-wide value forces the shader path; otherwise leave it.
+	var stylized_ps2 := preset.ps2_lighting_global
+	if preset.vertex_shading_mode == 2 and stylized_ps2 < 0.0:
+		stylized_ps2 = 1.0
+	var want_native := preset.vertex_shading_mode == 1
 	for mi in get_tree().get_nodes_in_group(&"lux_materials"):
 		if mi is MeshInstance3D:
 			for s in (mi as MeshInstance3D).get_surface_count():
@@ -417,9 +424,11 @@ func _push_material_state(preset: LuxPreset) -> void:
 					sm.set_shader_parameter(&"ps2_key_dir", key_dir)
 					sm.set_shader_parameter(&"ps2_key_color", key_col)
 					sm.set_shader_parameter(&"ps2_ambient", amb)
-					# Scene-wide PS2 override: -1 leaves the material's own value.
-					if preset.ps2_lighting_global >= 0.0:
-						sm.set_shader_parameter(&"ps2_lighting", preset.ps2_lighting_global)
+					if stylized_ps2 >= 0.0:
+						sm.set_shader_parameter(&"ps2_lighting", stylized_ps2)
+				elif mat is BaseMaterial3D:
+					# Native engine vertex shading (Godot 4.4+) for plain surfaces.
+					LuxVertexShading.set_material_per_vertex(mat, want_native)
 
 
 ## World-space direction from surface toward the preset's sun/key light, matching

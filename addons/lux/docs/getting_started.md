@@ -96,31 +96,38 @@ Lux takes advantage of three things new in Godot 4.7:
   to the SDR range and the dithered levels reach the screen exactly as authored.
   Turn it off if you want a preset's highlights to use the display's HDR range.
 
-## PS2 hardware lighting (Gouraud)
+## PS2 hardware lighting (two paths)
 
-The stylized material has two lighting personalities. By default it shades
-per-fragment — clean, readable, modern. The **PS2 path** instead evaluates
-lighting per *vertex* and interpolates it across the polygon, the way PS2
-hardware did (it had no pixel shaders, and only textures were
-perspective-correct — vertex colour was interpolated affinely). The result is the
-soft, slightly-wrong gradients and visible polygon-edge banding that read as
-"this is running on a PS2."
+Godot 4.4 added native per-vertex shading (the real thing PS2 did), and Lux uses
+it. A preset's `vertex_shading_mode` picks how surfaces get their vertex-lit look:
 
-Controls, on `LuxMaterialProfile` (per surface) or `LuxPreset.ps2_lighting_global`
-(whole scene):
+**Native Engine (recommended for authentic multi-light).** Godot shades
+StandardMaterial3D surfaces per vertex with the simplified light model. It sees
+*every* real-time light, so Lux's fluorescent/streetlight/area rigs all
+contribute, integrates with clustering, and casts pixel shadows from the first
+DirectionalLight3D. LuxRoot flips `SHADING_MODE_PER_VERTEX` on plain surfaces in
+the `lux_materials` group. The trade-off: native vertex shading forces the
+engine's Lambertian model and ignores a ShaderMaterial's custom `light()`, so it
+can't carry Lux's banding/palette.
 
-- `ps2_lighting` / `ps2_lighting_global` — 0 = modern per-pixel, 1 = full PS2
-  Gouraud. Blend in between. The scene-wide value is `-1` to leave each material's
-  own setting alone.
-- `ps2_skip_ndl` — drop the surface-angle (N·L) term for the flat, angle-blind
-  lighting PS2 world geometry often used (distance falloff only).
-- `mach_band_emphasis` — sharpen the interpolated gradient so the Mach-band edges
-  at polygon boundaries read as intentional character rather than being smoothed.
+**Lux Stylized Gouraud.** Lux's own stylized shader has a `ps2_lighting` path
+(added in 0.4.0) that evaluates lighting per vertex *and* keeps the banding,
+palette tinting, and Mach-band emphasis. Because a fragment shader can't do true
+per-vertex, per-light accumulation, it approximates from the key light Lux pushes
+in (the preset's sun). Use this when you want the vertex feel *plus* Lux's
+stylization on the same surface.
 
-LuxRoot pushes the key light direction, color, and ambient (from the active
-preset's sun) into every Lux material, so the Gouraud path is lit consistently
-with the rest of the scene. In the sample scene, press **P** to flip the whole
-blockout between per-pixel and PS2 lighting.
+Controls, on `LuxMaterialProfile` (per surface) or the preset:
+
+- `LuxPreset.vertex_shading_mode` — Off / Native Engine / Lux Stylized Gouraud.
+- `ps2_lighting` / `ps2_lighting_global` — Lux stylized blend (0 = per-pixel,
+  1 = full Gouraud). `-1` scene-wide leaves each material's own value.
+- `ps2_skip_ndl` — flat, angle-blind term for the Lux stylized path.
+- `mach_band_emphasis` — sharpen polygon-edge gradients on the Lux stylized path.
+
+In the sample scene, **P** flips the blockout's Lux materials into the stylized
+Gouraud path. (Native mode applies to StandardMaterial3D surfaces; the sample's
+meshes use Lux ShaderMaterials, so they demonstrate the stylized path.)
 
 ## The PS2/CRT look
 

@@ -9,6 +9,32 @@ and the API; these are called out under **Changed** / **Breaking**.
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-07-05
+### Added
+- **Native engine vertex shading** integration (Godot 4.4+, PR #83360). A preset
+  `vertex_shading_mode` now chooses between:
+  - **Off** — per-pixel (modern).
+  - **Native Engine** — Godot's built-in per-vertex shading on StandardMaterial3D
+    surfaces. This is the authentic multi-light PSX path: it sees every real-time
+    light (so Lux's omni/spot/area rigs all contribute), integrates with
+    clustering, and casts pixel shadows from the first DirectionalLight3D. LuxRoot
+    flips `SHADING_MODE_PER_VERTEX` on plain surfaces in the `lux_materials` group.
+  - **Lux Stylized Gouraud** — the v0.4.0 shader path, for keeping Lux's
+    banding/palette/Mach-bands on top of a vertex-lit feel (approximated from the
+    key light only, since the engine forces Lambertian for native vertex shading
+    and ignores custom `light()`).
+- **`LuxVertexShading`** helper with a 4.4+ availability guard, per-material
+  `SHADING_MODE_PER_VERTEX` toggling, and the
+  `rendering/shading/overrides/force_vertex_shading` project override.
+- Validator notes the native-vertex-shading shadow limitation (first
+  DirectionalLight3D only) and the stylized-path key-light approximation, and
+  warns if Native Engine mode is selected on a pre-4.4 build.
+
+### Notes
+- The native path is recommended for true multi-light vertex lighting; the Lux
+  Stylized path (v0.4.0) remains for stylized surfaces that need Lux's look, which
+  the engine's Lambertian-only vertex mode can't reproduce.
+
 ## [0.4.1] — 2026-07-05
 ### Changed
 - Removed the direct project title reference from the README so the addon reads
@@ -94,7 +120,8 @@ and the API; these are called out under **Changed** / **Breaking**.
 - Editor dock (apply/preview, art sliders, save level override, validate),
   validation panel, before/after sample scene, and docs.
 
-[Unreleased]: https://github.com/siliconight/lux/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/siliconight/lux/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/siliconight/lux/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/siliconight/lux/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/siliconight/lux/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/siliconight/lux/compare/v0.2.0...v0.3.0

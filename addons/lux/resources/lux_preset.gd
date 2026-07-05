@@ -97,9 +97,17 @@ extends Resource
 @export_group("Materials")
 ## Pushed to Lux stylized materials registered in the "lux_materials" group.
 @export_range(0.0, 1.0) var default_wetness: float = 0.0
-## Scene-wide PS2 per-vertex (Gouraud) lighting blend. -1 = leave each material's
-## own ps2_lighting alone; 0..1 = force all Lux materials to this amount, so a
-## whole level can flip into the PS2 hardware look from one preset.
+## How surfaces get their vertex-lit PSX look:
+##   Off               — per-pixel shading (modern).
+##   Native Engine     — Godot 4.4+ native per-vertex shading on StandardMaterial3D
+##                       surfaces: real multi-light + shadows, no Lux stylization.
+##   Lux Stylized Gouraud — Lux's shader ps2_lighting path: keeps banding/palette,
+##                       approximates from the key light only.
+## Native is the authentic multi-light path; Stylized keeps Lux's look.
+@export_enum("Off", "Native Engine", "Lux Stylized Gouraud") var vertex_shading_mode: int = 0
+## Scene-wide PS2 per-vertex (Gouraud) lighting blend for the Lux stylized path.
+## -1 = leave each material's own ps2_lighting alone; 0..1 = force all Lux
+## materials to this amount. Applied when vertex_shading_mode is Lux Stylized.
 @export_range(-1.0, 1.0, 0.01) var ps2_lighting_global: float = -1.0
 
 @export_group("Gameplay")

@@ -113,6 +113,48 @@ static func validate(root: LuxRoot) -> Array:
 				)
 			)
 
+	# --- Native vertex shading (Godot 4.4+) notes ---
+	if preset != null and preset.vertex_shading_mode == 1:
+		if not LuxVertexShading.native_available():
+			(
+				findings
+				. append(
+					(
+						Finding
+						. new(
+							Severity.WARN,
+							"Preset asks for Native Engine vertex shading, but this engine build is pre-4.4; falling back to per-pixel."
+						)
+					)
+				)
+			)
+		else:
+			(
+				findings
+				. append(
+					(
+						Finding
+						. new(
+							Severity.INFO,
+							"Native vertex shading: only the first DirectionalLight3D casts shadows on vertex-lit surfaces (Forward+/Mobile); omni/spot rigs won't shadow."
+						)
+					)
+				)
+			)
+	elif preset != null and preset.vertex_shading_mode == 2:
+		(
+			findings
+			. append(
+				(
+					Finding
+					. new(
+						Severity.INFO,
+						"Lux Stylized Gouraud keeps banding/palette but approximates from the key light only; use Native Engine mode for true multi-light vertex lighting."
+					)
+				)
+			)
+		)
+
 	# --- Expensive post combinations ---
 	if preset != null:
 		if preset.dither_enabled and preset.dither_cell_size == 1 and preset.color_levels < 8:
