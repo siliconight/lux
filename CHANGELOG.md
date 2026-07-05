@@ -9,6 +9,13 @@ and the API; these are called out under **Changed** / **Breaking**.
 
 ## [Unreleased]
 
+## [0.5.1] — 2026-07-05
+### Changed
+- README facelift: rewritten to present Lux as the shipped framework it now is —
+  feature sections for the retro toolbox, the two vertex-lighting paths, the four
+  light rigs, runtime API, and editor tooling — replacing the original MVP
+  deliverable checklist. Docs and behavior unchanged.
+
 ## [0.5.0] — 2026-07-05
 ### Added
 - **Native engine vertex shading** integration (Godot 4.4+, PR #83360). A preset
@@ -120,7 +127,8 @@ and the API; these are called out under **Changed** / **Breaking**.
 - Editor dock (apply/preview, art sliders, save level override, validate),
   validation panel, before/after sample scene, and docs.
 
-[Unreleased]: https://github.com/siliconight/lux/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/siliconight/lux/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/siliconight/lux/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/siliconight/lux/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/siliconight/lux/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/siliconight/lux/compare/v0.3.0...v0.4.0
