@@ -1,0 +1,58 @@
+[gd_resource type="Resource" script_class="LuxPreset" load_steps=3 format=3 uid="uid://lux_mission_hot"]
+
+[ext_resource type="Script" path="res://addons/lux/resources/lux_preset.gd" id="1_preset"]
+[ext_resource type="Script" path="res://addons/lux/resources/lux_palette.gd" id="2_palette"]
+
+[sub_resource type="Resource" id="pal"]
+script = ExtResource("2_palette")
+palette_name = &"Alarm Red"
+highlight = Color(0.58, 0.46, 0.44, 1)
+midtone = Color(0.52, 0.44, 0.44, 1)
+shadow = Color(0.5, 0.36, 0.38, 1)
+fog = Color(0.35, 0.16, 0.16, 1)
+accent = Color(1, 0.12, 0.15, 1)
+
+[resource]
+script = ExtResource("1_preset")
+preset_name = &"Mission Goes Hot"
+description = "The heist is blown: high contrast, red-shifted alarm wash, heavy vignette."
+sky_top_color = Color(0.06, 0.04, 0.05, 1)
+sky_horizon_color = Color(0.16, 0.06, 0.06, 1)
+ground_color = Color(0.05, 0.02, 0.02, 1)
+sky_energy = 0.5
+sun_enabled = false
+sun_elevation_deg = 8.0
+sun_azimuth_deg = 200.0
+sun_color = Color(1, 0.4, 0.35, 1)
+sun_energy = 0.4
+sun_shadows = false
+ambient_color = Color(0.55, 0.4, 0.4, 1)
+ambient_energy = 0.8
+tonemap_mode = 3
+exposure = 1.05
+tonemap_white = 5.0
+brightness = 1.0
+contrast = 1.18
+saturation = 1.1
+warmth = 0.35
+fog_enabled = true
+fog_color = Color(0.35, 0.14, 0.14, 1)
+fog_density = 0.008
+fog_sky_affect = 0.2
+glow_enabled = true
+glow_intensity = 0.7
+glow_bloom = 0.15
+glow_hdr_threshold = 0.8
+dither_enabled = true
+dither_strength = 0.35
+color_levels = 20
+dither_cell_size = 1
+dither_distance_fade = true
+dither_fade_start = 18.0
+dither_fade_end = 50.0
+vignette_strength = 0.4
+grain_strength = 0.05
+palette_influence = 0.45
+palette = SubResource("pal")
+default_wetness = 0.0
+alarm_color = Color(1, 0.12, 0.15, 1)

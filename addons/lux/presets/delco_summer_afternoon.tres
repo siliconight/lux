@@ -1,0 +1,58 @@
+[gd_resource type="Resource" script_class="LuxPreset" load_steps=3 format=3 uid="uid://lux_delco_summer"]
+
+[ext_resource type="Script" path="res://addons/lux/resources/lux_preset.gd" id="1_preset"]
+[ext_resource type="Script" path="res://addons/lux/resources/lux_palette.gd" id="2_palette"]
+
+[sub_resource type="Resource" id="pal"]
+script = ExtResource("2_palette")
+palette_name = &"Delco Warm"
+highlight = Color(0.56, 0.53, 0.44, 1)
+midtone = Color(0.5, 0.49, 0.46, 1)
+shadow = Color(0.42, 0.44, 0.55, 1)
+fog = Color(0.72, 0.74, 0.7, 1)
+accent = Color(1, 0.55, 0.2, 1)
+
+[resource]
+script = ExtResource("1_preset")
+preset_name = &"Delco Summer Afternoon"
+description = "Hazy, warm suburban afternoon. The neutral, readable daytime baseline."
+sky_top_color = Color(0.34, 0.52, 0.78, 1)
+sky_horizon_color = Color(0.82, 0.78, 0.68, 1)
+ground_color = Color(0.3, 0.27, 0.22, 1)
+sky_energy = 1.1
+sun_enabled = true
+sun_elevation_deg = 46.0
+sun_azimuth_deg = 205.0
+sun_color = Color(1, 0.94, 0.8, 1)
+sun_energy = 1.5
+sun_shadows = true
+ambient_color = Color(0.6, 0.62, 0.62, 1)
+ambient_energy = 1.1
+tonemap_mode = 2
+exposure = 1.0
+tonemap_white = 6.0
+brightness = 1.0
+contrast = 1.02
+saturation = 1.05
+warmth = 0.22
+fog_enabled = true
+fog_color = Color(0.78, 0.78, 0.72, 1)
+fog_density = 0.0035
+fog_sky_affect = 0.2
+glow_enabled = true
+glow_intensity = 0.35
+glow_bloom = 0.05
+glow_hdr_threshold = 1.1
+dither_enabled = true
+dither_strength = 0.22
+color_levels = 28
+dither_cell_size = 1
+dither_distance_fade = true
+dither_fade_start = 30.0
+dither_fade_end = 80.0
+vignette_strength = 0.12
+grain_strength = 0.025
+palette_influence = 0.25
+palette = SubResource("pal")
+default_wetness = 0.0
+alarm_color = Color(1, 0.15, 0.22, 1)

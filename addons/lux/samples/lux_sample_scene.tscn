@@ -1,0 +1,48 @@
+[gd_scene load_steps=6 format=3 uid="uid://lux_sample_scene"]
+
+[ext_resource type="Script" path="res://addons/lux/samples/lux_sample_scene.gd" id="1_sample"]
+[ext_resource type="Script" path="res://addons/lux/runtime/lux_root.gd" id="2_root"]
+[ext_resource type="Resource" path="res://addons/lux/presets/delco_summer_afternoon.tres" id="3_preset"]
+[ext_resource type="Script" path="res://addons/lux/runtime/rigs/lux_fluorescent_rig.gd" id="4_fluoro"]
+[ext_resource type="Script" path="res://addons/lux/runtime/rigs/lux_streetlight_rig.gd" id="5_street"]
+[ext_resource type="Script" path="res://addons/lux/runtime/rigs/lux_area_light_rig.gd" id="6_area"]
+
+[node name="LuxSampleScene" type="Node3D"]
+script = ExtResource("1_sample")
+
+[node name="LuxRoot" type="Node3D" parent="."]
+script = ExtResource("2_root")
+active_preset = ExtResource("3_preset")
+quality_tier = 0
+apply_on_ready = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.9, 0, 0.44, 0, 1, 0, -0.44, 0, 0.9, 8, 3.2, 12)
+near = 0.05
+far = 300.0
+fov = 62.0
+
+[node name="FluorescentRig" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -4)
+script = ExtResource("4_fluoro")
+
+[node name="StreetlightRig" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 8)
+script = ExtResource("5_street")
+
+[node name="AreaPanelRig" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.4, -11.6)
+script = ExtResource("6_area")
+panel_size = Vector2(2.2, 1.3)
+normalize_energy = true
+show_emissive_quad = true
+
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="Hint" type="Label" parent="UI"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 900.0
+offset_bottom = 80.0
+text = "LUX SAMPLE"

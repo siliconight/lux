@@ -1,0 +1,58 @@
+[gd_resource type="Resource" script_class="LuxPreset" load_steps=3 format=3 uid="uid://lux_blue_hour"]
+
+[ext_resource type="Script" path="res://addons/lux/resources/lux_preset.gd" id="1_preset"]
+[ext_resource type="Script" path="res://addons/lux/resources/lux_palette.gd" id="2_palette"]
+
+[sub_resource type="Resource" id="pal"]
+script = ExtResource("2_palette")
+palette_name = &"Dusk Blue"
+highlight = Color(0.52, 0.5, 0.46, 1)
+midtone = Color(0.46, 0.48, 0.54, 1)
+shadow = Color(0.38, 0.42, 0.58, 1)
+fog = Color(0.4, 0.46, 0.6, 1)
+accent = Color(1, 0.62, 0.35, 1)
+
+[resource]
+script = ExtResource("1_preset")
+preset_name = &"Blue Hour"
+description = "Cool, quiet dusk just after sunset. Long shadows, warm accent lights."
+sky_top_color = Color(0.12, 0.16, 0.34, 1)
+sky_horizon_color = Color(0.5, 0.42, 0.48, 1)
+ground_color = Color(0.1, 0.11, 0.16, 1)
+sky_energy = 0.7
+sun_enabled = true
+sun_elevation_deg = 4.0
+sun_azimuth_deg = 250.0
+sun_color = Color(1, 0.7, 0.5, 1)
+sun_energy = 0.9
+sun_shadows = true
+ambient_color = Color(0.42, 0.48, 0.62, 1)
+ambient_energy = 0.9
+tonemap_mode = 3
+exposure = 1.05
+tonemap_white = 6.0
+brightness = 1.0
+contrast = 1.05
+saturation = 1.0
+warmth = -0.1
+fog_enabled = true
+fog_color = Color(0.42, 0.48, 0.62, 1)
+fog_density = 0.005
+fog_sky_affect = 0.3
+glow_enabled = true
+glow_intensity = 0.45
+glow_bloom = 0.08
+glow_hdr_threshold = 0.95
+dither_enabled = true
+dither_strength = 0.28
+color_levels = 24
+dither_cell_size = 1
+dither_distance_fade = true
+dither_fade_start = 25.0
+dither_fade_end = 70.0
+vignette_strength = 0.18
+grain_strength = 0.03
+palette_influence = 0.3
+palette = SubResource("pal")
+default_wetness = 0.0
+alarm_color = Color(1, 0.15, 0.22, 1)

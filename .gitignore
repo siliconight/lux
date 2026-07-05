@@ -1,0 +1,20 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Godot-specific export presets with secrets
+export_presets.cfg
+
+# Imported translations (automatically generated from CSV files)
+*.translation
+
+# Mono/C# build artifacts (not used here, kept for safety)
+.mono/
+data_*/
+mono_crash.*.json
+
+# Editor/OS cruft
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
