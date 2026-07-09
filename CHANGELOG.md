@@ -7,6 +7,16 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.9.1] — 2026-07-09
+
+### Added
+- Look-dev harness: **exposure** (Z/X) and **glow HDR threshold** (C/V) knobs —
+  the two controls behind the "HDR pop" (bright subject against dark/hazy
+  background, à la Halo 3). Exposure sets where the tonemap rolls off; the glow
+  threshold decides *what* blooms, so only genuinely-bright highlights bleed.
+  Both are LuxPreset fields applied via the environment; `apply_preset(_,0)`
+  already re-runs env, so they push live. Doc adds the Halo-pop recipe.
+
 ## [0.9.0] — 2026-07-09
 
 ### Added

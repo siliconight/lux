@@ -36,12 +36,14 @@ the harness works, then point it at a real `.glb`.
 | U / J | dither strength | the retro ordered-dither grain |
 | I / K | vignette | frames the shot, focuses the eye |
 | O / L | fog density | atmosphere / depth separation |
+| Z / X | **exposure** | where the tonemap rolls off — how "bright is bright" (HDR pop) |
+| C / V | **glow HDR threshold** | *what* blooms: raise it so only bright highlights bleed, not everything |
 | 1–5 | jump preset | delco / blue hour / fluorescent / rain / hot |
 | Space | Lux on/off | before/after vs the raw baked albedo |
 | `[` | capture **before** | writes `lookdev_before.png` |
 | `]` | capture **after** | writes `lookdev_after.png` |
 | F5 | dump values | prints current pop values to console |
-| Z | reset | back to the preset's shipped values |
+| \\ | reset | back to the preset's shipped values |
 
 ## The tuning loop
 
@@ -53,6 +55,30 @@ the harness works, then point it at a real `.glb`.
 4. When a look lands, hit **F5** — it dumps the values. Paste them into
    `delco_summer_afternoon.tres` (or a new preset) so the whole game gets the
    look, not just this scene.
+
+## The Halo-3 pop recipe (bright subject vs hazy background)
+
+That "white armor pops against the desert" look is a *grade + separation*
+result, not a new feature. Bungie's own tech (HDR two-buffer, aggressive
+tonemap, bloom on genuinely-bright highlights, atmospheric scattering for depth)
+maps onto knobs you have here:
+
+1. **Exposure (Z/X)** — set where bright rolls off. Nudge up until highlights
+   feel like they're pushing past white, then back off a hair.
+2. **Glow HDR threshold (C/V)** — raise it so *only* the bright bits bloom
+   (armor sheen, sky), not the whole frame. This is the single knob that makes
+   bloom read as "HDR pop" instead of "everything is foggy."
+3. **Glow intensity (W)** — then dial how much those bright bits bleed.
+4. **Contrast (E) + saturation (Q)** — punch and colour. PS2/Halo both ran hot;
+   push until the banding is about to crush, then ease off.
+5. **Separation** — the real trick: keep the *subject* warm and bright while the
+   *background* goes cool and hazy. Push **fog (O)** and let Patina's depth
+   recession desaturate distance. Warm-bright-near vs cool-hazy-far is what
+   makes the foreground pop, more than any single grade value.
+
+Skip spherical-harmonics baked GI (Halo 3's costly lightmaps) — PS2 had none,
+and Lux's banding + baked ambient is the correct era substitute. Chasing SH GI
+pulls *away* from the PS2 look toward a 360-era one.
 
 ## Baking a look into a preset
 

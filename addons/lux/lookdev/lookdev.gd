@@ -55,6 +55,7 @@ const KNOBS := {
 	"palette_influence": [0.0, 1.0, 0.03],
 	"dither_strength": [0.0, 1.0, 0.03], "vignette_strength": [0.0, 1.0, 0.03],
 	"fog_density": [0.0, 0.05, 0.001],
+	"exposure": [0.25, 4.0, 0.05], "glow_hdr_threshold": [0.0, 4.0, 0.05],
 }
 
 
@@ -153,8 +154,12 @@ func _unhandled_input(e: InputEvent) -> void:
 		KEY_K: _bump("vignette_strength", -1)
 		KEY_O: _bump("fog_density", 1)
 		KEY_L: _bump("fog_density", -1)
+		KEY_Z: _bump("exposure", 1)
+		KEY_X: _bump("exposure", -1)
+		KEY_C: _bump("glow_hdr_threshold", 1)
+		KEY_V: _bump("glow_hdr_threshold", -1)
 		KEY_SPACE: _toggle_lux()
-		KEY_Z: _reset()
+		KEY_BACKSLASH: _reset()
 		KEY_F5: _dump()
 		KEY_BRACKETLEFT: _shot("before")
 		KEY_BRACKETRIGHT: _shot("after")
@@ -216,4 +221,6 @@ func _refresh_hud() -> void:
 		p.warmth, p.palette_influence, p.dither_strength]
 	_hud.text += "vignette %.2f [I/K]   fog %.4f [O/L]\n" % [
 		p.vignette_strength, p.fog_density]
-	_hud.text += "[1-5] preset   [Space] Lux on/off   '[' before-shot   ']' after-shot   F5 dump   Z reset"
+	_hud.text += "exposure %.2f [Z/X]   glow-threshold %.2f [C/V]   <- the HDR pop\n" % [
+		p.exposure, p.glow_hdr_threshold]
+	_hud.text += "[1-5] preset   [Space] Lux on/off   '[' before   ']' after   F5 dump   \\ reset"
