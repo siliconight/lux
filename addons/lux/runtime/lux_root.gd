@@ -169,6 +169,7 @@ func _load_default_library() -> void:
 	var dir := "res://addons/lux/presets/"
 	var files := [
 		"delco_summer_afternoon.tres",
+		"delco_arcade.tres",
 		"gas_station_fluorescent.tres",
 		"blue_hour.tres",
 		"heavy_rain.tres",

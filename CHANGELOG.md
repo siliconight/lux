@@ -7,6 +7,18 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.9.2] — 2026-07-09
+
+### Added
+- **`delco_arcade` preset** — punchy saturated near vs washed-out far, the
+  arcade/PS2 plane-separation look. Brighter HDR key (exposure 1.15, sun energy
+  1.7, glow threshold 1.25 so only highlights bloom), punchy saturation 1.22 /
+  contrast 1.1, and cooler denser distance fog (density 0.006, cool-light
+  colour) so the background washes out with camera distance while the foreground
+  stays saturated. This is the *camera-relative* half of the separation;
+  Patina's `--depth punch` bakes the per-surface half. Registered in LuxRoot;
+  reachable in the look-dev harness on preset key **6**.
+
 ## [0.9.1] — 2026-07-09
 
 ### Added

@@ -41,8 +41,8 @@ var _dist := 14.0
 var _height := 6.0
 
 const PRESETS := [
-	&"Delco Summer Afternoon", &"Blue Hour", &"Gas Station Fluorescent",
-	&"Heavy Rain", &"Mission Goes Hot",
+	&"Delco Summer Afternoon", &"Delco Arcade", &"Blue Hour",
+	&"Gas Station Fluorescent", &"Heavy Rain", &"Mission Goes Hot",
 ]
 
 # knob -> (min, max, step) for clamping + HUD; keeps edits inside shader ranges.
@@ -163,7 +163,7 @@ func _unhandled_input(e: InputEvent) -> void:
 		KEY_F5: _dump()
 		KEY_BRACKETLEFT: _shot("before")
 		KEY_BRACKETRIGHT: _shot("after")
-		KEY_1, KEY_2, KEY_3, KEY_4, KEY_5:
+		KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6:
 			var idx := e.keycode - KEY_1
 			if idx < PRESETS.size():
 				_lux.blend_to_preset(PRESETS[idx], 0.4)
@@ -223,4 +223,4 @@ func _refresh_hud() -> void:
 		p.vignette_strength, p.fog_density]
 	_hud.text += "exposure %.2f [Z/X]   glow-threshold %.2f [C/V]   <- the HDR pop\n" % [
 		p.exposure, p.glow_hdr_threshold]
-	_hud.text += "[1-5] preset   [Space] Lux on/off   '[' before   ']' after   F5 dump   \\ reset"
+	_hud.text += "[1-6] preset   [Space] Lux on/off   '[' before   ']' after   F5 dump   \\ reset"

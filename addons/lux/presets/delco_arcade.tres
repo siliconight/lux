@@ -1,0 +1,58 @@
+[gd_resource type="Resource" script_class="LuxPreset" load_steps=3 format=3 uid="uid://lux_delco_arcade"]
+
+[ext_resource type="Script" path="res://addons/lux/resources/lux_preset.gd" id="1_preset"]
+[ext_resource type="Script" path="res://addons/lux/resources/lux_palette.gd" id="2_palette"]
+
+[sub_resource type="Resource" id="pal"]
+script = ExtResource("2_palette")
+palette_name = &"Delco Arcade"
+highlight = Color(0.62, 0.58, 0.46, 1)
+midtone = Color(0.52, 0.5, 0.46, 1)
+shadow = Color(0.4, 0.42, 0.56, 1)
+fog = Color(0.82, 0.85, 0.9, 1)
+accent = Color(1, 0.55, 0.2, 1)
+
+[resource]
+script = ExtResource("1_preset")
+preset_name = &"Delco Arcade"
+description = "Punchy saturated near vs washed-out far — arcade/PS2 plane-separation pop. Bright HDR key, cool light haze building with distance."
+sky_top_color = Color(0.32, 0.52, 0.82, 1)
+sky_horizon_color = Color(0.84, 0.82, 0.76, 1)
+ground_color = Color(0.3, 0.27, 0.22, 1)
+sky_energy = 1.15
+sun_enabled = true
+sun_elevation_deg = 46.0
+sun_azimuth_deg = 205.0
+sun_color = Color(1, 0.95, 0.82, 1)
+sun_energy = 1.7
+sun_shadows = true
+ambient_color = Color(0.58, 0.62, 0.68, 1)
+ambient_energy = 1.05
+tonemap_mode = 2
+exposure = 1.15
+tonemap_white = 6.0
+brightness = 1.0
+contrast = 1.1
+saturation = 1.22
+warmth = 0.18
+fog_enabled = true
+fog_color = Color(0.72, 0.78, 0.88, 1)
+fog_density = 0.006
+fog_sky_affect = 0.35
+glow_enabled = true
+glow_intensity = 0.55
+glow_bloom = 0.06
+glow_hdr_threshold = 1.25
+dither_enabled = true
+dither_strength = 0.2
+color_levels = 28
+dither_cell_size = 1
+dither_distance_fade = true
+dither_fade_start = 30.0
+dither_fade_end = 80.0
+vignette_strength = 0.16
+grain_strength = 0.025
+palette_influence = 0.28
+palette = SubResource("pal")
+default_wetness = 0.0
+alarm_color = Color(1, 0.15, 0.22, 1)
