@@ -91,10 +91,10 @@ func _load_building() -> void:
 		push_warning("look-dev: building not found at %s — showing empty stage."
 			% building_path)
 		return
-	var packed := load(building_path)
+	var packed: Resource = load(building_path)
 	_building = packed.instantiate() if packed is PackedScene else null
 	if _building == null and packed is Mesh:
-		var mi := MeshInstance3D.new(); mi.mesh = packed; _building = mi
+		var mi: MeshInstance3D = MeshInstance3D.new(); mi.mesh = packed; _building = mi
 	if _building:
 		add_child(_building)
 		# apply the Lux LEVEL role so the stylized material + vertex colour show.
@@ -107,7 +107,7 @@ func _load_building() -> void:
 func _frame_building() -> void:
 	# Fit the orbit to the building's actual bounds so we circle AROUND it
 	# (establishing shot) instead of sweeping through the inside.
-	var aabb := _node_aabb(_building)
+	var aabb: AABB = _node_aabb(_building)
 	if aabb.size.length() < 0.01:
 		return
 	_center = aabb.get_center()
@@ -118,10 +118,10 @@ func _frame_building() -> void:
 
 func _node_aabb(node: Node) -> AABB:
 	# Union of every MeshInstance3D's world-space AABB under `node`.
-	var out := AABB()
+	var out: AABB = AABB()
 	var first := true
 	for mi in _all_mesh_instances(node):
-		var world := mi.global_transform * mi.get_aabb()
+		var world: AABB = mi.global_transform * mi.get_aabb()
 		if first:
 			out = world; first = false
 		else:
@@ -139,7 +139,7 @@ func _all_mesh_instances(node: Node) -> Array:
 
 
 func _setup_hud() -> void:
-	var ui := CanvasLayer.new(); add_child(ui)
+	var ui: CanvasLayer = CanvasLayer.new(); add_child(ui)
 	_hud = Label.new()
 	_hud.position = Vector2(16, 12)
 	_hud.add_theme_color_override("font_color", Color(1, 1, 1))
@@ -225,7 +225,7 @@ func _toggle_lux() -> void:
 		_push()
 	else:
 		# crude "off": neutral preset so you see the raw baked albedo x flat light
-		var neutral := LuxPreset.new()
+		var neutral: LuxPreset = LuxPreset.new()
 		neutral.preset_name = &"(Lux off — raw bake)"
 		neutral.saturation = 1.0; neutral.contrast = 1.0
 		neutral.glow_enabled = false; neutral.dither_enabled = false
@@ -248,8 +248,8 @@ func _dump() -> void:
 
 func _shot(label: String) -> void:
 	await RenderingServer.frame_post_draw
-	var img := get_viewport().get_texture().get_image()
-	var path := "%s/lookdev_%s.png" % [screenshot_dir, label]
+	var img: Image = get_viewport().get_texture().get_image()
+	var path: String = "%s/lookdev_%s.png" % [screenshot_dir, label]
 	img.save_png(path)
 	print("look-dev: saved %s -> %s" % [label, ProjectSettings.globalize_path(path)])
 
@@ -257,7 +257,7 @@ func _shot(label: String) -> void:
 func _refresh_hud() -> void:
 	if _hud == null:
 		return
-	var p := _live
+	var p: LuxPreset = _live
 	_hud.text = "LOOK-DEV — Lux: %s   preset: %s\n" % [
 		"ON" if _lux_on else "OFF (raw bake)",
 		String(_base.preset_name) if _base else "?"]

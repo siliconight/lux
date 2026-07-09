@@ -7,20 +7,60 @@ extends Node
 
 var world_env: WorldEnvironment
 
+## When true, Lux never authors the sky — it assumes a sky provider (SkyMint or
+## any node that sets its own sky material) owns it, and Lux writes only the
+## grade. Auto-detected per-apply when left false; set true to force.
+var defer_sky := false
+
+
+func _sky_is_provided(env: Environment) -> bool:
+	# A provider owns the sky if it set a non-Procedural sky material (SkyMint
+	# uses a ShaderMaterial). Lux authors only ProceduralSkyMaterial, so anything
+	# else means "someone else is driving the sky — leave it alone."
+	if defer_sky:
+		return true
+	if env.sky != null and env.sky.sky_material != null:
+		return not (env.sky.sky_material is ProceduralSkyMaterial)
+	return false
+
 
 func ensure_world_environment(parent: Node) -> void:
 	if world_env != null and is_instance_valid(world_env):
 		return
-	# Reuse an existing WorldEnvironment in the scene if the level already has one.
-	for c in parent.get_children():
-		if c is WorldEnvironment:
-			world_env = c
-			return
+	# Reuse an existing WorldEnvironment if the level already has one — including
+	# a sky provider like SkyMint (which IS a WorldEnvironment). Check the parent's
+	# children first, then the wider scene, so Lux writes its grade onto the
+	# provider's environment instead of making a second, conflicting one.
+	var found: WorldEnvironment = _find_world_environment(parent)
+	if found != null:
+		world_env = found
+		return
 	world_env = WorldEnvironment.new()
 	world_env.name = &"LuxWorldEnvironment"
 	parent.add_child(world_env)
 	if Engine.is_editor_hint() and parent.get_tree() != null:
 		world_env.owner = parent.get_tree().edited_scene_root
+
+
+func _find_world_environment(parent: Node) -> WorldEnvironment:
+	# direct children first (the common case), then the whole scene tree.
+	for c in parent.get_children():
+		if c is WorldEnvironment:
+			return c
+	var root: Node = parent.get_tree().current_scene if parent.get_tree() != null else null
+	if root != null:
+		return _search_world_environment(root)
+	return null
+
+
+func _search_world_environment(node: Node) -> WorldEnvironment:
+	if node is WorldEnvironment:
+		return node
+	for c in node.get_children():
+		var r: WorldEnvironment = _search_world_environment(c)
+		if r != null:
+			return r
+	return null
 
 
 func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
@@ -32,21 +72,27 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 		world_env.environment = env
 
 	# --- Sky ---
-	var sky := env.sky
-	if sky == null:
-		sky = Sky.new()
-		env.sky = sky
-	var sky_mat := sky.sky_material
-	if not (sky_mat is ProceduralSkyMaterial):
-		sky_mat = ProceduralSkyMaterial.new()
-		sky.sky_material = sky_mat
-	var psm := sky_mat as ProceduralSkyMaterial
-	psm.sky_top_color = preset.sky_top_color
-	psm.sky_horizon_color = preset.sky_horizon_color
-	psm.ground_bottom_color = preset.ground_color
-	psm.ground_horizon_color = preset.sky_horizon_color
-	psm.sky_energy_multiplier = preset.sky_energy
-	env.background_mode = Environment.BG_SKY
+	# When a sky *provider* (e.g. SkyMint) owns this environment, it has already
+	# built the sky (panorama + clouds + day/night) as a ShaderMaterial. Lux is
+	# the look authority but NOT the sky author in that case: skip the sky block
+	# so we don't stomp the provider's material, and write only the grade
+	# (tonemap/exposure/fog/glow/adjustment) onto the shared environment.
+	if not _sky_is_provided(env):
+		var sky: Sky = env.sky
+		if sky == null:
+			sky = Sky.new()
+			env.sky = sky
+		var sky_mat: Material = sky.sky_material
+		if not (sky_mat is ProceduralSkyMaterial):
+			sky_mat = ProceduralSkyMaterial.new()
+			sky.sky_material = sky_mat
+		var psm := sky_mat as ProceduralSkyMaterial
+		psm.sky_top_color = preset.sky_top_color
+		psm.sky_horizon_color = preset.sky_horizon_color
+		psm.ground_bottom_color = preset.ground_color
+		psm.ground_horizon_color = preset.sky_horizon_color
+		psm.sky_energy_multiplier = preset.sky_energy
+		env.background_mode = Environment.BG_SKY
 
 	# --- Ambient ---
 	match preset.ambient_mode:

@@ -112,7 +112,7 @@ func _resolve_sun_link() -> void:
 	if not auto_find_skymint:
 		_sun_link_resolved = false
 		return
-	var skymint := _find_skymint()
+	var skymint: Node = _find_skymint()
 	if skymint != null and skymint.get(&"sun_light") is DirectionalLight3D:
 		sun_light = skymint.get(&"sun_light")
 		_sun_link_resolved = sun_light != null
@@ -123,7 +123,7 @@ func _find_skymint() -> Node:
 	# DirectionalLight3D (SkyMint's public field). We don't check the class name,
 	# because get_class() returns the native base ("WorldEnvironment") for script
 	# classes — the property is the reliable, dependency-free signal.
-	var root := get_tree().current_scene
+	var root: Node = get_tree().current_scene
 	if root == null:
 		return null
 	var stack: Array[Node] = [root]
@@ -151,6 +151,12 @@ func _build_modules() -> void:
 	_env.name = &"LuxEnvironment"
 	add_child(_env)
 	_env.ensure_world_environment(self)
+	# If the environment Lux adopted is a sky provider (SkyMint — duck-typed on
+	# its sun_light property), defer the sky to it: Lux writes only the grade,
+	# SkyMint keeps the panorama/clouds/day-night. auto_find_skymint gates it.
+	if auto_find_skymint and _env.world_env != null \
+			and "sun_light" in _env.world_env:
+		_env.defer_sky = true
 
 	_lighting = LuxLighting.new()
 	_lighting.name = &"LuxLighting"

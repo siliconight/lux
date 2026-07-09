@@ -7,6 +7,32 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.10.0] — 2026-07-09
+
+### Added
+- **SkyMint integration** — Lux and SkyMint now share one WorldEnvironment:
+  SkyMint owns the sky (panorama, clouds, day/night), Lux writes only its grade
+  onto the same environment. Lux's `ensure_world_environment` searches the whole
+  scene to adopt SkyMint's environment; `LuxEnvironment.defer_sky` (auto-set when
+  a sky provider is detected) makes Lux skip authoring the sky. Combined with the
+  existing `auto_find_skymint` sun-borrow, a SkyMint day/night sun relights the
+  vertex-lit world while Lux drives the look. Duck-typed, no hard dependency —
+  Lux authors its own procedural sky when no provider is present. See
+  `docs/skymint_integration.md`.
+
+### Fixed
+- Strict-typed several method-return `:=` inferences in `lux_environment.gd` and
+  `lux_root.gd` for Godot 4.7's stricter inference.
+
+## [0.9.5] — 2026-07-09
+
+### Fixed
+- Look-dev harness: made every method-return `:=` inference explicit
+  (`packed: Resource`, `aabb: AABB`, `world: AABB`, `img: Image`, etc.).
+  Godot 4.7's stricter type inference rejected the `world` AABB inference at
+  line 124; typing them explicitly parses cleanly. Literal-value inferences
+  (bool/float/Vector3) are unchanged.
+
 ## [0.9.4] — 2026-07-09
 
 ### Fixed
