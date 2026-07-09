@@ -1,14 +1,14 @@
 {
   "slot_manifest_version": "1.2.0",
-  "building_id": "gas_station",
+  "building_id": "gs_corner_station",
   "theme": "greybox",
   "module_library": "art/zoo",
   "module_size": 2.0,
   "space": "spec/Blender Z-up raw coords; rot_y = degrees about up",
   "coverage": {
     "breach/generated": 1,
-    "doorway/generated": 9,
-    "wall/generated": 66,
+    "doorway/generated": 10,
+    "wall/generated": 70,
     "window/generated": 3
   },
   "slots": [
@@ -190,7 +190,7 @@
         "collision": "convex"
       },
       "interactive": {
-        "id": "gas_station:if:1aa79023",
+        "id": "gs_corner_station:if:3a4a19b5",
         "kind": "breach_wall",
         "states": [
           "intact",
@@ -554,7 +554,7 @@
         "collision": "convex"
       },
       "interactive": {
-        "id": "gas_station:if:da5d3e19",
+        "id": "gs_corner_station:if:ced64cc5",
         "kind": "door",
         "states": [
           "closed",
@@ -613,20 +613,20 @@
       "facing": "N",
       "transform": {
         "translation": [
-          13.25,
+          13.2,
           11.0,
           2.1
         ],
         "rot_y": 0,
         "scale": [
-          1.5,
+          1.4,
           0.3,
           4.2
         ]
       },
       "fit": {
         "dims": [
-          1.5,
+          1.4,
           0.3,
           4.2
         ],
@@ -660,7 +660,7 @@
       },
       "fit": {
         "dims": [
-          1.0,
+          1.2,
           0.3,
           4.2
         ],
@@ -668,7 +668,7 @@
         "openings": [
           {
             "kind": "door",
-            "width": 1.0,
+            "width": 1.2,
             "height": 2.2,
             "sill": 0.0
           }
@@ -676,7 +676,7 @@
         "collision": "convex"
       },
       "interactive": {
-        "id": "gas_station:if:f3e1dadf",
+        "id": "gs_corner_station:if:5abacd00",
         "kind": "door",
         "states": [
           "closed",
@@ -701,20 +701,20 @@
       "facing": "N",
       "transform": {
         "translation": [
-          15.5,
+          15.55,
           11.0,
           2.1
         ],
         "rot_y": 0,
         "scale": [
-          1.0,
+          0.9,
           0.3,
           4.2
         ]
       },
       "fit": {
         "dims": [
-          1.0,
+          0.9,
           0.3,
           4.2
         ],
@@ -941,7 +941,7 @@
         "collision": "convex"
       },
       "interactive": {
-        "id": "gas_station:if:3a93ea0d",
+        "id": "gs_corner_station:if:e701924e",
         "kind": "door",
         "states": [
           "closed",
@@ -1165,7 +1165,7 @@
         "collision": "convex"
       },
       "interactive": {
-        "id": "gas_station:if:5575e93f",
+        "id": "gs_corner_station:if:cce54c5a",
         "kind": "door",
         "states": [
           "closed",
@@ -1498,7 +1498,7 @@
         "collision": "convex"
       },
       "interactive": {
-        "id": "gas_station:if:517b18b2",
+        "id": "gs_corner_station:if:3f956874",
         "kind": "door",
         "states": [
           "closed",
@@ -1994,7 +1994,7 @@
         "collision": "convex"
       },
       "interactive": {
-        "id": "gas_station:if:3171e051",
+        "id": "gs_corner_station:if:741a5438",
         "kind": "door",
         "states": [
           "closed",
@@ -2361,7 +2361,7 @@
         "collision": "convex"
       },
       "interactive": {
-        "id": "gas_station:if:51434d19",
+        "id": "gs_corner_station:if:ea8a70ee",
         "kind": "door",
         "states": [
           "closed",
@@ -2619,7 +2619,7 @@
         "collision": "convex"
       },
       "interactive": {
-        "id": "gas_station:if:a351e397",
+        "id": "gs_corner_station:if:8c4aac21",
         "kind": "door",
         "states": [
           "closed",
@@ -2780,20 +2780,20 @@
       "facing": "X",
       "transform": {
         "translation": [
-          10.25,
+          10.2,
           2.0,
           2.1
         ],
         "rot_y": 0,
         "scale": [
-          0.5,
+          0.4,
           0.3,
           4.2
         ]
       },
       "fit": {
         "dims": [
-          0.5,
+          0.4,
           0.3,
           4.2
         ],
@@ -2827,7 +2827,7 @@
       },
       "fit": {
         "dims": [
-          1.0,
+          1.2,
           0.3,
           4.2
         ],
@@ -2835,7 +2835,7 @@
         "openings": [
           {
             "kind": "door",
-            "width": 1.0,
+            "width": 1.2,
             "height": 2.2,
             "sill": 0.0
           }
@@ -2843,7 +2843,7 @@
         "collision": "convex"
       },
       "interactive": {
-        "id": "gas_station:if:e12e104e",
+        "id": "gs_corner_station:if:b2cbf614",
         "kind": "door",
         "states": [
           "closed",
@@ -2868,7 +2868,7 @@
       "facing": "X",
       "transform": {
         "translation": [
-          12.5,
+          12.6,
           2.0,
           2.1
         ],
@@ -2902,7 +2902,7 @@
       "facing": "X",
       "transform": {
         "translation": [
-          14.5,
+          14.6,
           2.0,
           2.1
         ],
@@ -2936,20 +2936,210 @@
       "facing": "X",
       "transform": {
         "translation": [
-          15.75,
+          15.8,
           2.0,
           2.1
         ],
         "rot_y": 0,
         "scale": [
-          0.5,
+          0.4,
           0.3,
           4.2
         ]
       },
       "fit": {
         "dims": [
-          0.5,
+          0.4,
+          0.3,
+          4.2
+        ],
+        "pivot": "center",
+        "openings": [],
+        "collision": "convex"
+      }
+    },
+    {
+      "slot_id": "int_0_2_seg0",
+      "role": "wall",
+      "size_mod": "full",
+      "style": 1,
+      "current_ref": "wall_greybox_01",
+      "kit_axis": "theme",
+      "wall": "int_0_2",
+      "story": 0,
+      "facing": "Y",
+      "transform": {
+        "translation": [
+          12.5,
+          -10.0,
+          2.1
+        ],
+        "rot_y": 90,
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "fit": {
+        "dims": [
+          0.3,
+          2.0,
+          4.2
+        ],
+        "pivot": "center",
+        "openings": [],
+        "collision": "convex"
+      }
+    },
+    {
+      "slot_id": "int_0_2_seg1",
+      "role": "wall",
+      "size_mod": "end",
+      "style": 1,
+      "current_ref": "wallEnd_greybox_01",
+      "kit_axis": "theme",
+      "wall": "int_0_2",
+      "story": 0,
+      "facing": "Y",
+      "transform": {
+        "translation": [
+          12.5,
+          -8.5,
+          2.1
+        ],
+        "rot_y": 90,
+        "scale": [
+          0.3,
+          1.0,
+          4.2
+        ]
+      },
+      "fit": {
+        "dims": [
+          0.3,
+          1.0,
+          4.2
+        ],
+        "pivot": "center",
+        "openings": [],
+        "collision": "convex"
+      }
+    },
+    {
+      "slot_id": "int_0_3_seg0",
+      "role": "wall",
+      "size_mod": "end",
+      "style": 1,
+      "current_ref": "wallEnd_greybox_01",
+      "kit_axis": "theme",
+      "wall": "int_0_3",
+      "story": 0,
+      "facing": "X",
+      "transform": {
+        "translation": [
+          13.1,
+          -8.0,
+          2.1
+        ],
+        "rot_y": 0,
+        "scale": [
+          1.2,
+          0.3,
+          4.2
+        ]
+      },
+      "fit": {
+        "dims": [
+          1.2,
+          0.3,
+          4.2
+        ],
+        "pivot": "center",
+        "openings": [],
+        "collision": "convex"
+      }
+    },
+    {
+      "slot_id": "int_0_3_open0",
+      "role": "doorway",
+      "size_mod": "full",
+      "style": 1,
+      "current_ref": "doorway_greybox_01",
+      "kit_axis": "theme",
+      "wall": "int_0_3",
+      "story": 0,
+      "facing": "X",
+      "transform": {
+        "translation": [
+          14.25,
+          -8.0,
+          2.1
+        ],
+        "rot_y": 0,
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "fit": {
+        "dims": [
+          1.1,
+          0.3,
+          4.2
+        ],
+        "pivot": "center",
+        "openings": [
+          {
+            "kind": "door",
+            "width": 1.1,
+            "height": 2.2,
+            "sill": 0.0
+          }
+        ],
+        "collision": "convex"
+      },
+      "interactive": {
+        "id": "gs_corner_station:if:e20668f9",
+        "kind": "door",
+        "states": [
+          "closed",
+          "open"
+        ],
+        "default": "closed",
+        "collision_per_state": {
+          "closed": true,
+          "open": false
+        }
+      }
+    },
+    {
+      "slot_id": "int_0_3_seg1",
+      "role": "wall",
+      "size_mod": "end",
+      "style": 1,
+      "current_ref": "wallEnd_greybox_01",
+      "kit_axis": "theme",
+      "wall": "int_0_3",
+      "story": 0,
+      "facing": "X",
+      "transform": {
+        "translation": [
+          15.4,
+          -8.0,
+          2.1
+        ],
+        "rot_y": 0,
+        "scale": [
+          1.2,
+          0.3,
+          4.2
+        ]
+      },
+      "fit": {
+        "dims": [
+          1.2,
           0.3,
           4.2
         ],

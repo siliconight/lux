@@ -1,0 +1,168 @@
+{
+  "files": {
+    "blend": "doorway_delco_01_w120.blend",
+    "glb": "doorway_delco_01_w120.glb",
+    "meta": "doorway_delco_01_w120.meta.json"
+  },
+  "genome": {
+    "species": "doorway",
+    "version": 1
+  },
+  "license": {
+    "construction_knowledge": "CC0",
+    "notes": "Original procedural construction. Architectural module: a center-pivot wall slab with a floor-height passage (open frame, no door leaf)."
+  },
+  "module": {
+    "dims": [
+      1.2,
+      0.3,
+      4.2
+    ],
+    "fit": "exact",
+    "pivot": "center",
+    "style": 1,
+    "theme": "delco",
+    "type": "doorway",
+    "width_cm": 120
+  },
+  "plan": {
+    "ambient": 0.35,
+    "attachments": [],
+    "bevel": 0.003,
+    "budgets": {
+      "tris_lod0": 600
+    },
+    "color": [
+      0.5,
+      0.49,
+      0.46
+    ],
+    "dim_scale": {
+      "depth": 1.0,
+      "height": 1.0,
+      "width": 1.0
+    },
+    "dimensions": {
+      "depth": 0.3,
+      "height": 4.2,
+      "width": 1.2
+    },
+    "fit_exact": true,
+    "genome_version": 1,
+    "material": "concrete",
+    "module": {
+      "fit": "exact",
+      "species": "doorway",
+      "state": null,
+      "stem": "doorway_delco_01_w120",
+      "style": 1,
+      "theme": "delco",
+      "type": "doorway",
+      "width_cm": 120
+    },
+    "params": {
+      "header": 0.22,
+      "jamb": 0.12
+    },
+    "parts": [
+      "Doorway_Jamb_L",
+      "Doorway_Jamb_R",
+      "Doorway_Header"
+    ],
+    "pivot": "center",
+    "species": "doorway",
+    "style": "delco",
+    "style_block": {
+      "ambient": 0.35,
+      "bevel": 0.003,
+      "color": [
+        0.5,
+        0.49,
+        0.46
+      ],
+      "material": "concrete",
+      "wear": 0.35
+    },
+    "target_dims": {
+      "depth": 0.3,
+      "height": 4.2,
+      "width": 1.2
+    },
+    "tool_version": "0.22.1",
+    "wear": 0.35
+  },
+  "validation": {
+    "checks": [
+      {
+        "id": "dim_width",
+        "level": "pass",
+        "msg": "width=1.200m within [0.600, 5.000]m"
+      },
+      {
+        "id": "dim_depth",
+        "level": "pass",
+        "msg": "depth=0.300m within [0.050, 0.600]m"
+      },
+      {
+        "id": "dim_height",
+        "level": "fail",
+        "msg": "height=4.200m OUTSIDE [1.800, 3.600]m"
+      },
+      {
+        "id": "fit_depth",
+        "level": "pass",
+        "msg": "depth=0.300m fits exact target 0.300m"
+      },
+      {
+        "id": "fit_height",
+        "level": "pass",
+        "msg": "height=4.200m fits exact target 4.200m"
+      },
+      {
+        "id": "fit_width",
+        "level": "pass",
+        "msg": "width=1.200m fits exact target 1.200m"
+      },
+      {
+        "id": "tri_budget",
+        "level": "pass",
+        "msg": "132 tris <= budget 600"
+      },
+      {
+        "id": "uvs",
+        "level": "pass",
+        "msg": "UV layer present"
+      },
+      {
+        "id": "wear_colors",
+        "level": "pass",
+        "msg": "vertex wear colors present"
+      },
+      {
+        "id": "materials",
+        "level": "pass",
+        "msg": "materials assigned"
+      },
+      {
+        "id": "parts_named",
+        "level": "pass",
+        "msg": "3 named parts"
+      },
+      {
+        "id": "collision",
+        "level": "pass",
+        "msg": "collision mesh present ('-col')"
+      },
+      {
+        "id": "transforms",
+        "level": "pass",
+        "msg": "all transforms applied"
+      }
+    ],
+    "status": "fail"
+  },
+  "zoo": {
+    "module_stem": "doorway_delco_01_w120",
+    "tool_version": "0.22.1"
+  }
+}

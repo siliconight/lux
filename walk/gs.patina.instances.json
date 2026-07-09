@@ -1,6 +1,6 @@
 {
-  "building_id": "gas_station",
-  "count": 80,
+  "building_id": "gs_corner_station",
+  "count": 85,
   "instances": [
     {
       "instance": {
@@ -1361,6 +1361,91 @@
         ]
       },
       "slot_id": "int_0_1_seg5"
+    },
+    {
+      "instance": {
+        "color": [
+          0.538,
+          0.527,
+          0.495,
+          1.0
+        ],
+        "custom_data": [
+          0.121,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_2_seg0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.453,
+          0.444,
+          0.417,
+          1.0
+        ],
+        "custom_data": [
+          0.759,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_2_seg1"
+    },
+    {
+      "instance": {
+        "color": [
+          0.488,
+          0.478,
+          0.449,
+          1.0
+        ],
+        "custom_data": [
+          0.641,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_3_seg0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.523,
+          0.512,
+          0.481,
+          1.0
+        ],
+        "custom_data": [
+          0.573,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_3_open0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.549,
+          0.538,
+          0.505,
+          1.0
+        ],
+        "custom_data": [
+          0.962,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_3_seg1"
     }
   ],
   "note": "per-slot instance color/custom_data; keyed by slot_id; feeds MultiMesh per-instance buffers, breaks modular repetition",

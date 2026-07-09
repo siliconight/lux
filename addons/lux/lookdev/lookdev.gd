@@ -37,6 +37,7 @@ var _lux_on := true
 var _base: LuxPreset          # pristine copy of the starting preset
 var _live: LuxPreset          # the edited copy we push each frame
 var _orbit := 0.0
+var _center := Vector3.ZERO
 var _dist := 14.0
 var _height := 6.0
 
@@ -100,6 +101,41 @@ func _load_building() -> void:
 		if ClassDB.class_exists("LuxMaterialApplier") or true:
 			LuxMaterialApplier.apply_role(_building, LuxRole.Role.LEVEL,
 				_lux.active_preset.get_palette_or_neutral() if _lux.active_preset else null)
+		_frame_building()
+
+
+func _frame_building() -> void:
+	# Fit the orbit to the building's actual bounds so we circle AROUND it
+	# (establishing shot) instead of sweeping through the inside.
+	var aabb := _node_aabb(_building)
+	if aabb.size.length() < 0.01:
+		return
+	_center = aabb.get_center()
+	var radius: float = aabb.size.length() * 0.5
+	_dist = radius * 2.2           # pull back to fit the whole building
+	_height = _center.y + radius * 0.7   # look slightly down on it
+
+
+func _node_aabb(node: Node) -> AABB:
+	# Union of every MeshInstance3D's world-space AABB under `node`.
+	var out := AABB()
+	var first := true
+	for mi in _all_mesh_instances(node):
+		var world := mi.global_transform * mi.get_aabb()
+		if first:
+			out = world; first = false
+		else:
+			out = out.merge(world)
+	return out
+
+
+func _all_mesh_instances(node: Node) -> Array:
+	var result: Array = []
+	if node is MeshInstance3D:
+		result.append(node)
+	for c in node.get_children():
+		result.append_array(_all_mesh_instances(c))
+	return result
 
 
 func _setup_hud() -> void:
@@ -115,8 +151,9 @@ func _setup_hud() -> void:
 func _process(delta: float) -> void:
 	_orbit += delta * 0.15
 	if _cam:
-		_cam.position = Vector3(sin(_orbit) * _dist, _height, cos(_orbit) * _dist)
-		_cam.look_at(Vector3.ZERO, Vector3.UP)
+		_cam.position = _center + Vector3(
+			sin(_orbit) * _dist, _height - _center.y, cos(_orbit) * _dist)
+		_cam.look_at(_center, Vector3.UP)
 	_refresh_hud()
 
 
@@ -135,6 +172,12 @@ func _bump(field: String, dir: int) -> void:
 
 
 func _unhandled_input(e: InputEvent) -> void:
+	# mouse wheel = zoom the orbit in/out
+	if e is InputEventMouseButton and e.pressed:
+		if e.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_dist = maxf(2.0, _dist * 0.9)
+		elif e.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_dist = _dist * 1.1
 	if not (e is InputEventKey and e.pressed and not e.echo):
 		return
 	match e.keycode:
@@ -159,12 +202,15 @@ func _unhandled_input(e: InputEvent) -> void:
 		KEY_C: _bump("glow_hdr_threshold", 1)
 		KEY_V: _bump("glow_hdr_threshold", -1)
 		KEY_SPACE: _toggle_lux()
+		KEY_UP: _height += 1.5
+		KEY_DOWN: _height -= 1.5
+		KEY_HOME: _frame_building()
 		KEY_BACKSLASH: _reset()
 		KEY_F5: _dump()
 		KEY_BRACKETLEFT: _shot("before")
 		KEY_BRACKETRIGHT: _shot("after")
 		KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6:
-			var idx := e.keycode - KEY_1
+			var idx: int = e.keycode - KEY_1
 			if idx < PRESETS.size():
 				_lux.blend_to_preset(PRESETS[idx], 0.4)
 				await get_tree().create_timer(0.45).timeout
@@ -223,4 +269,5 @@ func _refresh_hud() -> void:
 		p.vignette_strength, p.fog_density]
 	_hud.text += "exposure %.2f [Z/X]   glow-threshold %.2f [C/V]   <- the HDR pop\n" % [
 		p.exposure, p.glow_hdr_threshold]
-	_hud.text += "[1-6] preset   [Space] Lux on/off   '[' before   ']' after   F5 dump   \\ reset"
+	_hud.text += "[1-6] preset   [Space] Lux on/off   '[' before   ']' after   F5 dump   \\ reset\n"
+	_hud.text += "wheel zoom   up/down height   Home reframe"

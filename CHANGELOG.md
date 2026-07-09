@@ -7,6 +7,22 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.9.4] — 2026-07-09
+
+### Fixed
+- Look-dev harness camera now **frames the building**: computes the model's
+  world-space AABB on load and orbits its centre at a fit distance, instead of
+  circling the world origin at a fixed 14 m (which swept the camera *through*
+  the inside of the building). Added mouse-wheel zoom, up/down height, and Home
+  to reframe — so an off-centre or oversized building is still viewable.
+
+## [0.9.3] — 2026-07-09
+
+### Fixed
+- Look-dev harness: `var idx := e.keycode - KEY_1` failed Godot's type inference
+  (untyped event value) — declared `idx: int` explicitly so `lookdev.gd` parses
+  and the scene runs.
+
 ## [0.9.2] — 2026-07-09
 
 ### Added

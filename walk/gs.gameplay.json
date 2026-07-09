@@ -1,72 +1,63 @@
 {
-  "level": "corner_deli_heist_01",
+  "level": "gs_corner_station",
   "mode": "heist",
-  "building_id": "corner_deli_heist_01",
+  "building_id": "gs_corner_station",
   "footprint": [
-    38.0,
-    28.0
+    32.0,
+    22.0
   ],
   "rarity": null,
   "rarity_color": null,
   "markers": [
     {
-      "name": "LADDER_0",
-      "type": "ladder",
-      "id": "ladder_0",
-      "x": 17.5,
-      "y": 9.5,
-      "z": 0.0,
-      "climb_height": 6.6,
-      "width": 0.7,
-      "depth": 0.25,
-      "facing": "W"
-    },
-    {
-      "name": "HATCH_-12_8",
-      "type": "hatch",
+      "name": "COVER_LOW_REG",
+      "type": "cover_low",
+      "id": "REG",
       "x": -12.0,
-      "y": 8.0,
-      "z": 3.3,
-      "breachable": true
+      "y": -7.0,
+      "z": 0.0,
+      "rot_z": 0.0,
+      "room": "sales_floor"
     },
     {
-      "name": "ATTACKER_SPAWN_STEALTH_FRONT",
-      "type": "attacker_spawn",
-      "id": "STEALTH_FRONT",
-      "x": 0.0,
-      "y": -18.0,
+      "name": "COVER_HIGH_AISLE1",
+      "type": "cover_high",
+      "id": "AISLE1",
+      "x": -8.0,
+      "y": 0.0,
       "z": 0.0,
-      "rot_z": 0,
-      "room": null,
-      "meta": {
-        "phase": "stealth"
-      }
+      "rot_z": 0.0,
+      "room": "sales_floor"
     },
     {
-      "name": "ATTACKER_SPAWN_LOUD_ALLEY",
-      "type": "attacker_spawn",
-      "id": "LOUD_ALLEY",
-      "x": -22.0,
-      "y": 4.0,
+      "name": "COVER_HIGH_AISLE2",
+      "type": "cover_high",
+      "id": "AISLE2",
+      "x": -3.0,
+      "y": 0.0,
       "z": 0.0,
-      "rot_z": 90,
-      "room": null,
-      "meta": {
-        "phase": "loud"
-      }
+      "rot_z": 0.0,
+      "room": "sales_floor"
     },
     {
-      "name": "EXTRACTION_VAN",
-      "type": "extraction",
-      "id": "VAN",
-      "x": 0.0,
-      "y": -17.0,
+      "name": "COVER_HIGH_RACK1",
+      "type": "cover_high",
+      "id": "RACK1",
+      "x": 11.0,
+      "y": -6.0,
       "z": 0.0,
-      "rot_z": 180,
-      "room": null,
-      "meta": {
-        "zone": "south_van_extract"
-      }
+      "rot_z": 0.0,
+      "room": "stockroom"
+    },
+    {
+      "name": "CAMERA_SOCKET_01",
+      "type": "camera_socket",
+      "id": "01",
+      "x": -15.0,
+      "y": 10.0,
+      "z": 3.5,
+      "rot_z": -45,
+      "room": "sales_floor"
     },
     {
       "name": "OBJECTIVE_REGISTER",
@@ -76,1311 +67,1418 @@
       "y": -7.0,
       "z": 0.9,
       "rot_z": 0.0,
-      "room": "deli_counter"
+      "room": "sales_floor"
     },
     {
       "name": "OBJECTIVE_SAFE",
       "type": "objective",
       "id": "SAFE",
-      "x": 8.5,
-      "y": 6.0,
-      "z": -2.2,
+      "x": 14.5,
+      "y": 9.0,
+      "z": 0.5,
       "rot_z": 0.0,
-      "room": "basement_vault"
+      "room": "back_office"
     },
     {
-      "name": "OBJECTIVE_SERVER",
-      "type": "objective",
-      "id": "SERVER",
-      "x": 8.0,
-      "y": 8.0,
-      "z": 4.4,
-      "rot_z": 0.0,
-      "room": "server_room"
-    },
-    {
-      "name": "LOOT_VAULT_CASH",
+      "name": "LOOT_SAFECASH",
       "type": "loot",
-      "id": "VAULT_CASH",
-      "x": 8.5,
-      "y": 6.0,
-      "z": -2.0,
+      "id": "SAFECASH",
+      "x": 14.5,
+      "y": 9.0,
+      "z": 0.6,
       "rot_z": 0.0,
-      "room": "basement_vault"
+      "room": "back_office"
     },
     {
-      "name": "COVER_LOW_AISLE_LEFT",
-      "type": "cover_low",
-      "id": "AISLE_LEFT",
-      "x": -2.0,
-      "y": -9.5,
+      "name": "EXTRACTION_FORECOURT",
+      "type": "extraction",
+      "id": "FORECOURT",
+      "x": 0.0,
+      "y": -20.0,
       "z": 0.0,
       "rot_z": 0.0,
-      "room": "market_aisles"
+      "room": "sales_floor"
     },
     {
-      "name": "COVER_LOW_AISLE_RIGHT",
-      "type": "cover_low",
-      "id": "AISLE_RIGHT",
-      "x": 2.5,
-      "y": -9.5,
-      "z": 0.0,
-      "rot_z": 0.0,
-      "room": "market_aisles"
-    },
-    {
-      "name": "COVER_HIGH_PALLET_STACK",
-      "type": "cover_high",
-      "id": "PALLET_STACK",
-      "x": 12.0,
-      "y": 10.0,
-      "z": 0.0,
-      "rot_z": 0.0,
-      "room": "stockroom_loading"
-    },
-    {
-      "name": "CAMERA_SOCKET_CAM_FRONT",
-      "type": "camera_socket",
-      "id": "CAM_FRONT",
-      "x": -17.5,
-      "y": -12.5,
-      "z": 2.6,
-      "rot_z": 45,
-      "room": "customer_floor"
-    },
-    {
-      "name": "CAMERA_SOCKET_CAM_SERVER",
-      "type": "camera_socket",
-      "id": "CAM_SERVER",
-      "x": 16.0,
-      "y": 12.0,
-      "z": 5.8,
-      "rot_z": -135,
-      "room": "server_room"
-    },
-    {
-      "name": "PATROL_POINT_P01",
-      "type": "patrol_point",
-      "id": "P01",
-      "x": -2.0,
-      "y": -11.0,
-      "z": 0.0,
-      "rot_z": 0.0,
-      "room": "market_aisles"
-    },
-    {
-      "name": "PATROL_POINT_P02",
-      "type": "patrol_point",
-      "id": "P02",
-      "x": 12.0,
-      "y": -4.0,
-      "z": 0.0,
-      "rot_z": 0.0,
-      "room": "kitchen"
-    },
-    {
-      "name": "PATROL_POINT_P03",
-      "type": "patrol_point",
-      "id": "P03",
-      "x": 4.0,
-      "y": 10.0,
-      "z": 0.0,
-      "rot_z": 0.0,
-      "room": "stockroom_loading"
-    },
-    {
-      "name": "PATROL_POINT_P04",
-      "type": "patrol_point",
-      "id": "P04",
+      "name": "ATTACKER_SPAWN_A",
+      "type": "attacker_spawn",
+      "id": "A",
       "x": -8.0,
-      "y": 5.0,
-      "z": -3.3,
+      "y": -22.0,
+      "z": 0.0,
+      "rot_z": 0,
+      "room": "sales_floor"
+    },
+    {
+      "name": "ATTACKER_SPAWN_B",
+      "type": "attacker_spawn",
+      "id": "B",
+      "x": 8.0,
+      "y": -22.0,
+      "z": 0.0,
+      "rot_z": 0,
+      "room": "sales_floor"
+    },
+    {
+      "name": "COVER_LOW_AUTO_COFFEE_ISLAND",
+      "type": "cover_low",
+      "id": "AUTO_COFFEE_ISLAND",
+      "x": 2.0,
+      "y": -7.0,
+      "z": 0.0,
       "rot_z": 0.0,
-      "room": "cold_storage"
+      "room": "sales_floor",
+      "meta": {
+        "auto": "cover_from_volume",
+        "from": "coffee_island"
+      }
+    },
+    {
+      "name": "COVER_HIGH_AUTO_COOLER_RUN",
+      "type": "cover_high",
+      "id": "AUTO_COOLER_RUN",
+      "x": 4.5,
+      "y": 6.0,
+      "z": 0.0,
+      "rot_z": 0.0,
+      "room": "sales_floor",
+      "meta": {
+        "auto": "cover_from_volume",
+        "from": "cooler_run"
+      }
+    },
+    {
+      "name": "COVER_LOW_AUTO_MANAGER_DESK",
+      "type": "cover_low",
+      "id": "AUTO_MANAGER_DESK",
+      "x": 12.0,
+      "y": 7.0,
+      "z": 0.0,
+      "rot_z": 0.0,
+      "room": "back_office",
+      "meta": {
+        "auto": "cover_from_volume",
+        "from": "manager_desk"
+      }
+    },
+    {
+      "name": "LANDMARK_FORECOURT",
+      "type": "landmark",
+      "id": "FORECOURT",
+      "x": 0.0,
+      "y": -17.5,
+      "z": 1.0,
+      "rot_z": 0.0,
+      "room": "forecourt",
+      "meta": {
+        "auto": "landmark",
+        "label": "forecourt",
+        "role": "staging"
+      }
+    },
+    {
+      "name": "LANDMARK_SALES_FLOOR",
+      "type": "landmark",
+      "id": "SALES_FLOOR",
+      "x": -5.0,
+      "y": 0.0,
+      "z": 1.0,
+      "rot_z": 0.0,
+      "room": "sales_floor",
+      "meta": {
+        "auto": "landmark",
+        "label": "sales_floor",
+        "role": "public_entry"
+      }
+    },
+    {
+      "name": "LANDMARK_BACK_OFFICE",
+      "type": "landmark",
+      "id": "BACK_OFFICE",
+      "x": 11.0,
+      "y": 6.5,
+      "z": 1.0,
+      "rot_z": 0.0,
+      "room": "back_office",
+      "meta": {
+        "auto": "landmark",
+        "label": "back_office",
+        "role": "objective_room"
+      }
     }
   ],
   "rooms": [
     {
-      "id": "customer_floor",
+      "id": "forecourt",
       "story": 0,
       "bounds": [
-        -19.0,
         -14.0,
-        -8.0,
-        -3.0
+        -24.0,
+        14.0,
+        -11.0
       ],
-      "role": "public_entry",
+      "role": "staging",
       "combat_range": "medium",
       "fortifiable": false,
       "objective": false,
       "center": [
-        -13.5,
-        -8.5,
+        0.0,
+        -17.5,
         0.0
       ]
     },
     {
-      "id": "deli_counter",
+      "id": "sales_floor",
       "story": 0,
       "bounds": [
-        -19.0,
-        -3.0,
-        -8.0,
-        6.0
-      ],
-      "role": "objective_room",
-      "combat_range": "close",
-      "fortifiable": true,
-      "objective": true,
-      "center": [
-        -13.5,
-        1.5,
-        0.0
-      ]
-    },
-    {
-      "id": "market_aisles",
-      "story": 0,
-      "bounds": [
-        -8.0,
-        -14.0,
-        7.0,
-        -3.0
-      ],
-      "role": "connector",
-      "combat_range": "medium",
-      "fortifiable": false,
-      "objective": false,
-      "center": [
-        -0.5,
-        -8.5,
-        0.0
-      ]
-    },
-    {
-      "id": "kitchen",
-      "story": 0,
-      "bounds": [
-        7.0,
-        -14.0,
-        19.0,
-        6.0
-      ],
-      "role": "connector",
-      "combat_range": "close",
-      "fortifiable": false,
-      "objective": false,
-      "center": [
-        13.0,
-        -4.0,
-        0.0
-      ]
-    },
-    {
-      "id": "stockroom_loading",
-      "story": 0,
-      "bounds": [
-        -8.0,
+        -16.0,
+        -11.0,
         6.0,
-        19.0,
-        14.0
+        11.0
       ],
       "role": "public_entry",
       "combat_range": "long",
       "fortifiable": false,
       "objective": false,
       "center": [
-        5.5,
-        10.0,
+        -5.0,
+        0.0,
         0.0
       ]
     },
     {
-      "id": "stairwell",
+      "id": "restroom",
       "story": 0,
       "bounds": [
-        -19.0,
-        6.0,
-        -8.0,
-        14.0
+        12.5,
+        -11.0,
+        16.0,
+        -8.0
       ],
-      "role": "connector",
+      "role": "utility",
       "combat_range": "close",
       "fortifiable": false,
       "objective": false,
       "center": [
-        -13.5,
-        10.0,
+        14.25,
+        -9.5,
         0.0
       ]
     },
     {
-      "id": "manager_office",
-      "story": 1,
+      "id": "stockroom",
+      "story": 0,
       "bounds": [
-        -19.0,
-        -14.0,
-        -2.0,
+        6.0,
+        -11.0,
+        16.0,
         2.0
       ],
-      "role": "objective_room",
-      "combat_range": "medium",
-      "fortifiable": true,
-      "objective": true,
-      "center": [
-        -10.5,
-        -6.0,
-        3.3
-      ]
-    },
-    {
-      "id": "apartment_hideout",
-      "story": 1,
-      "bounds": [
-        -2.0,
-        -14.0,
-        19.0,
-        2.0
-      ],
-      "role": "fortifiable",
+      "role": "connector",
       "combat_range": "close",
-      "fortifiable": true,
+      "fortifiable": false,
       "objective": false,
       "center": [
-        8.5,
-        -6.0,
-        3.3
+        11.0,
+        -4.5,
+        0.0
       ]
     },
     {
-      "id": "server_room",
-      "story": 1,
+      "id": "back_office",
+      "story": 0,
       "bounds": [
-        -2.0,
+        6.0,
         2.0,
-        19.0,
-        14.0
-      ],
-      "role": "objective_room",
-      "combat_range": "medium",
-      "fortifiable": true,
-      "objective": true,
-      "center": [
-        8.5,
-        8.0,
-        3.3
-      ]
-    },
-    {
-      "id": "upper_hall",
-      "story": 1,
-      "bounds": [
-        -19.0,
-        2.0,
-        -2.0,
-        14.0
-      ],
-      "role": "connector",
-      "combat_range": "medium",
-      "fortifiable": false,
-      "objective": false,
-      "center": [
-        -10.5,
-        8.0,
-        3.3
-      ]
-    },
-    {
-      "id": "basement_corridor",
-      "story": -1,
-      "bounds": [
-        -19.0,
-        -14.0,
-        1.0,
-        1.0
-      ],
-      "role": "connector",
-      "combat_range": "medium",
-      "fortifiable": false,
-      "objective": false,
-      "center": [
-        -9.0,
-        -6.5,
-        -3.3
-      ]
-    },
-    {
-      "id": "cold_storage",
-      "story": -1,
-      "bounds": [
-        -19.0,
-        1.0,
-        1.0,
-        14.0
-      ],
-      "role": "loot_room",
-      "combat_range": "close",
-      "fortifiable": false,
-      "objective": false,
-      "center": [
-        -9.0,
-        7.5,
-        -3.3
-      ]
-    },
-    {
-      "id": "basement_vault",
-      "story": -1,
-      "bounds": [
-        1.0,
-        1.0,
-        19.0,
-        14.0
+        16.0,
+        11.0
       ],
       "role": "objective_room",
       "combat_range": "close",
       "fortifiable": true,
       "objective": true,
       "center": [
-        10.0,
-        7.5,
-        -3.3
-      ]
-    },
-    {
-      "id": "utility_room",
-      "story": -1,
-      "bounds": [
-        1.0,
-        -14.0,
-        19.0,
-        1.0
-      ],
-      "role": "connector",
-      "combat_range": "medium",
-      "fortifiable": false,
-      "objective": false,
-      "center": [
-        10.0,
-        -6.5,
-        -3.3
+        11.0,
+        6.5,
+        0.0
       ]
     }
   ],
-  "vertical_links": [
-    {
-      "kind": "stair",
-      "role": "main_internal_rotation",
-      "from_story": -1,
-      "to_story": 2,
-      "story": null,
-      "x": null,
-      "y": null,
-      "breachable": null
-    },
-    {
-      "kind": "floor_hole",
-      "role": "vertical_attack_angle",
-      "from_story": null,
-      "to_story": null,
-      "story": 1,
-      "x": 8.0,
-      "y": -4.0,
-      "breachable": null
-    },
-    {
-      "kind": "hatch",
-      "role": "roof_drop_to_stair",
-      "from_story": null,
-      "to_story": null,
-      "story": 1,
-      "x": -12.0,
-      "y": 8.0,
-      "breachable": true
-    }
-  ],
+  "vertical_links": [],
   "openings": [
     {
       "wall": "ext_0_N",
       "kind": "garage",
       "story": 0,
-      "x": -9.5,
-      "y": 14.0,
-      "z": 1.5,
-      "width": 3.2,
-      "height": 2.7,
+      "x": 8.96,
+      "y": 11.0,
+      "z": 1.65,
+      "width": 3.0,
+      "height": 3.0,
       "sill": 0.0,
-      "tag": "loading_bay",
+      "tag": "stock_roll_door",
       "breach_class": null,
       "material": null,
       "vaultable": false,
       "reinforceable": false,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
       "wall": "ext_0_N",
       "kind": "door",
       "story": 0,
-      "x": 12.16,
-      "y": 14.0,
-      "z": 1.25,
-      "width": 1.1,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": "rear_staff_entry",
-      "breach_class": null,
-      "material": null,
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "ext_0_S",
-      "kind": "door",
-      "story": 0,
-      "x": -10.64,
-      "y": -14.0,
+      "x": 14.72,
+      "y": 11.0,
       "z": 1.25,
       "width": 1.2,
       "height": 2.2,
       "sill": 0.0,
-      "tag": "front_customer_entry",
+      "tag": "office_back_door",
       "breach_class": null,
       "material": null,
       "vaultable": false,
       "reinforceable": false,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
-      "wall": "ext_0_S",
-      "kind": "window",
-      "story": 0,
-      "x": 0.0,
-      "y": -14.0,
-      "z": 1.7,
-      "width": 2.0,
-      "height": 1.4,
-      "sill": 0.85,
-      "tag": null,
-      "breach_class": null,
-      "material": "glass",
-      "vaultable": true,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "ext_0_S",
+      "wall": "ext_0_N",
       "kind": "breach",
       "story": 0,
-      "x": 12.92,
-      "y": -14.0,
+      "x": -9.6,
+      "y": 11.0,
       "z": 1.25,
       "width": 1.6,
       "height": 2.2,
       "sill": 0.0,
-      "tag": "south_breach",
+      "tag": "north_breach",
       "breach_class": "soft_wall",
       "material": "drywall",
       "vaultable": false,
       "reinforceable": false,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
-      "wall": "ext_0_E",
+      "wall": "ext_0_S",
+      "kind": "door",
+      "story": 0,
+      "x": -5.12,
+      "y": -11.0,
+      "z": 1.25,
+      "width": 1.8,
+      "height": 2.2,
+      "sill": 0.0,
+      "tag": "front_entry_west",
+      "breach_class": null,
+      "material": null,
+      "vaultable": false,
+      "reinforceable": false,
+      "building": "gs_corner_station"
+    },
+    {
+      "wall": "ext_0_S",
+      "kind": "door",
+      "story": 0,
+      "x": 5.12,
+      "y": -11.0,
+      "z": 1.25,
+      "width": 1.8,
+      "height": 2.2,
+      "sill": 0.0,
+      "tag": "front_entry_east",
+      "breach_class": null,
+      "material": null,
+      "vaultable": false,
+      "reinforceable": false,
+      "building": "gs_corner_station"
+    },
+    {
+      "wall": "ext_0_S",
       "kind": "window",
       "story": 0,
-      "x": 19.0,
-      "y": -7.0,
-      "z": 1.85,
-      "width": 1.4,
-      "height": 1.4,
+      "x": -12.8,
+      "y": -11.0,
+      "z": 2.35,
+      "width": 3.0,
+      "height": 2.4,
       "sill": 1.0,
       "tag": null,
       "breach_class": null,
       "material": "glass",
-      "vaultable": true,
+      "vaultable": false,
       "reinforceable": false,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
-      "wall": "ext_0_E",
+      "wall": "ext_0_S",
       "kind": "window",
       "story": 0,
-      "x": 19.0,
-      "y": 7.0,
-      "z": 1.85,
-      "width": 1.4,
-      "height": 1.4,
+      "x": 12.8,
+      "y": -11.0,
+      "z": 2.35,
+      "width": 3.0,
+      "height": 2.4,
       "sill": 1.0,
       "tag": null,
       "breach_class": null,
       "material": "glass",
-      "vaultable": true,
+      "vaultable": false,
       "reinforceable": false,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
+    },
+    {
+      "wall": "ext_0_E",
+      "kind": "door",
+      "story": 0,
+      "x": 16.0,
+      "y": -4.4,
+      "z": 1.25,
+      "width": 1.1,
+      "height": 2.2,
+      "sill": 0.0,
+      "tag": "east_stock_service",
+      "breach_class": null,
+      "material": null,
+      "vaultable": false,
+      "reinforceable": false,
+      "building": "gs_corner_station"
     },
     {
       "wall": "ext_0_W",
       "kind": "door",
       "story": 0,
-      "x": -19.0,
-      "y": 5.04,
+      "x": -16.0,
+      "y": -2.2,
       "z": 1.25,
-      "width": 1.0,
+      "width": 1.1,
       "height": 2.2,
       "sill": 0.0,
-      "tag": "alley_entry",
+      "tag": "west_service",
       "breach_class": null,
       "material": null,
       "vaultable": false,
       "reinforceable": false,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
       "wall": "ext_0_W",
-      "kind": "breach",
+      "kind": "window",
       "story": 0,
-      "x": -19.0,
-      "y": -8.96,
-      "z": 1.25,
-      "width": 1.5,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": "alley_soft_wall",
-      "breach_class": "soft_wall",
-      "material": "drywall",
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "ext_1_N",
-      "kind": "window",
-      "story": 1,
-      "x": 0.0,
-      "y": 14.0,
-      "z": 5.15,
-      "width": 1.4,
+      "x": -16.0,
+      "y": 6.6,
+      "z": 2.05,
+      "width": 1.6,
       "height": 1.4,
-      "sill": 1.0,
+      "sill": 1.2,
       "tag": null,
       "breach_class": null,
-      "material": "glass",
+      "material": null,
       "vaultable": true,
       "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "ext_1_N",
-      "kind": "breach",
-      "story": 1,
-      "x": 12.92,
-      "y": 14.0,
-      "z": 4.55,
-      "width": 1.4,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": "roofline_breach",
-      "breach_class": "soft_wall",
-      "material": "drywall",
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "ext_1_S",
-      "kind": "window",
-      "story": 1,
-      "x": -10.64,
-      "y": -14.0,
-      "z": 5.15,
-      "width": 1.3,
-      "height": 1.4,
-      "sill": 1.0,
-      "tag": null,
-      "breach_class": null,
-      "material": "glass",
-      "vaultable": true,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "ext_1_S",
-      "kind": "window",
-      "story": 1,
-      "x": 10.64,
-      "y": -14.0,
-      "z": 5.15,
-      "width": 1.3,
-      "height": 1.4,
-      "sill": 1.0,
-      "tag": null,
-      "breach_class": null,
-      "material": "glass",
-      "vaultable": true,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "ext_1_E",
-      "kind": "window",
-      "story": 1,
-      "x": 19.0,
-      "y": 5.6,
-      "z": 5.15,
-      "width": 1.2,
-      "height": 1.4,
-      "sill": 1.0,
-      "tag": null,
-      "breach_class": null,
-      "material": "glass",
-      "vaultable": true,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
       "wall": "int_0_0",
       "kind": "door",
       "story": 0,
-      "x": -11.2,
-      "y": -8.0,
+      "x": 6.0,
+      "y": -6.6,
       "z": 1.25,
-      "width": 1.1,
+      "width": 1.4,
       "height": 2.2,
       "sill": 0.0,
-      "tag": "customer_to_counter",
+      "tag": "sales_to_stock",
       "breach_class": null,
       "material": null,
       "vaultable": false,
       "reinforceable": false,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
       "wall": "int_0_0",
-      "kind": "breach",
-      "story": 0,
-      "x": 10.64,
-      "y": -8.0,
-      "z": 1.25,
-      "width": 1.4,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": null,
-      "breach_class": "soft_wall",
-      "material": "drywall",
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_0_1",
       "kind": "door",
       "story": 0,
-      "x": 11.76,
-      "y": 7.0,
+      "x": 6.0,
+      "y": 6.6,
       "z": 1.25,
       "width": 1.1,
       "height": 2.2,
       "sill": 0.0,
-      "tag": "kitchen_to_loading",
+      "tag": "sales_to_office",
       "breach_class": null,
       "material": null,
       "vaultable": false,
       "reinforceable": false,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
       "wall": "int_0_1",
-      "kind": "window",
-      "story": 0,
-      "x": -8.4,
-      "y": 7.0,
-      "z": 1.95,
-      "width": 1.4,
-      "height": 1.4,
-      "sill": 1.1,
-      "tag": null,
-      "breach_class": null,
-      "material": "glass",
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_0_2",
       "kind": "door",
       "story": 0,
-      "x": -3.0,
-      "y": -1.9,
+      "x": 11.0,
+      "y": 2.0,
       "z": 1.25,
       "width": 1.2,
       "height": 2.2,
       "sill": 0.0,
-      "tag": "front_to_back",
+      "tag": "stock_to_office",
       "breach_class": null,
       "material": null,
       "vaultable": false,
       "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_0_2",
-      "kind": "breach",
-      "story": 0,
-      "x": -3.0,
-      "y": 10.64,
-      "z": 1.25,
-      "width": 1.5,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": null,
-      "breach_class": "soft_wall",
-      "material": "drywall",
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_0_3",
-      "kind": "garage",
-      "story": 0,
-      "x": 6.0,
-      "y": 5.7,
-      "z": 1.4,
-      "width": 2.4,
-      "height": 2.5,
-      "sill": 0.0,
-      "tag": "stockroom_gate",
-      "breach_class": null,
-      "material": null,
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
       "wall": "int_0_3",
       "kind": "door",
       "story": 0,
-      "x": 6.0,
-      "y": -15.2,
+      "x": 14.25,
+      "y": -8.0,
       "z": 1.25,
-      "width": 1.0,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": "office_stair_door",
-      "breach_class": null,
-      "material": null,
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_1_4",
-      "kind": "door",
-      "story": 1,
-      "x": 0.0,
-      "y": -2.0,
-      "z": 4.55,
       "width": 1.1,
       "height": 2.2,
       "sill": 0.0,
-      "tag": "hall_to_manager_office",
+      "tag": "stock_to_restroom",
       "breach_class": null,
       "material": null,
       "vaultable": false,
       "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_1_4",
-      "kind": "breach",
-      "story": 1,
-      "x": 10.08,
-      "y": -2.0,
-      "z": 4.55,
-      "width": 1.4,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": null,
-      "breach_class": "soft_wall",
-      "material": "drywall",
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_1_5",
-      "kind": "door",
-      "story": 1,
-      "x": 2.0,
-      "y": -9.5,
-      "z": 4.55,
-      "width": 1.0,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": "apartment_hall",
-      "breach_class": null,
-      "material": null,
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_1_5",
-      "kind": "breach",
-      "story": 1,
-      "x": 2.0,
-      "y": 10.64,
-      "z": 4.55,
-      "width": 1.4,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": null,
-      "breach_class": "soft_wall",
-      "material": "drywall",
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_-1_6",
-      "kind": "door",
-      "story": -1,
-      "x": -8.4,
-      "y": 1.0,
-      "z": -2.05,
-      "width": 1.1,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": "basement_corridor",
-      "breach_class": null,
-      "material": null,
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_-1_6",
-      "kind": "breach",
-      "story": -1,
-      "x": 7.2,
-      "y": 1.0,
-      "z": -2.05,
-      "width": 1.4,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": "vault_side_breach",
-      "breach_class": "reinforceable",
-      "material": "brick_ext",
-      "vaultable": false,
-      "reinforceable": true,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_-1_7",
-      "kind": "door",
-      "story": -1,
-      "x": 1.0,
-      "y": 3.2,
-      "z": -2.05,
-      "width": 1.1,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": "cold_room_door",
-      "breach_class": null,
-      "material": null,
-      "vaultable": false,
-      "reinforceable": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "wall": "int_-1_7",
-      "kind": "breach",
-      "story": -1,
-      "x": 1.0,
-      "y": -10.24,
-      "z": -2.05,
-      "width": 1.4,
-      "height": 2.2,
-      "sill": 0.0,
-      "tag": null,
-      "breach_class": "reinforceable",
-      "material": "brick_ext",
-      "vaultable": false,
-      "reinforceable": true,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     }
   ],
   "objectives": [
     {
-      "name": "OBJECTIVE_GRAB_REGISTER_CASH",
-      "id": "grab_register_cash",
+      "name": "OBJECTIVE_REGISTER_GRAB",
+      "id": "register_grab",
       "kind": "bag_cash",
       "x": -12.0,
       "y": -7.0,
       "z": 0.9,
-      "room": "deli_counter",
+      "room": "sales_floor",
       "required": true,
       "duration": 8.0,
-      "meta": {
-        "phase": "stealth_or_loud",
-        "payoff": "fast_cash"
-      }
+      "meta": null
     },
     {
-      "name": "OBJECTIVE_DRILL_BASEMENT_SAFE",
-      "id": "drill_basement_safe",
+      "name": "OBJECTIVE_OFFICE_SAFE",
+      "id": "office_safe",
       "kind": "drill",
-      "x": 8.5,
-      "y": 6.0,
-      "z": -2.2,
-      "room": "basement_vault",
+      "x": 14.5,
+      "y": 9.0,
+      "z": 0.5,
+      "room": "back_office",
       "required": true,
-      "duration": 45.0,
-      "meta": {
-        "phase": "loud",
-        "noise_radius": 30
-      }
-    },
-    {
-      "name": "OBJECTIVE_WIPE_CAMERA_SERVER",
-      "id": "wipe_camera_server",
-      "kind": "hack",
-      "x": 8.0,
-      "y": 8.0,
-      "z": 4.4,
-      "room": "server_room",
-      "required": false,
-      "duration": 18.0,
-      "meta": {
-        "reward": "lower_alarm_pressure"
-      }
+      "duration": 30.0,
+      "meta": null
     }
   ],
   "loot": [
     {
-      "name": "LOOT_CIGARETTE_CASE_01",
-      "id": "cigarette_case_01",
-      "kind": "contraband_case",
-      "x": 13.5,
-      "y": 10.0,
-      "z": 0.9,
-      "value": 1500,
-      "bags": 1,
-      "room": "stockroom_loading",
-      "meta": null
-    },
-    {
-      "name": "LOOT_COLD_ROOM_RARE_MEAT",
-      "id": "cold_room_rare_meat",
-      "kind": "black_market_food",
-      "x": -8.0,
-      "y": 5.0,
-      "z": -2.1,
-      "value": 2200,
-      "bags": 2,
-      "room": "cold_storage",
-      "meta": null
-    },
-    {
-      "name": "LOOT_VAULT_CASH_BAGS",
-      "id": "vault_cash_bags",
+      "name": "LOOT_REGISTER_CASH",
+      "id": "register_cash",
       "kind": "cash",
-      "x": 8.5,
-      "y": 6.0,
-      "z": -2.0,
-      "value": 8000,
-      "bags": 3,
-      "room": "basement_vault",
+      "x": -12.0,
+      "y": -7.0,
+      "z": 0.9,
+      "value": 2500,
+      "bags": 1,
+      "room": "sales_floor",
       "meta": null
     },
     {
-      "name": "LOOT_MANAGER_SAFE_DOCS",
-      "id": "manager_safe_docs",
-      "kind": "evidence",
-      "x": -9.5,
-      "y": -6.5,
-      "z": 4.2,
+      "name": "LOOT_SAFE_CASH",
+      "id": "safe_cash",
+      "kind": "cash",
+      "x": 14.5,
+      "y": 9.0,
+      "z": 0.6,
+      "value": 8000,
+      "bags": 2,
+      "room": "back_office",
+      "meta": null
+    },
+    {
+      "name": "LOOT_STOCK_CONTRABAND",
+      "id": "stock_contraband",
+      "kind": "contraband",
+      "x": 11.0,
+      "y": -2.5,
+      "z": 1.0,
       "value": 3000,
       "bags": 1,
-      "room": "manager_office",
+      "room": "stockroom",
       "meta": null
     }
   ],
   "zones": [
     {
-      "name": "EXTRACTION_ZONE_SOUTH_VAN_EXTRACT",
-      "id": "south_van_extract",
+      "name": "EXTRACTION_ZONE_FORECOURT_EXTRACT",
+      "id": "forecourt_extract",
       "kind": "extraction",
       "story": 0,
       "bounds": [
-        -6.0,
-        -20.0,
-        6.0,
-        -15.0
+        -12.0,
+        -24.0,
+        12.0,
+        -14.0
       ],
       "center": [
         0.0,
-        -17.5,
+        -19.0,
         0.0
       ],
-      "meta": {
-        "vehicle": "ice_cream_truck",
-        "phase": "escape"
-      }
-    },
-    {
-      "name": "DROP_ZONE_REAR_ALLEY_DROP",
-      "id": "rear_alley_drop",
-      "kind": "drop",
-      "story": 0,
-      "bounds": [
-        8.0,
-        15.0,
-        18.0,
-        20.0
-      ],
-      "center": [
-        13.0,
-        17.5,
-        0.0
-      ],
-      "meta": {
-        "bag_throw": true
-      }
-    },
-    {
-      "name": "SECURE_ZONE_STOCKROOM_SECURE_AREA",
-      "id": "stockroom_secure_area",
-      "kind": "secure",
-      "story": 0,
-      "bounds": [
-        7.0,
-        6.0,
-        19.0,
-        14.0
-      ],
-      "center": [
-        13.0,
-        10.0,
-        0.0
-      ],
-      "meta": {
-        "temporary_loot_hold": true
-      }
+      "meta": null
     }
   ],
   "materials": [
     {
-      "id": "brick_ext",
+      "id": "concrete",
       "acoustic": "Concrete",
-      "absorption": 0.72,
-      "damping": 0.62
+      "absorption": 0.7,
+      "damping": 0.6
     },
     {
       "id": "drywall",
       "acoustic": "Drywall",
-      "absorption": 0.42,
-      "damping": 0.38
+      "absorption": null,
+      "damping": null
     },
     {
       "id": "glass",
       "acoustic": "Glass",
-      "absorption": 0.08,
+      "absorption": 0.1,
       "damping": 0.05
     },
     {
       "id": "metal",
       "acoustic": "Metal",
-      "absorption": 0.18,
-      "damping": 0.16
+      "absorption": 0.5,
+      "damping": 0.3
     },
     {
       "id": "wood",
       "acoustic": "Wood",
-      "absorption": 0.35,
-      "damping": 0.3
+      "absorption": null,
+      "damping": null
     }
   ],
   "surfaces": [
     {
-      "node": "ext_col_-1_N",
+      "node": "ext_col_0_N_seg0",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "ext_col_-1_S",
+      "node": "ext_col_0_N_seg1",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "ext_col_-1_E",
+      "node": "ext_col_0_N_seg2",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "ext_col_-1_W",
+      "node": "ext_col_0_N_open0_lintel",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "ext_col_0_N",
+      "node": "ext_col_0_N_open0_BREACHPANEL",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "ext_col_0_S",
+      "node": "ext_col_0_N_seg3",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "ext_col_0_E",
+      "node": "ext_col_0_N_seg4",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "ext_col_0_W",
+      "node": "ext_col_0_N_seg5",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "ext_col_1_N",
+      "node": "ext_col_0_N_seg6",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "ext_col_1_S",
+      "node": "ext_col_0_N_seg7",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "ext_col_1_E",
+      "node": "ext_col_0_N_seg8",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "ext_col_1_W",
+      "node": "ext_col_0_N_seg9",
       "material": {
-        "id": "brick_ext",
+        "id": "concrete",
         "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "int_col_0_0",
+      "node": "ext_col_0_N_seg10",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_N_seg11",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_N_open1_lintel",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_N_seg12",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_N_seg13",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_N_open2_lintel",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_N_seg14",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg0",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_open0_lintel",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_open0_sill",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_open0_pane",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg1",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg2",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg3",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_open1_lintel",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg4",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg5",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg6",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg7",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg8",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_open2_lintel",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg9",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg10",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg11",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_open3_lintel",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_open3_sill",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_open3_pane",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_S_seg12",
+      "material": {
+        "id": "glass",
+        "acoustic": "Glass",
+        "absorption": 0.1,
+        "damping": 0.05
+      }
+    },
+    {
+      "node": "ext_col_0_E_seg0",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_E_seg1",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_E_seg2",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_E_open0_lintel",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_E_seg3",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_E_seg4",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_E_seg5",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_E_seg6",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_E_seg7",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_E_seg8",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_E_seg9",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_E_seg10",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_seg0",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_seg1",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_seg2",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_seg3",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_seg4",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_open0_lintel",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_seg5",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_seg6",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_seg7",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_seg8",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_open1_lintel",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_open1_sill",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_open1_pane",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_seg9",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "ext_col_0_W_seg10",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "int_col_0_0_seg0",
       "material": {
         "id": "drywall",
         "acoustic": "Drywall",
-        "absorption": 0.42,
-        "damping": 0.38
+        "absorption": null,
+        "damping": null
       }
     },
     {
-      "node": "int_col_0_1",
+      "node": "int_col_0_0_seg1",
       "material": {
         "id": "drywall",
         "acoustic": "Drywall",
-        "absorption": 0.42,
-        "damping": 0.38
+        "absorption": null,
+        "damping": null
       }
     },
     {
-      "node": "int_col_0_2",
+      "node": "int_col_0_0_open0_lintel",
       "material": {
         "id": "drywall",
         "acoustic": "Drywall",
-        "absorption": 0.42,
-        "damping": 0.38
+        "absorption": null,
+        "damping": null
       }
     },
     {
-      "node": "int_col_0_3",
+      "node": "int_col_0_0_seg2",
       "material": {
         "id": "drywall",
         "acoustic": "Drywall",
-        "absorption": 0.42,
-        "damping": 0.38
+        "absorption": null,
+        "damping": null
       }
     },
     {
-      "node": "int_col_1_4",
+      "node": "int_col_0_0_seg3",
       "material": {
         "id": "drywall",
         "acoustic": "Drywall",
-        "absorption": 0.42,
-        "damping": 0.38
+        "absorption": null,
+        "damping": null
       }
     },
     {
-      "node": "int_col_1_5",
+      "node": "int_col_0_0_seg4",
       "material": {
         "id": "drywall",
         "acoustic": "Drywall",
-        "absorption": 0.42,
-        "damping": 0.38
+        "absorption": null,
+        "damping": null
       }
     },
     {
-      "node": "int_col_-1_6",
+      "node": "int_col_0_0_seg5",
       "material": {
-        "id": "brick_ext",
-        "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
       }
     },
     {
-      "node": "int_col_-1_7",
+      "node": "int_col_0_0_seg6",
       "material": {
-        "id": "brick_ext",
-        "acoustic": "Concrete",
-        "absorption": 0.72,
-        "damping": 0.62
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_0_seg7",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_0_open1_lintel",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_0_seg8",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_0_seg9",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_1_seg0",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_1_seg1",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_1_seg2",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_1_open0_lintel",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_1_seg3",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_1_seg4",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_1_seg5",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_2_seg0",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_2_seg1",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_3_seg0",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_3_open0_lintel",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "int_col_0_3_seg1",
+      "material": {
+        "id": "drywall",
+        "acoustic": "Drywall",
+        "absorption": null,
+        "damping": null
       }
     },
     {
@@ -1388,80 +1486,71 @@
       "material": {
         "id": "wood",
         "acoustic": "Wood",
-        "absorption": 0.35,
-        "damping": 0.3
+        "absorption": null,
+        "damping": null
       }
     },
     {
-      "node": "VAULTLEDGE_1-convcolonly",
-      "material": {
-        "id": "metal",
-        "acoustic": "Metal",
-        "absorption": 0.18,
-        "damping": 0.16
-      }
-    },
-    {
-      "node": "front_register_counter_col",
+      "node": "register_counter_col",
       "material": {
         "id": "wood",
         "acoustic": "Wood",
-        "absorption": 0.35,
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "aisle_1_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
         "damping": 0.3
       }
     },
     {
-      "node": "deli_case_cover_col",
+      "node": "aisle_2_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "coffee_island_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "cooler_run_col",
       "material": {
         "id": "glass",
         "acoustic": "Glass",
-        "absorption": 0.08,
+        "absorption": 0.1,
         "damping": 0.05
       }
     },
     {
-      "node": "aisle_shelf_01_col",
+      "node": "stock_rack_1_col",
       "material": {
         "id": "metal",
         "acoustic": "Metal",
-        "absorption": 0.18,
-        "damping": 0.16
-      }
-    },
-    {
-      "node": "aisle_shelf_02_col",
-      "material": {
-        "id": "metal",
-        "acoustic": "Metal",
-        "absorption": 0.18,
-        "damping": 0.16
-      }
-    },
-    {
-      "node": "kitchen_prep_table_col",
-      "material": {
-        "id": "metal",
-        "acoustic": "Metal",
-        "absorption": 0.18,
-        "damping": 0.16
-      }
-    },
-    {
-      "node": "loading_pallet_stack_col",
-      "material": {
-        "id": "wood",
-        "acoustic": "Wood",
-        "absorption": 0.35,
+        "absorption": 0.5,
         "damping": 0.3
       }
     },
     {
-      "node": "stockroom_rack_01_col",
+      "node": "stock_rack_2_col",
       "material": {
         "id": "metal",
         "acoustic": "Metal",
-        "absorption": 0.18,
-        "damping": 0.16
+        "absorption": 0.5,
+        "damping": 0.3
       }
     },
     {
@@ -1469,89 +1558,215 @@
       "material": {
         "id": "wood",
         "acoustic": "Wood",
-        "absorption": 0.35,
+        "absorption": null,
+        "damping": null
+      }
+    },
+    {
+      "node": "office_safe_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
         "damping": 0.3
       }
     },
     {
-      "node": "server_rack_cluster_col",
+      "node": "forecourt_pad_col",
       "material": {
-        "id": "metal",
-        "acoustic": "Metal",
-        "absorption": 0.18,
-        "damping": 0.16
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
       }
     },
     {
-      "node": "apartment_sofa_cover_col",
+      "node": "canopy_roof_col",
       "material": {
-        "id": "wood",
-        "acoustic": "Wood",
-        "absorption": 0.35,
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
         "damping": 0.3
       }
     },
     {
-      "node": "basement_vault_block_col",
+      "node": "canopy_col_1_col",
       "material": {
         "id": "metal",
         "acoustic": "Metal",
-        "absorption": 0.18,
-        "damping": 0.16
+        "absorption": 0.5,
+        "damping": 0.3
       }
     },
     {
-      "node": "basement_cold_room_rack_col",
+      "node": "canopy_col_2_col",
       "material": {
         "id": "metal",
         "acoustic": "Metal",
-        "absorption": 0.18,
-        "damping": 0.16
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "canopy_col_3_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "canopy_col_4_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "canopy_col_5_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "canopy_col_6_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "pump_island_1_col",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "pump_island_2_col",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "pump_island_3_col",
+      "material": {
+        "id": "concrete",
+        "acoustic": "Concrete",
+        "absorption": 0.7,
+        "damping": 0.6
+      }
+    },
+    {
+      "node": "pump_1_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "pump_2_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "pump_3_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "pump_4_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "pump_5_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
+      }
+    },
+    {
+      "node": "pump_6_col",
+      "material": {
+        "id": "metal",
+        "acoustic": "Metal",
+        "absorption": 0.5,
+        "damping": 0.3
       }
     }
   ],
   "interactives": [
     {
-      "id": "corner_deli_heist_01:if:5de07020",
-      "kind": "door",
-      "slot_ref": "ext_0_N_open0",
-      "transform": {
-        "translation": [
-          -9.5,
-          14.0,
-          1.5
-        ],
-        "rot_y": 0
-      },
-      "states": [
-        "closed",
-        "open"
-      ],
-      "default": "closed",
-      "transitions": [
-        {
-          "event": "toggle",
-          "from": "closed",
-          "to": "open"
-        },
-        {
-          "event": "toggle",
-          "from": "open",
-          "to": "closed"
-        }
-      ],
-      "source": "inferred",
-      "reversible": true,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:e6e25b48",
+      "id": "gs_corner_station:if:ced64cc5",
       "kind": "door",
       "slot_ref": "ext_0_N_open1",
       "transform": {
         "translation": [
-          12.16,
-          14.0,
+          8.96,
+          11.0,
+          1.65
+        ],
+        "rot_y": 0
+      },
+      "states": [
+        "closed",
+        "open"
+      ],
+      "default": "closed",
+      "transitions": [
+        {
+          "event": "toggle",
+          "from": "closed",
+          "to": "open"
+        },
+        {
+          "event": "toggle",
+          "from": "open",
+          "to": "closed"
+        }
+      ],
+      "source": "inferred",
+      "reversible": true,
+      "building": "gs_corner_station"
+    },
+    {
+      "id": "gs_corner_station:if:5abacd00",
+      "kind": "door",
+      "slot_ref": "ext_0_N_open2",
+      "transform": {
+        "translation": [
+          14.72,
+          11.0,
           1.25
         ],
         "rot_y": 0
@@ -1575,16 +1790,44 @@
       ],
       "source": "inferred",
       "reversible": true,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
-      "id": "corner_deli_heist_01:if:d4d4b0e8",
-      "kind": "door",
-      "slot_ref": "ext_0_S_open0",
+      "id": "gs_corner_station:if:3a4a19b5",
+      "kind": "breach_wall",
+      "slot_ref": "ext_0_N_open0",
       "transform": {
         "translation": [
-          -10.64,
-          -14.0,
+          -9.6,
+          11.0,
+          1.25
+        ],
+        "rot_y": 0
+      },
+      "states": [
+        "intact",
+        "breached"
+      ],
+      "default": "intact",
+      "transitions": [
+        {
+          "event": "breach",
+          "from": "intact",
+          "to": "breached"
+        }
+      ],
+      "source": "inferred",
+      "reversible": false,
+      "building": "gs_corner_station"
+    },
+    {
+      "id": "gs_corner_station:if:e701924e",
+      "kind": "door",
+      "slot_ref": "ext_0_S_open1",
+      "transform": {
+        "translation": [
+          -5.12,
+          -11.0,
           1.25
         ],
         "rot_y": 180
@@ -1608,44 +1851,82 @@
       ],
       "source": "inferred",
       "reversible": true,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
-      "id": "corner_deli_heist_01:if:999457c3",
-      "kind": "breach_wall",
+      "id": "gs_corner_station:if:cce54c5a",
+      "kind": "door",
       "slot_ref": "ext_0_S_open2",
       "transform": {
         "translation": [
-          12.92,
-          -14.0,
+          5.12,
+          -11.0,
           1.25
         ],
         "rot_y": 180
       },
       "states": [
-        "intact",
-        "breached"
+        "closed",
+        "open"
       ],
-      "default": "intact",
+      "default": "closed",
       "transitions": [
         {
-          "event": "breach",
-          "from": "intact",
-          "to": "breached"
+          "event": "toggle",
+          "from": "closed",
+          "to": "open"
+        },
+        {
+          "event": "toggle",
+          "from": "open",
+          "to": "closed"
         }
       ],
       "source": "inferred",
-      "reversible": false,
-      "building": "corner_deli_heist_01"
+      "reversible": true,
+      "building": "gs_corner_station"
     },
     {
-      "id": "corner_deli_heist_01:if:02e3da41",
+      "id": "gs_corner_station:if:3f956874",
       "kind": "door",
-      "slot_ref": "ext_0_W_open1",
+      "slot_ref": "ext_0_E_open0",
       "transform": {
         "translation": [
-          -19.0,
-          5.04,
+          16.0,
+          -4.4,
+          1.25
+        ],
+        "rot_y": 90
+      },
+      "states": [
+        "closed",
+        "open"
+      ],
+      "default": "closed",
+      "transitions": [
+        {
+          "event": "toggle",
+          "from": "closed",
+          "to": "open"
+        },
+        {
+          "event": "toggle",
+          "from": "open",
+          "to": "closed"
+        }
+      ],
+      "source": "inferred",
+      "reversible": true,
+      "building": "gs_corner_station"
+    },
+    {
+      "id": "gs_corner_station:if:741a5438",
+      "kind": "door",
+      "slot_ref": "ext_0_W_open0",
+      "transform": {
+        "translation": [
+          -16.0,
+          -2.2,
           1.25
         ],
         "rot_y": 270
@@ -1669,75 +1950,19 @@
       ],
       "source": "inferred",
       "reversible": true,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
-      "id": "corner_deli_heist_01:if:fec0cf10",
-      "kind": "breach_wall",
-      "slot_ref": "ext_0_W_open0",
-      "transform": {
-        "translation": [
-          -19.0,
-          -8.96,
-          1.25
-        ],
-        "rot_y": 270
-      },
-      "states": [
-        "intact",
-        "breached"
-      ],
-      "default": "intact",
-      "transitions": [
-        {
-          "event": "breach",
-          "from": "intact",
-          "to": "breached"
-        }
-      ],
-      "source": "inferred",
-      "reversible": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:ea0b5c76",
-      "kind": "breach_wall",
-      "slot_ref": "ext_1_N_open1",
-      "transform": {
-        "translation": [
-          12.92,
-          14.0,
-          4.55
-        ],
-        "rot_y": 0
-      },
-      "states": [
-        "intact",
-        "breached"
-      ],
-      "default": "intact",
-      "transitions": [
-        {
-          "event": "breach",
-          "from": "intact",
-          "to": "breached"
-        }
-      ],
-      "source": "inferred",
-      "reversible": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:cc04aa87",
+      "id": "gs_corner_station:if:ea8a70ee",
       "kind": "door",
       "slot_ref": "int_0_0_open0",
       "transform": {
         "translation": [
-          -11.2,
-          -8.0,
+          6.0,
+          -6.6,
           1.25
         ],
-        "rot_y": 0
+        "rot_y": 90
       },
       "states": [
         "closed",
@@ -1758,139 +1983,17 @@
       ],
       "source": "inferred",
       "reversible": true,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
-      "id": "corner_deli_heist_01:if:3ab06757",
-      "kind": "breach_wall",
+      "id": "gs_corner_station:if:8c4aac21",
+      "kind": "door",
       "slot_ref": "int_0_0_open1",
       "transform": {
         "translation": [
-          10.64,
-          -8.0,
-          1.25
-        ],
-        "rot_y": 0
-      },
-      "states": [
-        "intact",
-        "breached"
-      ],
-      "default": "intact",
-      "transitions": [
-        {
-          "event": "breach",
-          "from": "intact",
-          "to": "breached"
-        }
-      ],
-      "source": "inferred",
-      "reversible": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:db7c601c",
-      "kind": "door",
-      "slot_ref": "int_0_1_open1",
-      "transform": {
-        "translation": [
-          11.76,
-          7.0,
-          1.25
-        ],
-        "rot_y": 0
-      },
-      "states": [
-        "closed",
-        "open"
-      ],
-      "default": "closed",
-      "transitions": [
-        {
-          "event": "toggle",
-          "from": "closed",
-          "to": "open"
-        },
-        {
-          "event": "toggle",
-          "from": "open",
-          "to": "closed"
-        }
-      ],
-      "source": "inferred",
-      "reversible": true,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:8b24e5fa",
-      "kind": "door",
-      "slot_ref": "int_0_2_open0",
-      "transform": {
-        "translation": [
-          -3.0,
-          -1.9,
-          1.25
-        ],
-        "rot_y": 90
-      },
-      "states": [
-        "closed",
-        "open"
-      ],
-      "default": "closed",
-      "transitions": [
-        {
-          "event": "toggle",
-          "from": "closed",
-          "to": "open"
-        },
-        {
-          "event": "toggle",
-          "from": "open",
-          "to": "closed"
-        }
-      ],
-      "source": "inferred",
-      "reversible": true,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:436c4802",
-      "kind": "breach_wall",
-      "slot_ref": "int_0_2_open1",
-      "transform": {
-        "translation": [
-          -3.0,
-          10.64,
-          1.25
-        ],
-        "rot_y": 90
-      },
-      "states": [
-        "intact",
-        "breached"
-      ],
-      "default": "intact",
-      "transitions": [
-        {
-          "event": "breach",
-          "from": "intact",
-          "to": "breached"
-        }
-      ],
-      "source": "inferred",
-      "reversible": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:064e5357",
-      "kind": "door",
-      "slot_ref": "int_0_3_open1",
-      "transform": {
-        "translation": [
           6.0,
-          5.7,
-          1.4
+          6.6,
+          1.25
         ],
         "rot_y": 90
       },
@@ -1913,51 +2016,51 @@
       ],
       "source": "inferred",
       "reversible": true,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     },
     {
-      "id": "corner_deli_heist_01:if:2140fa26",
+      "id": "gs_corner_station:if:b2cbf614",
+      "kind": "door",
+      "slot_ref": "int_0_1_open0",
+      "transform": {
+        "translation": [
+          11.0,
+          2.0,
+          1.25
+        ],
+        "rot_y": 0
+      },
+      "states": [
+        "closed",
+        "open"
+      ],
+      "default": "closed",
+      "transitions": [
+        {
+          "event": "toggle",
+          "from": "closed",
+          "to": "open"
+        },
+        {
+          "event": "toggle",
+          "from": "open",
+          "to": "closed"
+        }
+      ],
+      "source": "inferred",
+      "reversible": true,
+      "building": "gs_corner_station"
+    },
+    {
+      "id": "gs_corner_station:if:e20668f9",
       "kind": "door",
       "slot_ref": "int_0_3_open0",
       "transform": {
         "translation": [
-          6.0,
-          -15.2,
+          14.25,
+          -8.0,
           1.25
         ],
-        "rot_y": 90
-      },
-      "states": [
-        "closed",
-        "open"
-      ],
-      "default": "closed",
-      "transitions": [
-        {
-          "event": "toggle",
-          "from": "closed",
-          "to": "open"
-        },
-        {
-          "event": "toggle",
-          "from": "open",
-          "to": "closed"
-        }
-      ],
-      "source": "inferred",
-      "reversible": true,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:ad28c071",
-      "kind": "door",
-      "slot_ref": "int_1_4_open0",
-      "transform": {
-        "translation": [
-          0.0,
-          -2.0,
-          4.55
-        ],
         "rot_y": 0
       },
       "states": [
@@ -1979,338 +2082,129 @@
       ],
       "source": "inferred",
       "reversible": true,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:311477aa",
-      "kind": "breach_wall",
-      "slot_ref": "int_1_4_open1",
-      "transform": {
-        "translation": [
-          10.08,
-          -2.0,
-          4.55
-        ],
-        "rot_y": 0
-      },
-      "states": [
-        "intact",
-        "breached"
-      ],
-      "default": "intact",
-      "transitions": [
-        {
-          "event": "breach",
-          "from": "intact",
-          "to": "breached"
-        }
-      ],
-      "source": "inferred",
-      "reversible": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:34a48184",
-      "kind": "door",
-      "slot_ref": "int_1_5_open0",
-      "transform": {
-        "translation": [
-          2.0,
-          -9.5,
-          4.55
-        ],
-        "rot_y": 90
-      },
-      "states": [
-        "closed",
-        "open"
-      ],
-      "default": "closed",
-      "transitions": [
-        {
-          "event": "toggle",
-          "from": "closed",
-          "to": "open"
-        },
-        {
-          "event": "toggle",
-          "from": "open",
-          "to": "closed"
-        }
-      ],
-      "source": "inferred",
-      "reversible": true,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:4e478581",
-      "kind": "breach_wall",
-      "slot_ref": "int_1_5_open1",
-      "transform": {
-        "translation": [
-          2.0,
-          10.64,
-          4.55
-        ],
-        "rot_y": 90
-      },
-      "states": [
-        "intact",
-        "breached"
-      ],
-      "default": "intact",
-      "transitions": [
-        {
-          "event": "breach",
-          "from": "intact",
-          "to": "breached"
-        }
-      ],
-      "source": "inferred",
-      "reversible": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:feba4677",
-      "kind": "door",
-      "slot_ref": "int_-1_6_open0",
-      "transform": {
-        "translation": [
-          -8.4,
-          1.0,
-          -2.05
-        ],
-        "rot_y": 0
-      },
-      "states": [
-        "closed",
-        "open"
-      ],
-      "default": "closed",
-      "transitions": [
-        {
-          "event": "toggle",
-          "from": "closed",
-          "to": "open"
-        },
-        {
-          "event": "toggle",
-          "from": "open",
-          "to": "closed"
-        }
-      ],
-      "source": "inferred",
-      "reversible": true,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:909a2fa6",
-      "kind": "breach_wall",
-      "slot_ref": "int_-1_6_open1",
-      "transform": {
-        "translation": [
-          7.2,
-          1.0,
-          -2.05
-        ],
-        "rot_y": 0
-      },
-      "states": [
-        "intact",
-        "breached"
-      ],
-      "default": "intact",
-      "transitions": [
-        {
-          "event": "breach",
-          "from": "intact",
-          "to": "breached"
-        }
-      ],
-      "source": "inferred",
-      "reversible": false,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:9e66308f",
-      "kind": "door",
-      "slot_ref": "int_-1_7_open1",
-      "transform": {
-        "translation": [
-          1.0,
-          3.2,
-          -2.05
-        ],
-        "rot_y": 90
-      },
-      "states": [
-        "closed",
-        "open"
-      ],
-      "default": "closed",
-      "transitions": [
-        {
-          "event": "toggle",
-          "from": "closed",
-          "to": "open"
-        },
-        {
-          "event": "toggle",
-          "from": "open",
-          "to": "closed"
-        }
-      ],
-      "source": "inferred",
-      "reversible": true,
-      "building": "corner_deli_heist_01"
-    },
-    {
-      "id": "corner_deli_heist_01:if:6e4b8710",
-      "kind": "breach_wall",
-      "slot_ref": "int_-1_7_open0",
-      "transform": {
-        "translation": [
-          1.0,
-          -10.24,
-          -2.05
-        ],
-        "rot_y": 90
-      },
-      "states": [
-        "intact",
-        "breached"
-      ],
-      "default": "intact",
-      "transitions": [
-        {
-          "event": "breach",
-          "from": "intact",
-          "to": "breached"
-        }
-      ],
-      "source": "inferred",
-      "reversible": false,
-      "building": "corner_deli_heist_01"
+      "building": "gs_corner_station"
     }
   ],
   "surface_roles": {
-    "slab_-1": "floor",
     "slab_0": "floor",
-    "slab_1": "floor",
-    "slab_2": "ceiling",
-    "ext_-1_N": "wall",
-    "ext_-1_S": "wall",
-    "ext_-1_E": "wall",
-    "ext_-1_W": "wall",
-    "ext_0_N": "wall",
-    "ext_0_S": "wall",
-    "ext_0_E": "wall",
-    "ext_0_W": "wall",
-    "ext_1_N": "wall",
-    "ext_1_S": "wall",
-    "ext_1_E": "wall",
-    "ext_1_W": "wall",
-    "int_0_0": "wall",
-    "int_0_1": "wall",
-    "int_0_2": "wall",
-    "int_0_3": "wall",
-    "int_1_4": "wall",
-    "int_1_5": "wall",
-    "int_-1_6": "wall",
-    "int_-1_7": "wall",
-    "stair0_-1_0": "stair",
-    "stair0_-1_1": "stair",
-    "stair0_-1_2": "stair",
-    "stair0_-1_3": "stair",
-    "stair0_-1_4": "stair",
-    "stair0_-1_5": "stair",
-    "stair0_-1_6": "stair",
-    "stair0_-1_7": "stair",
-    "stair0_-1_8": "stair",
-    "stair0_-1_9": "stair",
-    "stair0_-1_10": "stair",
-    "stair0_-1_11": "stair",
-    "stair0_-1_12": "stair",
-    "stair0_-1_13": "stair",
-    "stair0_-1_14": "stair",
-    "stair0_-1_15": "stair",
-    "stair0_land_-1": "stair",
-    "stair0_0_0": "stair",
-    "stair0_0_1": "stair",
-    "stair0_0_2": "stair",
-    "stair0_0_3": "stair",
-    "stair0_0_4": "stair",
-    "stair0_0_5": "stair",
-    "stair0_0_6": "stair",
-    "stair0_0_7": "stair",
-    "stair0_0_8": "stair",
-    "stair0_0_9": "stair",
-    "stair0_0_10": "stair",
-    "stair0_0_11": "stair",
-    "stair0_0_12": "stair",
-    "stair0_0_13": "stair",
-    "stair0_0_14": "stair",
-    "stair0_0_15": "stair",
-    "stair0_land_0": "stair",
-    "stair0_1_0": "stair",
-    "stair0_1_1": "stair",
-    "stair0_1_2": "stair",
-    "stair0_1_3": "stair",
-    "stair0_1_4": "stair",
-    "stair0_1_5": "stair",
-    "stair0_1_6": "stair",
-    "stair0_1_7": "stair",
-    "stair0_1_8": "stair",
-    "stair0_1_9": "stair",
-    "stair0_1_10": "stair",
-    "stair0_1_11": "stair",
-    "stair0_1_12": "stair",
-    "stair0_1_13": "stair",
-    "stair0_1_14": "stair",
-    "stair0_1_15": "stair",
-    "ladder0_rail_0_-1": "ladder",
-    "ladder0_rail_0_1": "ladder",
-    "ladder0_rung_0_0": "ladder",
-    "ladder0_rung_0_1": "ladder",
-    "ladder0_rung_0_2": "ladder",
-    "ladder0_rung_0_3": "ladder",
-    "ladder0_rung_0_4": "ladder",
-    "ladder0_rung_0_5": "ladder",
-    "ladder0_rung_0_6": "ladder",
-    "ladder0_rung_0_7": "ladder",
-    "ladder0_rung_0_8": "ladder",
-    "ladder0_rung_0_9": "ladder",
-    "ladder0_rung_0_10": "ladder",
-    "ladder0_rail_1_-1": "ladder",
-    "ladder0_rail_1_1": "ladder",
-    "ladder0_rung_1_0": "ladder",
-    "ladder0_rung_1_1": "ladder",
-    "ladder0_rung_1_2": "ladder",
-    "ladder0_rung_1_3": "ladder",
-    "ladder0_rung_1_4": "ladder",
-    "ladder0_rung_1_5": "ladder",
-    "ladder0_rung_1_6": "ladder",
-    "ladder0_rung_1_7": "ladder",
-    "ladder0_rung_1_8": "ladder",
-    "ladder0_rung_1_9": "ladder",
-    "ladder0_rung_1_10": "ladder",
+    "slab_1": "ceiling",
+    "ext_0_N_seg0": "wall",
+    "ext_0_N_seg1": "wall",
+    "ext_0_N_seg2": "wall",
+    "ext_0_N_open0_lintel": "breach",
+    "ext_0_N_open0_BREACHPANEL": "breach",
+    "ext_0_N_seg3": "wall",
+    "ext_0_N_seg4": "wall",
+    "ext_0_N_seg5": "wall",
+    "ext_0_N_seg6": "wall",
+    "ext_0_N_seg7": "wall",
+    "ext_0_N_seg8": "wall",
+    "ext_0_N_seg9": "wall",
+    "ext_0_N_seg10": "wall",
+    "ext_0_N_seg11": "wall",
+    "ext_0_N_open1_lintel": "doorway",
+    "ext_0_N_seg12": "wall",
+    "ext_0_N_seg13": "wall",
+    "ext_0_N_open2_lintel": "doorway",
+    "ext_0_N_seg14": "wall",
+    "ext_0_S_seg0": "wall",
+    "ext_0_S_open0_lintel": "window",
+    "ext_0_S_open0_sill": "window",
+    "ext_0_S_open0_pane": "window",
+    "ext_0_S_seg1": "wall",
+    "ext_0_S_seg2": "wall",
+    "ext_0_S_seg3": "wall",
+    "ext_0_S_open1_lintel": "doorway",
+    "ext_0_S_seg4": "wall",
+    "ext_0_S_seg5": "wall",
+    "ext_0_S_seg6": "wall",
+    "ext_0_S_seg7": "wall",
+    "ext_0_S_seg8": "wall",
+    "ext_0_S_open2_lintel": "doorway",
+    "ext_0_S_seg9": "wall",
+    "ext_0_S_seg10": "wall",
+    "ext_0_S_seg11": "wall",
+    "ext_0_S_open3_lintel": "window",
+    "ext_0_S_open3_sill": "window",
+    "ext_0_S_open3_pane": "window",
+    "ext_0_S_seg12": "wall",
+    "ext_0_E_seg0": "wall",
+    "ext_0_E_seg1": "wall",
+    "ext_0_E_seg2": "wall",
+    "ext_0_E_open0_lintel": "doorway",
+    "ext_0_E_seg3": "wall",
+    "ext_0_E_seg4": "wall",
+    "ext_0_E_seg5": "wall",
+    "ext_0_E_seg6": "wall",
+    "ext_0_E_seg7": "wall",
+    "ext_0_E_seg8": "wall",
+    "ext_0_E_seg9": "wall",
+    "ext_0_E_seg10": "wall",
+    "ext_0_W_seg0": "wall",
+    "ext_0_W_seg1": "wall",
+    "ext_0_W_seg2": "wall",
+    "ext_0_W_seg3": "wall",
+    "ext_0_W_seg4": "wall",
+    "ext_0_W_open0_lintel": "doorway",
+    "ext_0_W_seg5": "wall",
+    "ext_0_W_seg6": "wall",
+    "ext_0_W_seg7": "wall",
+    "ext_0_W_seg8": "wall",
+    "ext_0_W_open1_lintel": "window",
+    "ext_0_W_open1_sill": "window",
+    "ext_0_W_open1_pane": "window",
+    "ext_0_W_seg9": "wall",
+    "ext_0_W_seg10": "wall",
+    "int_0_0_seg0": "wall",
+    "int_0_0_seg1": "wall",
+    "int_0_0_open0_lintel": "doorway",
+    "int_0_0_seg2": "wall",
+    "int_0_0_seg3": "wall",
+    "int_0_0_seg4": "wall",
+    "int_0_0_seg5": "wall",
+    "int_0_0_seg6": "wall",
+    "int_0_0_seg7": "wall",
+    "int_0_0_open1_lintel": "doorway",
+    "int_0_0_seg8": "wall",
+    "int_0_0_seg9": "wall",
+    "int_0_1_seg0": "wall",
+    "int_0_1_seg1": "wall",
+    "int_0_1_seg2": "wall",
+    "int_0_1_open0_lintel": "doorway",
+    "int_0_1_seg3": "wall",
+    "int_0_1_seg4": "wall",
+    "int_0_1_seg5": "wall",
+    "int_0_2_seg0": "wall",
+    "int_0_2_seg1": "wall",
+    "int_0_3_seg0": "wall",
+    "int_0_3_open0_lintel": "doorway",
+    "int_0_3_seg1": "wall",
     "VAULTLEDGE_0": "floor",
-    "VAULTLEDGE_1": "floor",
-    "front_register_counter": "prop",
-    "deli_case_cover": "prop",
-    "aisle_shelf_01": "prop",
-    "aisle_shelf_02": "prop",
-    "kitchen_prep_table": "prop",
-    "loading_pallet_stack": "prop",
-    "stockroom_rack_01": "prop",
+    "register_counter": "prop",
+    "aisle_1": "prop",
+    "aisle_2": "prop",
+    "coffee_island": "prop",
+    "cooler_run": "prop",
+    "stock_rack_1": "prop",
+    "stock_rack_2": "prop",
     "manager_desk": "prop",
-    "server_rack_cluster": "prop",
-    "apartment_sofa_cover": "prop",
-    "basement_vault_block": "prop",
-    "basement_cold_room_rack": "prop",
-    "parapet_N": "wall",
-    "parapet_S": "wall",
-    "parapet_E": "wall",
-    "parapet_W": "wall"
+    "office_safe": "prop",
+    "forecourt_pad": "prop",
+    "canopy_roof": "prop",
+    "canopy_col_1": "prop",
+    "canopy_col_2": "prop",
+    "canopy_col_3": "prop",
+    "canopy_col_4": "prop",
+    "canopy_col_5": "prop",
+    "canopy_col_6": "prop",
+    "pump_island_1": "prop",
+    "pump_island_2": "prop",
+    "pump_island_3": "prop",
+    "pump_1": "prop",
+    "pump_2": "prop",
+    "pump_3": "prop",
+    "pump_4": "prop",
+    "pump_5": "prop",
+    "pump_6": "prop"
   }
 }
