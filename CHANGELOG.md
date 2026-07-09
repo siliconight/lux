@@ -7,6 +7,18 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.9.0] — 2026-07-09
+
+### Added
+- **Look-dev harness** (`addons/lux/lookdev/`) — a scene for tuning the PS2 pop
+  live on a real building. Loads a Patina-art-passed `.glb`, applies the LEVEL
+  role, and drives the grade/post knobs (saturation, glow, contrast, warmth,
+  palette influence, dither, vignette, fog) in real time via hotkeys with an
+  on-screen readout. Edits a local preset copy (`LuxRoot.local_override`) so the
+  shipped `.tres` is untouched; `[`/`]` capture before/after PNGs and **F5**
+  dumps the tuned values to paste back into a preset. This is the composite
+  iteration loop — "it renders" → "it looks good." See `lookdev/lookdev.md`.
+
 ## [0.8.3] - IP-neutral sample lights
 
 ### Changed

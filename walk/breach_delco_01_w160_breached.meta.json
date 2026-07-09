@@ -1,0 +1,168 @@
+{
+  "files": {
+    "blend": "breach_delco_01_w160_breached.blend",
+    "glb": "breach_delco_01_w160_breached.glb",
+    "meta": "breach_delco_01_w160_breached.meta.json"
+  },
+  "genome": {
+    "species": "breach",
+    "version": 1
+  },
+  "license": {
+    "construction_knowledge": "CC0",
+    "notes": "Original procedural construction. Architectural module: a center-pivot wall slab with a punched floor-height hole (clean cutout; blown/rough look is a later art pass)."
+  },
+  "module": {
+    "dims": [
+      1.6,
+      0.3,
+      4.2
+    ],
+    "fit": "exact",
+    "pivot": "center",
+    "style": 1,
+    "theme": "delco",
+    "type": "breach",
+    "width_cm": 160
+  },
+  "plan": {
+    "ambient": 0.35,
+    "attachments": [],
+    "bevel": 0.002,
+    "budgets": {
+      "tris_lod0": 600
+    },
+    "color": [
+      0.48,
+      0.46,
+      0.43
+    ],
+    "dim_scale": {
+      "depth": 1.0,
+      "height": 1.0,
+      "width": 1.0
+    },
+    "dimensions": {
+      "depth": 0.3,
+      "height": 4.2,
+      "width": 1.6
+    },
+    "fit_exact": true,
+    "genome_version": 1,
+    "material": "concrete",
+    "module": {
+      "fit": "exact",
+      "species": "breach",
+      "state": "breached",
+      "stem": "breach_delco_01_w160_breached",
+      "style": 1,
+      "theme": "delco",
+      "type": "breach",
+      "width_cm": 160
+    },
+    "params": {
+      "jamb": 0.08,
+      "lintel": 0.1
+    },
+    "parts": [
+      "Breach_Jamb_L",
+      "Breach_Jamb_R",
+      "Breach_Header"
+    ],
+    "pivot": "center",
+    "species": "breach",
+    "style": "delco",
+    "style_block": {
+      "ambient": 0.35,
+      "bevel": 0.002,
+      "color": [
+        0.48,
+        0.46,
+        0.43
+      ],
+      "material": "concrete",
+      "wear": 0.55
+    },
+    "target_dims": {
+      "depth": 0.3,
+      "height": 4.2,
+      "width": 1.6
+    },
+    "tool_version": "0.22.1",
+    "wear": 0.55
+  },
+  "validation": {
+    "checks": [
+      {
+        "id": "dim_width",
+        "level": "pass",
+        "msg": "width=1.600m within [0.600, 5.000]m"
+      },
+      {
+        "id": "dim_depth",
+        "level": "pass",
+        "msg": "depth=0.300m within [0.050, 0.600]m"
+      },
+      {
+        "id": "dim_height",
+        "level": "pass",
+        "msg": "height=4.200m within [1.800, 4.500]m"
+      },
+      {
+        "id": "fit_depth",
+        "level": "pass",
+        "msg": "depth=0.300m fits exact target 0.300m"
+      },
+      {
+        "id": "fit_height",
+        "level": "pass",
+        "msg": "height=4.200m fits exact target 4.200m"
+      },
+      {
+        "id": "fit_width",
+        "level": "pass",
+        "msg": "width=1.600m fits exact target 1.600m"
+      },
+      {
+        "id": "tri_budget",
+        "level": "pass",
+        "msg": "132 tris <= budget 600"
+      },
+      {
+        "id": "uvs",
+        "level": "pass",
+        "msg": "UV layer present"
+      },
+      {
+        "id": "wear_colors",
+        "level": "pass",
+        "msg": "vertex wear colors present"
+      },
+      {
+        "id": "materials",
+        "level": "pass",
+        "msg": "materials assigned"
+      },
+      {
+        "id": "parts_named",
+        "level": "pass",
+        "msg": "3 named parts"
+      },
+      {
+        "id": "collision",
+        "level": "pass",
+        "msg": "collision mesh present ('-col')"
+      },
+      {
+        "id": "transforms",
+        "level": "pass",
+        "msg": "all transforms applied"
+      }
+    ],
+    "status": "pass"
+  },
+  "zoo": {
+    "module_stem": "breach_delco_01_w160_breached",
+    "tool_version": "0.22.1"
+  }
+}

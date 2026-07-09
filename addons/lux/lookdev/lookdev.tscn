@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://lux_lookdev_scene"]
+
+[ext_resource type="Script" path="res://addons/lux/lookdev/lookdev.gd" id="1_lookdev"]
+[ext_resource type="Script" path="res://addons/lux/runtime/lux_root.gd" id="2_luxroot"]
+[ext_resource type="Resource" path="res://addons/lux/presets/delco_summer_afternoon.tres" id="3_preset"]
+
+[node name="LookDev" type="Node3D"]
+script = ExtResource("1_lookdev")
+building_path = "res://walk/gs.patina.glb"
+start_preset_name = &"Delco Summer Afternoon"
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.94, 0.34, 0, -0.34, 0.94, 0, 6, 14)
+fov = 60.0
+
+[node name="LuxRoot" type="Node3D" parent="."]
+script = ExtResource("2_luxroot")
+active_preset = ExtResource("3_preset")

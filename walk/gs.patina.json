@@ -1,0 +1,1871 @@
+{
+  "anchors": {
+    "counts": {
+      "exterior_light": 26,
+      "ground_edge": 64,
+      "roofline": 52,
+      "wall_base": 38
+    },
+    "sidecar": "<out>.anchors.json"
+  },
+  "decals": {
+    "instances": [],
+    "textures": {}
+  },
+  "generator": "Patina 0.13.0",
+  "kitbash": [
+    {
+      "bounds_max": [
+        -10.825,
+        1.05,
+        8.75
+      ],
+      "bounds_min": [
+        -11.175,
+        0.0,
+        3.25
+      ],
+      "mesh": "VAULTLEDGE_0",
+      "role": "trim"
+    },
+    {
+      "bounds_max": [
+        10.7,
+        1.2,
+        1.0
+      ],
+      "bounds_min": [
+        10.3,
+        0.0,
+        -5.0
+      ],
+      "mesh": "VAULTLEDGE_1",
+      "role": "trim"
+    },
+    {
+      "bounds_max": [
+        -1.5,
+        1.6,
+        12.5
+      ],
+      "bounds_min": [
+        -2.5,
+        0.0,
+        6.5
+      ],
+      "mesh": "aisle_shelf_01",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        3.0,
+        1.6,
+        12.5
+      ],
+      "bounds_min": [
+        2.0,
+        0.0,
+        6.5
+      ],
+      "mesh": "aisle_shelf_02",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        9.5,
+        4.2,
+        8.6
+      ],
+      "bounds_min": [
+        5.5,
+        3.3,
+        7.4
+      ],
+      "mesh": "apartment_sofa_cover",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -5.0,
+        -1.7,
+        -4.5
+      ],
+      "bounds_min": [
+        -11.0,
+        -3.3,
+        -5.5
+      ],
+      "mesh": "basement_cold_room_rack",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        12.0,
+        -2.0,
+        -3.5
+      ],
+      "bounds_min": [
+        5.0,
+        -3.3,
+        -8.5
+      ],
+      "mesh": "basement_vault_block",
+      "role": "ceiling"
+    },
+    {
+      "bounds_max": [
+        -7.0,
+        1.3,
+        1.75
+      ],
+      "bounds_min": [
+        -14.0,
+        0.0,
+        0.65
+      ],
+      "mesh": "deli_case_cover",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.175,
+        0.0,
+        14.0
+      ],
+      "bounds_min": [
+        18.825,
+        -3.3,
+        -14.0
+      ],
+      "mesh": "ext_-1_E",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        0.0,
+        -13.825
+      ],
+      "bounds_min": [
+        -19.0,
+        -3.3,
+        -14.175
+      ],
+      "mesh": "ext_-1_N",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        0.0,
+        14.175
+      ],
+      "bounds_min": [
+        -19.0,
+        -3.3,
+        13.825
+      ],
+      "mesh": "ext_-1_S",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -18.825,
+        0.0,
+        14.0
+      ],
+      "bounds_min": [
+        -19.175,
+        -3.3,
+        -14.0
+      ],
+      "mesh": "ext_-1_W",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.175,
+        3.3,
+        14.0
+      ],
+      "bounds_min": [
+        18.825,
+        0.0,
+        -14.0
+      ],
+      "mesh": "ext_0_E",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        3.3,
+        -13.825
+      ],
+      "bounds_min": [
+        -19.0,
+        0.0,
+        -14.175
+      ],
+      "mesh": "ext_0_N",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        3.3,
+        14.175
+      ],
+      "bounds_min": [
+        -19.0,
+        0.0,
+        13.825
+      ],
+      "mesh": "ext_0_S",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -18.825,
+        3.3,
+        14.0
+      ],
+      "bounds_min": [
+        -19.175,
+        0.0,
+        -14.0
+      ],
+      "mesh": "ext_0_W",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.175,
+        6.6,
+        14.0
+      ],
+      "bounds_min": [
+        18.825,
+        3.3,
+        -14.0
+      ],
+      "mesh": "ext_1_E",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        6.6,
+        -13.825
+      ],
+      "bounds_min": [
+        -19.0,
+        3.3,
+        -14.175
+      ],
+      "mesh": "ext_1_N",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        6.6,
+        14.175
+      ],
+      "bounds_min": [
+        -19.0,
+        3.3,
+        13.825
+      ],
+      "mesh": "ext_1_S",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -18.825,
+        6.6,
+        14.0
+      ],
+      "bounds_min": [
+        -19.175,
+        3.3,
+        -14.0
+      ],
+      "mesh": "ext_1_W",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        13.8,
+        2.35,
+        14.175
+      ],
+      "bounds_min": [
+        12.2,
+        0.15,
+        13.825
+      ],
+      "mesh": "ext_col_0_S_BREACHPANEL1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -18.825,
+        2.35,
+        9.75
+      ],
+      "bounds_min": [
+        -19.175,
+        0.15,
+        8.25
+      ],
+      "mesh": "ext_col_0_W_BREACHPANEL0",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        13.7,
+        5.65,
+        -13.825
+      ],
+      "bounds_min": [
+        12.3,
+        3.45,
+        -14.175
+      ],
+      "mesh": "ext_col_1_N_BREACHPANEL0",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -9.0,
+        1.1,
+        7.45
+      ],
+      "bounds_min": [
+        -15.0,
+        0.0,
+        6.55
+      ],
+      "mesh": "front_register_counter",
+      "role": "trim"
+    },
+    {
+      "bounds_max": [
+        12.0,
+        0.0,
+        -0.825
+      ],
+      "bounds_min": [
+        -12.0,
+        -3.3,
+        -1.175
+      ],
+      "mesh": "int_-1_6",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        1.175,
+        0.0,
+        16.0
+      ],
+      "bounds_min": [
+        0.825,
+        -3.3,
+        -16.0
+      ],
+      "mesh": "int_-1_7",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        14.0,
+        3.3,
+        8.175
+      ],
+      "bounds_min": [
+        -14.0,
+        0.0,
+        7.825
+      ],
+      "mesh": "int_0_0",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        14.0,
+        3.3,
+        -6.825
+      ],
+      "bounds_min": [
+        -14.0,
+        0.0,
+        -7.175
+      ],
+      "mesh": "int_0_1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -2.825,
+        3.3,
+        19.0
+      ],
+      "bounds_min": [
+        -3.175,
+        0.0,
+        -19.0
+      ],
+      "mesh": "int_0_2",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        6.175,
+        3.3,
+        19.0
+      ],
+      "bounds_min": [
+        5.825,
+        0.0,
+        -19.0
+      ],
+      "mesh": "int_0_3",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        14.0,
+        6.6,
+        2.175
+      ],
+      "bounds_min": [
+        -14.0,
+        3.3,
+        1.825
+      ],
+      "mesh": "int_1_4",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        2.175,
+        6.6,
+        19.0
+      ],
+      "bounds_min": [
+        1.825,
+        3.3,
+        -19.0
+      ],
+      "mesh": "int_1_5",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        7.7,
+        -0.95,
+        -0.825
+      ],
+      "bounds_min": [
+        6.3,
+        -3.15,
+        -1.175
+      ],
+      "mesh": "int_col_-1_6_BREACHPANEL1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        1.175,
+        -0.95,
+        10.7
+      ],
+      "bounds_min": [
+        0.825,
+        -3.15,
+        9.3
+      ],
+      "mesh": "int_col_-1_7_BREACHPANEL0",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        11.2,
+        2.35,
+        8.175
+      ],
+      "bounds_min": [
+        9.8,
+        0.15,
+        7.825
+      ],
+      "mesh": "int_col_0_0_BREACHPANEL1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -2.825,
+        2.35,
+        -9.75
+      ],
+      "bounds_min": [
+        -3.175,
+        0.15,
+        -11.25
+      ],
+      "mesh": "int_col_0_2_BREACHPANEL1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        10.7,
+        5.65,
+        2.175
+      ],
+      "bounds_min": [
+        9.3,
+        3.45,
+        1.825
+      ],
+      "mesh": "int_col_1_4_BREACHPANEL1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        2.175,
+        5.65,
+        -9.8
+      ],
+      "bounds_min": [
+        1.825,
+        3.45,
+        -11.2
+      ],
+      "mesh": "int_col_1_5_BREACHPANEL1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        14.0,
+        0.9,
+        5.1
+      ],
+      "bounds_min": [
+        10.0,
+        0.0,
+        3.9
+      ],
+      "mesh": "kitchen_prep_table",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        3.3,
+        -9.12
+      ],
+      "bounds_min": [
+        17.375,
+        0.0,
+        -9.18
+      ],
+      "mesh": "ladder0_rail_0_-1",
+      "role": "trim"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        3.3,
+        -9.82
+      ],
+      "bounds_min": [
+        17.375,
+        0.0,
+        -9.88
+      ],
+      "mesh": "ladder0_rail_0_1",
+      "role": "trim"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        6.6,
+        -9.12
+      ],
+      "bounds_min": [
+        17.375,
+        3.3,
+        -9.18
+      ],
+      "mesh": "ladder0_rail_1_-1",
+      "role": "trim"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        6.6,
+        -9.82
+      ],
+      "bounds_min": [
+        17.375,
+        3.3,
+        -9.88
+      ],
+      "mesh": "ladder0_rail_1_1",
+      "role": "trim"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        0.175,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        0.125,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_0_0",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        0.475,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        0.425,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_0_1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        3.175,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        3.125,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_0_10",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        0.775,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        0.725,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_0_2",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        1.075,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        1.025,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_0_3",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        1.375,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        1.325,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_0_4",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        1.675,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        1.625,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_0_5",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        1.975,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        1.925,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_0_6",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        2.275,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        2.225,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_0_7",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        2.575,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        2.525,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_0_8",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        2.875,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        2.825,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_0_9",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        3.475,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        3.425,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_1_0",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        3.775,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        3.725,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_1_1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        6.475,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        6.425,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_1_10",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        4.075,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        4.025,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_1_2",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        4.375,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        4.325,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_1_3",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        4.675,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        4.625,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_1_4",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        4.975,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        4.925,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_1_5",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        5.275,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        5.225,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_1_6",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        5.575,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        5.525,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_1_7",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        5.875,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        5.825,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_1_8",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        17.625,
+        6.175,
+        -9.15
+      ],
+      "bounds_min": [
+        17.375,
+        6.125,
+        -9.85
+      ],
+      "mesh": "ladder0_rung_1_9",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        14.25,
+        1.5,
+        -8.75
+      ],
+      "bounds_min": [
+        9.75,
+        0.0,
+        -11.25
+      ],
+      "mesh": "loading_pallet_stack",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -8.0,
+        4.4,
+        7.2
+      ],
+      "bounds_min": [
+        -11.0,
+        3.3,
+        5.8
+      ],
+      "mesh": "manager_desk",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        7.6,
+        14.0
+      ],
+      "bounds_min": [
+        18.65,
+        6.6,
+        -14.0
+      ],
+      "mesh": "parapet_E",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        7.6,
+        -13.65
+      ],
+      "bounds_min": [
+        -19.0,
+        6.6,
+        -14.0
+      ],
+      "mesh": "parapet_N",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        7.6,
+        14.0
+      ],
+      "bounds_min": [
+        -19.0,
+        6.6,
+        13.65
+      ],
+      "mesh": "parapet_S",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -18.65,
+        7.6,
+        14.0
+      ],
+      "bounds_min": [
+        -19.0,
+        6.6,
+        -14.0
+      ],
+      "mesh": "parapet_W",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        10.0,
+        5.2,
+        -7.3
+      ],
+      "bounds_min": [
+        6.0,
+        3.0,
+        -8.7
+      ],
+      "mesh": "server_rack_cluster",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        -3.3,
+        14.0
+      ],
+      "bounds_min": [
+        -19.0,
+        -3.6,
+        -14.0
+      ],
+      "mesh": "slab_-1",
+      "role": "ceiling"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        0.0,
+        14.0
+      ],
+      "bounds_min": [
+        -19.0,
+        -0.3,
+        -14.0
+      ],
+      "mesh": "slab_0",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        3.3,
+        14.0
+      ],
+      "bounds_min": [
+        -19.0,
+        3.0,
+        -14.0
+      ],
+      "mesh": "slab_1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        19.0,
+        6.6,
+        14.0
+      ],
+      "bounds_min": [
+        -19.0,
+        6.3,
+        -14.0
+      ],
+      "mesh": "slab_2",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -3.0938,
+        -6.25
+      ],
+      "bounds_min": [
+        -15.0,
+        -3.3,
+        -6.5938
+      ],
+      "mesh": "stair0_-1_0",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -2.8875,
+        -6.5938
+      ],
+      "bounds_min": [
+        -15.0,
+        -3.0938,
+        -6.9375
+      ],
+      "mesh": "stair0_-1_1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -1.0312,
+        -9.6875
+      ],
+      "bounds_min": [
+        -15.0,
+        -1.2375,
+        -10.0312
+      ],
+      "mesh": "stair0_-1_10",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -0.825,
+        -10.0312
+      ],
+      "bounds_min": [
+        -15.0,
+        -1.0312,
+        -10.375
+      ],
+      "mesh": "stair0_-1_11",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -0.6188,
+        -10.375
+      ],
+      "bounds_min": [
+        -15.0,
+        -0.825,
+        -10.7188
+      ],
+      "mesh": "stair0_-1_12",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -0.4125,
+        -10.7188
+      ],
+      "bounds_min": [
+        -15.0,
+        -0.6187,
+        -11.0625
+      ],
+      "mesh": "stair0_-1_13",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -0.2062,
+        -11.0625
+      ],
+      "bounds_min": [
+        -15.0,
+        -0.4125,
+        -11.4062
+      ],
+      "mesh": "stair0_-1_14",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        0.0,
+        -11.4062
+      ],
+      "bounds_min": [
+        -15.0,
+        -0.2062,
+        -11.75
+      ],
+      "mesh": "stair0_-1_15",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -2.6812,
+        -6.9375
+      ],
+      "bounds_min": [
+        -15.0,
+        -2.8875,
+        -7.2812
+      ],
+      "mesh": "stair0_-1_2",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -2.475,
+        -7.2812
+      ],
+      "bounds_min": [
+        -15.0,
+        -2.6813,
+        -7.625
+      ],
+      "mesh": "stair0_-1_3",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -2.2687,
+        -7.625
+      ],
+      "bounds_min": [
+        -15.0,
+        -2.475,
+        -7.9688
+      ],
+      "mesh": "stair0_-1_4",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -2.0625,
+        -7.9688
+      ],
+      "bounds_min": [
+        -15.0,
+        -2.2688,
+        -8.3125
+      ],
+      "mesh": "stair0_-1_5",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -1.8563,
+        -8.3125
+      ],
+      "bounds_min": [
+        -15.0,
+        -2.0625,
+        -8.6562
+      ],
+      "mesh": "stair0_-1_6",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -1.65,
+        -8.6562
+      ],
+      "bounds_min": [
+        -15.0,
+        -1.8562,
+        -9.0
+      ],
+      "mesh": "stair0_-1_7",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -1.4438,
+        -9.0
+      ],
+      "bounds_min": [
+        -15.0,
+        -1.65,
+        -9.3438
+      ],
+      "mesh": "stair0_-1_8",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        -1.2375,
+        -9.3438
+      ],
+      "bounds_min": [
+        -15.0,
+        -1.4438,
+        -9.6875
+      ],
+      "mesh": "stair0_-1_9",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        0.2062,
+        -11.4062
+      ],
+      "bounds_min": [
+        -16.4,
+        0.0,
+        -11.75
+      ],
+      "mesh": "stair0_0_0",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        0.4125,
+        -11.0625
+      ],
+      "bounds_min": [
+        -16.4,
+        0.2062,
+        -11.4062
+      ],
+      "mesh": "stair0_0_1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        2.2688,
+        -7.9688
+      ],
+      "bounds_min": [
+        -16.4,
+        2.0625,
+        -8.3125
+      ],
+      "mesh": "stair0_0_10",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        2.475,
+        -7.625
+      ],
+      "bounds_min": [
+        -16.4,
+        2.2687,
+        -7.9688
+      ],
+      "mesh": "stair0_0_11",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        2.6813,
+        -7.2812
+      ],
+      "bounds_min": [
+        -16.4,
+        2.475,
+        -7.625
+      ],
+      "mesh": "stair0_0_12",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        2.8875,
+        -6.9375
+      ],
+      "bounds_min": [
+        -16.4,
+        2.6812,
+        -7.2812
+      ],
+      "mesh": "stair0_0_13",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        3.0938,
+        -6.5938
+      ],
+      "bounds_min": [
+        -16.4,
+        2.8875,
+        -6.9375
+      ],
+      "mesh": "stair0_0_14",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        3.3,
+        -6.25
+      ],
+      "bounds_min": [
+        -16.4,
+        3.0938,
+        -6.5938
+      ],
+      "mesh": "stair0_0_15",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        0.6187,
+        -10.7188
+      ],
+      "bounds_min": [
+        -16.4,
+        0.4125,
+        -11.0625
+      ],
+      "mesh": "stair0_0_2",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        0.825,
+        -10.375
+      ],
+      "bounds_min": [
+        -16.4,
+        0.6188,
+        -10.7188
+      ],
+      "mesh": "stair0_0_3",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        1.0312,
+        -10.0312
+      ],
+      "bounds_min": [
+        -16.4,
+        0.825,
+        -10.375
+      ],
+      "mesh": "stair0_0_4",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        1.2375,
+        -9.6875
+      ],
+      "bounds_min": [
+        -16.4,
+        1.0312,
+        -10.0312
+      ],
+      "mesh": "stair0_0_5",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        1.4438,
+        -9.3438
+      ],
+      "bounds_min": [
+        -16.4,
+        1.2375,
+        -9.6875
+      ],
+      "mesh": "stair0_0_6",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        1.65,
+        -9.0
+      ],
+      "bounds_min": [
+        -16.4,
+        1.4438,
+        -9.3438
+      ],
+      "mesh": "stair0_0_7",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        1.8562,
+        -8.6562
+      ],
+      "bounds_min": [
+        -16.4,
+        1.65,
+        -9.0
+      ],
+      "mesh": "stair0_0_8",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -15.0,
+        2.0625,
+        -8.3125
+      ],
+      "bounds_min": [
+        -16.4,
+        1.8563,
+        -8.6562
+      ],
+      "mesh": "stair0_0_9",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        3.5063,
+        -6.25
+      ],
+      "bounds_min": [
+        -15.0,
+        3.3,
+        -6.5938
+      ],
+      "mesh": "stair0_1_0",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        3.7125,
+        -6.5938
+      ],
+      "bounds_min": [
+        -15.0,
+        3.5062,
+        -6.9375
+      ],
+      "mesh": "stair0_1_1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        5.5687,
+        -9.6875
+      ],
+      "bounds_min": [
+        -15.0,
+        5.3625,
+        -10.0312
+      ],
+      "mesh": "stair0_1_10",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        5.775,
+        -10.0312
+      ],
+      "bounds_min": [
+        -15.0,
+        5.5687,
+        -10.375
+      ],
+      "mesh": "stair0_1_11",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        5.9813,
+        -10.375
+      ],
+      "bounds_min": [
+        -15.0,
+        5.775,
+        -10.7188
+      ],
+      "mesh": "stair0_1_12",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        6.1875,
+        -10.7188
+      ],
+      "bounds_min": [
+        -15.0,
+        5.9812,
+        -11.0625
+      ],
+      "mesh": "stair0_1_13",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        6.3938,
+        -11.0625
+      ],
+      "bounds_min": [
+        -15.0,
+        6.1875,
+        -11.4062
+      ],
+      "mesh": "stair0_1_14",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        6.6,
+        -11.4062
+      ],
+      "bounds_min": [
+        -15.0,
+        6.3937,
+        -11.75
+      ],
+      "mesh": "stair0_1_15",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        3.9188,
+        -6.9375
+      ],
+      "bounds_min": [
+        -15.0,
+        3.7125,
+        -7.2812
+      ],
+      "mesh": "stair0_1_2",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        4.125,
+        -7.2812
+      ],
+      "bounds_min": [
+        -15.0,
+        3.9187,
+        -7.625
+      ],
+      "mesh": "stair0_1_3",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        4.3313,
+        -7.625
+      ],
+      "bounds_min": [
+        -15.0,
+        4.125,
+        -7.9688
+      ],
+      "mesh": "stair0_1_4",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        4.5375,
+        -7.9688
+      ],
+      "bounds_min": [
+        -15.0,
+        4.3312,
+        -8.3125
+      ],
+      "mesh": "stair0_1_5",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        4.7438,
+        -8.3125
+      ],
+      "bounds_min": [
+        -15.0,
+        4.5375,
+        -8.6562
+      ],
+      "mesh": "stair0_1_6",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        4.95,
+        -8.6562
+      ],
+      "bounds_min": [
+        -15.0,
+        4.7438,
+        -9.0
+      ],
+      "mesh": "stair0_1_7",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        5.1562,
+        -9.0
+      ],
+      "bounds_min": [
+        -15.0,
+        4.95,
+        -9.3438
+      ],
+      "mesh": "stair0_1_8",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        5.3625,
+        -9.3438
+      ],
+      "bounds_min": [
+        -15.0,
+        5.1562,
+        -9.6875
+      ],
+      "mesh": "stair0_1_9",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        0.0,
+        -11.5094
+      ],
+      "bounds_min": [
+        -16.4,
+        -0.2062,
+        -11.9906
+      ],
+      "mesh": "stair0_land_-1",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        -13.6,
+        3.3,
+        -6.0094
+      ],
+      "bounds_min": [
+        -16.4,
+        3.0938,
+        -6.4906
+      ],
+      "mesh": "stair0_land_0",
+      "role": "wall"
+    },
+    {
+      "bounds_max": [
+        2.5,
+        2.0,
+        -7.75
+      ],
+      "bounds_min": [
+        1.5,
+        0.0,
+        -13.25
+      ],
+      "mesh": "stockroom_rack_01",
+      "role": "wall"
+    }
+  ],
+  "mode": "procedural",
+  "schema": "0.2.0",
+  "seed": 1999,
+  "shader": {
+    "affine_strength": 0.85,
+    "ambient": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "color_depth": 16,
+    "dither": true,
+    "fog": {
+      "color": [
+        0.1,
+        0.1,
+        0.12
+      ],
+      "enabled": true,
+      "far": 48.0,
+      "near": 12.0
+    },
+    "name": "ps1",
+    "vertex_jitter": 64
+  },
+  "slots": {
+    "aligned": true,
+    "building_id": "gas_station",
+    "manifest_version": "1.2.0",
+    "slot_count": 80,
+    "theme": "greybox"
+  },
+  "source": "gs.glb",
+  "stats": {
+    "collision_meshes": 100,
+    "collision_tris": 1358,
+    "visual_meshes": 127,
+    "visual_tris": 11170
+  },
+  "surfaces": {
+    "ceiling": {
+      "texture": "gs.patina.textures\\ceiling.png",
+      "uv_channel": "uv1",
+      "vertex_color": true
+    },
+    "exterior_wall": {
+      "texture": "gs.patina.textures\\wall.png",
+      "uv_channel": "uv1",
+      "vertex_color": true
+    },
+    "floor": {
+      "texture": "gs.patina.textures\\floor.png",
+      "uv_channel": "uv1",
+      "vertex_color": true
+    },
+    "roof": {
+      "texture": "gs.patina.textures\\ceiling.png",
+      "uv_channel": "uv1",
+      "vertex_color": true
+    },
+    "trim": {
+      "texture": "gs.patina.textures\\trim.png",
+      "uv_channel": "uv1",
+      "vertex_color": true
+    },
+    "wall": {
+      "texture": "gs.patina.textures\\wall.png",
+      "uv_channel": "uv1",
+      "vertex_color": true
+    }
+  },
+  "theme": {
+    "name": "default",
+    "palette": {}
+  }
+}

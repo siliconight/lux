@@ -1,0 +1,1373 @@
+{
+  "building_id": "gas_station",
+  "count": 80,
+  "instances": [
+    {
+      "instance": {
+        "color": [
+          0.515,
+          0.504,
+          0.473,
+          1.0
+        ],
+        "custom_data": [
+          0.625,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "roof_footprint"
+    },
+    {
+      "instance": {
+        "color": [
+          0.472,
+          0.462,
+          0.434,
+          1.0
+        ],
+        "custom_data": [
+          0.228,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.532,
+          0.521,
+          0.489,
+          1.0
+        ],
+        "custom_data": [
+          0.701,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg1"
+    },
+    {
+      "instance": {
+        "color": [
+          0.454,
+          0.445,
+          0.418,
+          1.0
+        ],
+        "custom_data": [
+          0.644,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg2"
+    },
+    {
+      "instance": {
+        "color": [
+          0.445,
+          0.436,
+          0.41,
+          1.0
+        ],
+        "custom_data": [
+          0.351,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_open0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.529,
+          0.518,
+          0.487,
+          1.0
+        ],
+        "custom_data": [
+          0.548,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg3"
+    },
+    {
+      "instance": {
+        "color": [
+          0.496,
+          0.486,
+          0.456,
+          1.0
+        ],
+        "custom_data": [
+          0.734,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg4"
+    },
+    {
+      "instance": {
+        "color": [
+          0.45,
+          0.441,
+          0.414,
+          1.0
+        ],
+        "custom_data": [
+          0.25,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg5"
+    },
+    {
+      "instance": {
+        "color": [
+          0.508,
+          0.497,
+          0.467,
+          1.0
+        ],
+        "custom_data": [
+          0.04,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg6"
+    },
+    {
+      "instance": {
+        "color": [
+          0.546,
+          0.535,
+          0.502,
+          1.0
+        ],
+        "custom_data": [
+          0.068,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg7"
+    },
+    {
+      "instance": {
+        "color": [
+          0.451,
+          0.442,
+          0.415,
+          1.0
+        ],
+        "custom_data": [
+          0.511,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg8"
+    },
+    {
+      "instance": {
+        "color": [
+          0.501,
+          0.491,
+          0.461,
+          1.0
+        ],
+        "custom_data": [
+          0.796,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg9"
+    },
+    {
+      "instance": {
+        "color": [
+          0.474,
+          0.465,
+          0.436,
+          1.0
+        ],
+        "custom_data": [
+          0.69,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg10"
+    },
+    {
+      "instance": {
+        "color": [
+          0.527,
+          0.517,
+          0.485,
+          1.0
+        ],
+        "custom_data": [
+          0.215,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg11"
+    },
+    {
+      "instance": {
+        "color": [
+          0.532,
+          0.521,
+          0.489,
+          1.0
+        ],
+        "custom_data": [
+          0.529,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_open1"
+    },
+    {
+      "instance": {
+        "color": [
+          0.5,
+          0.49,
+          0.46,
+          1.0
+        ],
+        "custom_data": [
+          0.101,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg12"
+    },
+    {
+      "instance": {
+        "color": [
+          0.51,
+          0.5,
+          0.469,
+          1.0
+        ],
+        "custom_data": [
+          0.473,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg13"
+    },
+    {
+      "instance": {
+        "color": [
+          0.474,
+          0.464,
+          0.436,
+          1.0
+        ],
+        "custom_data": [
+          0.509,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_open2"
+    },
+    {
+      "instance": {
+        "color": [
+          0.528,
+          0.517,
+          0.486,
+          1.0
+        ],
+        "custom_data": [
+          0.46,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_N_seg14"
+    },
+    {
+      "instance": {
+        "color": [
+          0.549,
+          0.538,
+          0.505,
+          1.0
+        ],
+        "custom_data": [
+          0.95,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.498,
+          0.488,
+          0.458,
+          1.0
+        ],
+        "custom_data": [
+          0.936,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_open0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.53,
+          0.52,
+          0.488,
+          1.0
+        ],
+        "custom_data": [
+          0.788,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg1"
+    },
+    {
+      "instance": {
+        "color": [
+          0.554,
+          0.543,
+          0.51,
+          1.0
+        ],
+        "custom_data": [
+          0.682,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg2"
+    },
+    {
+      "instance": {
+        "color": [
+          0.445,
+          0.436,
+          0.409,
+          1.0
+        ],
+        "custom_data": [
+          0.661,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg3"
+    },
+    {
+      "instance": {
+        "color": [
+          0.473,
+          0.463,
+          0.435,
+          1.0
+        ],
+        "custom_data": [
+          0.225,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_open1"
+    },
+    {
+      "instance": {
+        "color": [
+          0.544,
+          0.533,
+          0.5,
+          1.0
+        ],
+        "custom_data": [
+          0.884,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg4"
+    },
+    {
+      "instance": {
+        "color": [
+          0.464,
+          0.454,
+          0.427,
+          1.0
+        ],
+        "custom_data": [
+          0.004,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg5"
+    },
+    {
+      "instance": {
+        "color": [
+          0.52,
+          0.509,
+          0.478,
+          1.0
+        ],
+        "custom_data": [
+          0.483,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg6"
+    },
+    {
+      "instance": {
+        "color": [
+          0.531,
+          0.52,
+          0.488,
+          1.0
+        ],
+        "custom_data": [
+          0.379,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg7"
+    },
+    {
+      "instance": {
+        "color": [
+          0.457,
+          0.448,
+          0.421,
+          1.0
+        ],
+        "custom_data": [
+          0.37,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg8"
+    },
+    {
+      "instance": {
+        "color": [
+          0.503,
+          0.493,
+          0.463,
+          1.0
+        ],
+        "custom_data": [
+          0.768,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_open2"
+    },
+    {
+      "instance": {
+        "color": [
+          0.542,
+          0.531,
+          0.498,
+          1.0
+        ],
+        "custom_data": [
+          0.44,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg9"
+    },
+    {
+      "instance": {
+        "color": [
+          0.534,
+          0.524,
+          0.492,
+          1.0
+        ],
+        "custom_data": [
+          0.74,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg10"
+    },
+    {
+      "instance": {
+        "color": [
+          0.458,
+          0.449,
+          0.421,
+          1.0
+        ],
+        "custom_data": [
+          0.321,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg11"
+    },
+    {
+      "instance": {
+        "color": [
+          0.453,
+          0.444,
+          0.416,
+          1.0
+        ],
+        "custom_data": [
+          0.45,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_open3"
+    },
+    {
+      "instance": {
+        "color": [
+          0.476,
+          0.466,
+          0.438,
+          1.0
+        ],
+        "custom_data": [
+          0.283,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_S_seg12"
+    },
+    {
+      "instance": {
+        "color": [
+          0.483,
+          0.473,
+          0.444,
+          1.0
+        ],
+        "custom_data": [
+          0.481,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_seg0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.473,
+          0.463,
+          0.435,
+          1.0
+        ],
+        "custom_data": [
+          0.03,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_seg1"
+    },
+    {
+      "instance": {
+        "color": [
+          0.541,
+          0.53,
+          0.498,
+          1.0
+        ],
+        "custom_data": [
+          0.723,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_seg2"
+    },
+    {
+      "instance": {
+        "color": [
+          0.443,
+          0.434,
+          0.408,
+          1.0
+        ],
+        "custom_data": [
+          0.723,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_open0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.524,
+          0.513,
+          0.482,
+          1.0
+        ],
+        "custom_data": [
+          0.685,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_seg3"
+    },
+    {
+      "instance": {
+        "color": [
+          0.558,
+          0.547,
+          0.514,
+          1.0
+        ],
+        "custom_data": [
+          0.66,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_seg4"
+    },
+    {
+      "instance": {
+        "color": [
+          0.5,
+          0.49,
+          0.46,
+          1.0
+        ],
+        "custom_data": [
+          0.139,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_seg5"
+    },
+    {
+      "instance": {
+        "color": [
+          0.448,
+          0.439,
+          0.412,
+          1.0
+        ],
+        "custom_data": [
+          0.219,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_seg6"
+    },
+    {
+      "instance": {
+        "color": [
+          0.547,
+          0.536,
+          0.503,
+          1.0
+        ],
+        "custom_data": [
+          0.162,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_seg7"
+    },
+    {
+      "instance": {
+        "color": [
+          0.495,
+          0.485,
+          0.455,
+          1.0
+        ],
+        "custom_data": [
+          0.735,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_seg8"
+    },
+    {
+      "instance": {
+        "color": [
+          0.46,
+          0.451,
+          0.423,
+          1.0
+        ],
+        "custom_data": [
+          0.1,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_seg9"
+    },
+    {
+      "instance": {
+        "color": [
+          0.476,
+          0.466,
+          0.438,
+          1.0
+        ],
+        "custom_data": [
+          0.733,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_E_seg10"
+    },
+    {
+      "instance": {
+        "color": [
+          0.524,
+          0.513,
+          0.482,
+          1.0
+        ],
+        "custom_data": [
+          0.043,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_seg0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.477,
+          0.467,
+          0.438,
+          1.0
+        ],
+        "custom_data": [
+          0.919,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_seg1"
+    },
+    {
+      "instance": {
+        "color": [
+          0.553,
+          0.542,
+          0.509,
+          1.0
+        ],
+        "custom_data": [
+          0.082,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_seg2"
+    },
+    {
+      "instance": {
+        "color": [
+          0.467,
+          0.457,
+          0.429,
+          1.0
+        ],
+        "custom_data": [
+          0.73,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_seg3"
+    },
+    {
+      "instance": {
+        "color": [
+          0.5,
+          0.49,
+          0.46,
+          1.0
+        ],
+        "custom_data": [
+          0.977,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_seg4"
+    },
+    {
+      "instance": {
+        "color": [
+          0.52,
+          0.51,
+          0.479,
+          1.0
+        ],
+        "custom_data": [
+          0.173,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_open0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.496,
+          0.486,
+          0.457,
+          1.0
+        ],
+        "custom_data": [
+          0.104,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_seg5"
+    },
+    {
+      "instance": {
+        "color": [
+          0.453,
+          0.444,
+          0.417,
+          1.0
+        ],
+        "custom_data": [
+          0.987,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_seg6"
+    },
+    {
+      "instance": {
+        "color": [
+          0.553,
+          0.542,
+          0.509,
+          1.0
+        ],
+        "custom_data": [
+          0.683,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_seg7"
+    },
+    {
+      "instance": {
+        "color": [
+          0.453,
+          0.444,
+          0.416,
+          1.0
+        ],
+        "custom_data": [
+          0.519,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_seg8"
+    },
+    {
+      "instance": {
+        "color": [
+          0.511,
+          0.501,
+          0.47,
+          1.0
+        ],
+        "custom_data": [
+          0.238,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_open1"
+    },
+    {
+      "instance": {
+        "color": [
+          0.489,
+          0.479,
+          0.45,
+          1.0
+        ],
+        "custom_data": [
+          0.726,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_seg9"
+    },
+    {
+      "instance": {
+        "color": [
+          0.514,
+          0.504,
+          0.473,
+          1.0
+        ],
+        "custom_data": [
+          0.301,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "ext_0_W_seg10"
+    },
+    {
+      "instance": {
+        "color": [
+          0.516,
+          0.506,
+          0.475,
+          1.0
+        ],
+        "custom_data": [
+          0.08,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_seg0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.46,
+          0.451,
+          0.423,
+          1.0
+        ],
+        "custom_data": [
+          0.839,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_seg1"
+    },
+    {
+      "instance": {
+        "color": [
+          0.459,
+          0.45,
+          0.422,
+          1.0
+        ],
+        "custom_data": [
+          0.001,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_open0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.501,
+          0.491,
+          0.461,
+          1.0
+        ],
+        "custom_data": [
+          0.741,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_seg2"
+    },
+    {
+      "instance": {
+        "color": [
+          0.551,
+          0.54,
+          0.507,
+          1.0
+        ],
+        "custom_data": [
+          0.219,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_seg3"
+    },
+    {
+      "instance": {
+        "color": [
+          0.472,
+          0.462,
+          0.434,
+          1.0
+        ],
+        "custom_data": [
+          0.989,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_seg4"
+    },
+    {
+      "instance": {
+        "color": [
+          0.552,
+          0.541,
+          0.508,
+          1.0
+        ],
+        "custom_data": [
+          0.07,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_seg5"
+    },
+    {
+      "instance": {
+        "color": [
+          0.479,
+          0.469,
+          0.441,
+          1.0
+        ],
+        "custom_data": [
+          0.163,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_seg6"
+    },
+    {
+      "instance": {
+        "color": [
+          0.492,
+          0.482,
+          0.453,
+          1.0
+        ],
+        "custom_data": [
+          0.267,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_seg7"
+    },
+    {
+      "instance": {
+        "color": [
+          0.474,
+          0.465,
+          0.436,
+          1.0
+        ],
+        "custom_data": [
+          0.384,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_open1"
+    },
+    {
+      "instance": {
+        "color": [
+          0.48,
+          0.47,
+          0.441,
+          1.0
+        ],
+        "custom_data": [
+          0.011,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_seg8"
+    },
+    {
+      "instance": {
+        "color": [
+          0.472,
+          0.462,
+          0.434,
+          1.0
+        ],
+        "custom_data": [
+          0.964,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_0_seg9"
+    },
+    {
+      "instance": {
+        "color": [
+          0.542,
+          0.531,
+          0.498,
+          1.0
+        ],
+        "custom_data": [
+          0.75,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_1_seg0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.546,
+          0.535,
+          0.503,
+          1.0
+        ],
+        "custom_data": [
+          0.532,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_1_seg1"
+    },
+    {
+      "instance": {
+        "color": [
+          0.55,
+          0.539,
+          0.506,
+          1.0
+        ],
+        "custom_data": [
+          0.156,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_1_seg2"
+    },
+    {
+      "instance": {
+        "color": [
+          0.499,
+          0.489,
+          0.459,
+          1.0
+        ],
+        "custom_data": [
+          0.157,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_1_open0"
+    },
+    {
+      "instance": {
+        "color": [
+          0.541,
+          0.531,
+          0.498,
+          1.0
+        ],
+        "custom_data": [
+          0.44,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_1_seg3"
+    },
+    {
+      "instance": {
+        "color": [
+          0.518,
+          0.508,
+          0.477,
+          1.0
+        ],
+        "custom_data": [
+          0.123,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_1_seg4"
+    },
+    {
+      "instance": {
+        "color": [
+          0.475,
+          0.466,
+          0.437,
+          1.0
+        ],
+        "custom_data": [
+          0.87,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "slot_id": "int_0_1_seg5"
+    }
+  ],
+  "note": "per-slot instance color/custom_data; keyed by slot_id; feeds MultiMesh per-instance buffers, breaks modular repetition",
+  "schema": "patina-instances/1",
+  "seed": 1999,
+  "source": "gs.patina.glb",
+  "space": "spec/Blender Z-up raw coords",
+  "theme": "greybox",
+  "variation_strength": 0.12
+}

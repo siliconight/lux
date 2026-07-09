@@ -1,0 +1,375 @@
+{
+  "light_manifest_version": "1.0.0",
+  "building_id": "corner_deli_heist_01",
+  "theme": "greybox",
+  "space": "Blender Z-up, meters; rot_y = degrees about up; pos is the fixture location",
+  "rig_library": "lux",
+  "anchors": [
+    {
+      "id": "customer_floor_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        -13.5,
+        -8.5,
+        3.2
+      ],
+      "rot_y": 0.0,
+      "room": "customer_floor",
+      "row": {
+        "count": 4,
+        "spacing": 2.75
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "deli_counter_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        -13.5,
+        1.5,
+        3.2
+      ],
+      "rot_y": 0.0,
+      "room": "deli_counter",
+      "row": {
+        "count": 4,
+        "spacing": 2.75
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "market_aisles_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        -0.5,
+        -8.5,
+        3.2
+      ],
+      "rot_y": 0.0,
+      "room": "market_aisles",
+      "row": {
+        "count": 5,
+        "spacing": 3.0
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "kitchen_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        13.0,
+        -4.0,
+        3.2
+      ],
+      "rot_y": 90.0,
+      "room": "kitchen",
+      "row": {
+        "count": 5,
+        "spacing": 4.0
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "stockroom_loading_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        5.5,
+        10.0,
+        3.2
+      ],
+      "rot_y": 0.0,
+      "room": "stockroom_loading",
+      "row": {
+        "count": 5,
+        "spacing": 5.4
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "stairwell_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        -13.5,
+        10.0,
+        3.2
+      ],
+      "rot_y": 0.0,
+      "room": "stairwell",
+      "row": {
+        "count": 4,
+        "spacing": 2.75
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "manager_office_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        -10.5,
+        -6.0,
+        6.5
+      ],
+      "rot_y": 0.0,
+      "room": "manager_office",
+      "row": {
+        "count": 5,
+        "spacing": 3.4
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "apartment_hideout_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        8.5,
+        -6.0,
+        6.5
+      ],
+      "rot_y": 0.0,
+      "room": "apartment_hideout",
+      "row": {
+        "count": 5,
+        "spacing": 4.2
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "server_room_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        8.5,
+        8.0,
+        6.5
+      ],
+      "rot_y": 0.0,
+      "room": "server_room",
+      "row": {
+        "count": 5,
+        "spacing": 4.2
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "upper_hall_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        -10.5,
+        8.0,
+        6.5
+      ],
+      "rot_y": 0.0,
+      "room": "upper_hall",
+      "row": {
+        "count": 5,
+        "spacing": 3.4
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "basement_corridor_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        -9.0,
+        -6.5,
+        -0.1
+      ],
+      "rot_y": 0.0,
+      "room": "basement_corridor",
+      "row": {
+        "count": 5,
+        "spacing": 4.0
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "cold_storage_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        -9.0,
+        7.5,
+        -0.1
+      ],
+      "rot_y": 0.0,
+      "room": "cold_storage",
+      "row": {
+        "count": 5,
+        "spacing": 4.0
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "basement_vault_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        10.0,
+        7.5,
+        -0.1
+      ],
+      "rot_y": 0.0,
+      "room": "basement_vault",
+      "row": {
+        "count": 5,
+        "spacing": 3.6
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "utility_room_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        10.0,
+        -6.5,
+        -0.1
+      ],
+      "rot_y": 0.0,
+      "room": "utility_room",
+      "row": {
+        "count": 5,
+        "spacing": 3.6
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "ext_0_S_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        0.0,
+        -14.0,
+        1.7
+      ],
+      "rot_y": 90.0,
+      "size": [
+        2.0,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_0_E_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        19.0,
+        -7.0,
+        1.85
+      ],
+      "rot_y": 180.0,
+      "size": [
+        1.4,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_0_E_window_2",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        19.0,
+        7.0,
+        1.85
+      ],
+      "rot_y": 180.0,
+      "size": [
+        1.4,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_N_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        0.0,
+        14.0,
+        5.15
+      ],
+      "rot_y": 270.0,
+      "size": [
+        1.4,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_S_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        -10.64,
+        -14.0,
+        5.15
+      ],
+      "rot_y": 90.0,
+      "size": [
+        1.3,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_S_window_2",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        10.64,
+        -14.0,
+        5.15
+      ],
+      "rot_y": 90.0,
+      "size": [
+        1.3,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_E_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        19.0,
+        5.6,
+        5.15
+      ],
+      "rot_y": 180.0,
+      "size": [
+        1.2,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "int_0_1_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        -8.4,
+        7.0,
+        1.95
+      ],
+      "rot_y": 0.0,
+      "size": [
+        1.4,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    }
+  ]
+}

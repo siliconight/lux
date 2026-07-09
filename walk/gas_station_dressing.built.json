@@ -1,0 +1,22 @@
+{
+  "building_id": "gas_station",
+  "collision": "none",
+  "counts": {
+    "base_course": 38,
+    "conduit_run": 26,
+    "curb": 64,
+    "edge_strip": 52
+  },
+  "cover_count": 180,
+  "files": {
+    "blend": "gas_station_dressing.blend",
+    "glb": "gas_station_dressing.glb"
+  },
+  "source": "patina-dressing/1",
+  "space": "spec/Blender Z-up raw coords",
+  "theme": "delco",
+  "trim_sheet": "gs.patina.trim.png",
+  "zoo": {
+    "tool_version": "0.22.1"
+  }
+}

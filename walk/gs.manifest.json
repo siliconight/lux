@@ -1,0 +1,11 @@
+{
+  "kit_name": "Deli Counter",
+  "kit_version": "0.64.0",
+  "schema_version": "1.13.0",
+  "spec": "corner_deli_heist_01.json",
+  "spec_sha256_16": "3e54b6df6787159f",
+  "built_utc": "2026-07-09T20:10:44.017159+00:00",
+  "outputs": [
+    "gs.glb"
+  ]
+}

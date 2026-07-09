@@ -1,0 +1,4381 @@
+{
+  "building_id": "gas_station",
+  "counts": {
+    "base_course": 38,
+    "conduit_run": 26,
+    "curb": 64,
+    "edge_strip": 52
+  },
+  "note": "non-collision cover build orders for Zoo; Patina supplies the trim atlas + placement, Zoo builds the geometry (collision: none)",
+  "orders": [
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        12.717,
+        7.6
+      ],
+      "seed_offset": 377990,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        10.305,
+        7.6
+      ],
+      "seed_offset": 695646,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        7.682,
+        7.6
+      ],
+      "seed_offset": 231261,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        5.421,
+        7.6
+      ],
+      "seed_offset": 145039,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        2.73,
+        7.6
+      ],
+      "seed_offset": 284543,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        0.006,
+        7.6
+      ],
+      "seed_offset": 538852,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -2.32,
+        7.6
+      ],
+      "seed_offset": 343048,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -5.458,
+        7.6
+      ],
+      "seed_offset": 277056,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -7.723,
+        7.6
+      ],
+      "seed_offset": 695832,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -10.351,
+        7.6
+      ],
+      "seed_offset": 973704,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -12.818,
+        7.6
+      ],
+      "seed_offset": 947506,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        12.625,
+        -3.6
+      ],
+      "seed_offset": 517295,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        9.186,
+        -3.6
+      ],
+      "seed_offset": 712623,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        4.847,
+        -3.6
+      ],
+      "seed_offset": 32305,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        1.909,
+        -3.6
+      ],
+      "seed_offset": 496844,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        -2.189,
+        -3.6
+      ],
+      "seed_offset": 38302,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        -4.971,
+        -3.6
+      ],
+      "seed_offset": 840982,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        -8.412,
+        -3.6
+      ],
+      "seed_offset": 784737,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        -11.88,
+        -3.6
+      ],
+      "seed_offset": 464738,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        11.715,
+        4.8
+      ],
+      "seed_offset": 557987,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        7.029,
+        4.8
+      ],
+      "seed_offset": 383955,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        2.343,
+        4.8
+      ],
+      "seed_offset": 733082,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        -2.343,
+        4.8
+      ],
+      "seed_offset": 713259,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        -7.029,
+        4.8
+      ],
+      "seed_offset": 556263,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.0,
+        -11.715,
+        4.8
+      ],
+      "seed_offset": 560913,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        13.161,
+        -3.6
+      ],
+      "seed_offset": 114825,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        11.032,
+        -3.6
+      ],
+      "seed_offset": 967848,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        8.941,
+        -3.6
+      ],
+      "seed_offset": 433377,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        7.157,
+        -3.6
+      ],
+      "seed_offset": 196772,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        4.95,
+        -3.6
+      ],
+      "seed_offset": 847200,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        3.056,
+        -3.6
+      ],
+      "seed_offset": 51595,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        0.839,
+        -3.6
+      ],
+      "seed_offset": 970845,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -1.137,
+        -3.6
+      ],
+      "seed_offset": 268671,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -3.151,
+        -3.6
+      ],
+      "seed_offset": 713523,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -4.822,
+        -3.6
+      ],
+      "seed_offset": 269774,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -7.189,
+        -3.6
+      ],
+      "seed_offset": 631075,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -8.878,
+        -3.6
+      ],
+      "seed_offset": 582730,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -11.197,
+        -3.6
+      ],
+      "seed_offset": 644600,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.0,
+        -13.129,
+        -3.6
+      ],
+      "seed_offset": 455011,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        12.913,
+        7.6
+      ],
+      "seed_offset": 893864,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        9.865,
+        7.6
+      ],
+      "seed_offset": 210474,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        8.004,
+        7.6
+      ],
+      "seed_offset": 105664,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        4.819,
+        7.6
+      ],
+      "seed_offset": 748675,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        2.766,
+        7.6
+      ],
+      "seed_offset": 255740,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -0.349,
+        7.6
+      ],
+      "seed_offset": 478792,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -2.728,
+        7.6
+      ],
+      "seed_offset": 484902,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -4.864,
+        7.6
+      ],
+      "seed_offset": 209805,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -7.736,
+        7.6
+      ],
+      "seed_offset": 845429,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -10.264,
+        7.6
+      ],
+      "seed_offset": 361875,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -12.494,
+        7.6
+      ],
+      "seed_offset": 434988,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        12.378,
+        -3.6
+      ],
+      "seed_offset": 516506,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        9.07,
+        -3.6
+      ],
+      "seed_offset": 76163,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        5.001,
+        -3.6
+      ],
+      "seed_offset": 937759,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        2.073,
+        -3.6
+      ],
+      "seed_offset": 909052,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        -1.647,
+        -3.6
+      ],
+      "seed_offset": 445814,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        -5.601,
+        -3.6
+      ],
+      "seed_offset": 344136,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        -8.757,
+        -3.6
+      ],
+      "seed_offset": 184953,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        -12.767,
+        -3.6
+      ],
+      "seed_offset": 621758,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        11.715,
+        4.8
+      ],
+      "seed_offset": 565926,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        7.029,
+        4.8
+      ],
+      "seed_offset": 981643,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        2.343,
+        4.8
+      ],
+      "seed_offset": 656053,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        -2.343,
+        4.8
+      ],
+      "seed_offset": 540821,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        -7.029,
+        4.8
+      ],
+      "seed_offset": 921638,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.0,
+        -11.715,
+        4.8
+      ],
+      "seed_offset": 636285,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        13.043,
+        -3.6
+      ],
+      "seed_offset": 287110,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        11.209,
+        -3.6
+      ],
+      "seed_offset": 547499,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        8.93,
+        -3.6
+      ],
+      "seed_offset": 737435,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        7.119,
+        -3.6
+      ],
+      "seed_offset": 657151,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        4.922,
+        -3.6
+      ],
+      "seed_offset": 737860,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        2.997,
+        -3.6
+      ],
+      "seed_offset": 741447,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        1.164,
+        -3.6
+      ],
+      "seed_offset": 82127,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -0.823,
+        -3.6
+      ],
+      "seed_offset": 778500,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -2.896,
+        -3.6
+      ],
+      "seed_offset": 18154,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -4.995,
+        -3.6
+      ],
+      "seed_offset": 986572,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -7.038,
+        -3.6
+      ],
+      "seed_offset": 867082,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -9.0,
+        -3.6
+      ],
+      "seed_offset": 876690,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -10.885,
+        -3.6
+      ],
+      "seed_offset": 171707,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.0,
+        -13.055,
+        -3.6
+      ],
+      "seed_offset": 44636,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        12.053,
+        6.6
+      ],
+      "seed_offset": 349141,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        9.503,
+        6.6
+      ],
+      "seed_offset": 545423,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        7.249,
+        6.6
+      ],
+      "seed_offset": 966001,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        5.013,
+        6.6
+      ],
+      "seed_offset": 414610,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        2.554,
+        6.6
+      ],
+      "seed_offset": 319606,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        0.287,
+        6.6
+      ],
+      "seed_offset": 747153,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -2.108,
+        6.6
+      ],
+      "seed_offset": 680139,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -4.987,
+        6.6
+      ],
+      "seed_offset": 583961,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -7.622,
+        6.6
+      ],
+      "seed_offset": 215373,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -9.883,
+        6.6
+      ],
+      "seed_offset": 867240,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -12.471,
+        6.6
+      ],
+      "seed_offset": 140219,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        11.772,
+        -3.3
+      ],
+      "seed_offset": 484346,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        8.216,
+        -3.3
+      ],
+      "seed_offset": 729577,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        5.529,
+        -3.3
+      ],
+      "seed_offset": 990038,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        2.04,
+        -3.3
+      ],
+      "seed_offset": 701675,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        -1.793,
+        -3.3
+      ],
+      "seed_offset": 982140,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        -5.493,
+        -3.3
+      ],
+      "seed_offset": 932394,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        -8.051,
+        -3.3
+      ],
+      "seed_offset": 323780,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        -12.15,
+        -3.3
+      ],
+      "seed_offset": 228091,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        10.733,
+        4.125
+      ],
+      "seed_offset": 200544,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        5.367,
+        4.125
+      ],
+      "seed_offset": 772030,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        -0.0,
+        4.125
+      ],
+      "seed_offset": 913376,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        -5.367,
+        4.125
+      ],
+      "seed_offset": 997443,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        19.175,
+        -10.733,
+        4.125
+      ],
+      "seed_offset": 36306,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        12.215,
+        -3.3
+      ],
+      "seed_offset": 913516,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        10.264,
+        -3.3
+      ],
+      "seed_offset": 548658,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        8.266,
+        -3.3
+      ],
+      "seed_offset": 247085,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        6.378,
+        -3.3
+      ],
+      "seed_offset": 185923,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        4.243,
+        -3.3
+      ],
+      "seed_offset": 163026,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        2.252,
+        -3.3
+      ],
+      "seed_offset": 48603,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -0.018,
+        -3.3
+      ],
+      "seed_offset": 413495,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -2.107,
+        -3.3
+      ],
+      "seed_offset": 75084,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -4.242,
+        -3.3
+      ],
+      "seed_offset": 974320,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -6.175,
+        -3.3
+      ],
+      "seed_offset": 200166,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -8.25,
+        -3.3
+      ],
+      "seed_offset": 73212,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -10.226,
+        -3.3
+      ],
+      "seed_offset": 770058,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        19.175,
+        -12.531,
+        -3.3
+      ],
+      "seed_offset": 88708,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        12.433,
+        6.6
+      ],
+      "seed_offset": 860131,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        10.077,
+        6.6
+      ],
+      "seed_offset": 776796,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        6.981,
+        6.6
+      ],
+      "seed_offset": 994226,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        4.619,
+        6.6
+      ],
+      "seed_offset": 492186,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        2.705,
+        6.6
+      ],
+      "seed_offset": 816240,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -0.25,
+        6.6
+      ],
+      "seed_offset": 326353,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -2.27,
+        6.6
+      ],
+      "seed_offset": 52494,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -5.208,
+        6.6
+      ],
+      "seed_offset": 576176,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -7.22,
+        6.6
+      ],
+      "seed_offset": 374609,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -10.025,
+        6.6
+      ],
+      "seed_offset": 993520,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -11.969,
+        6.6
+      ],
+      "seed_offset": 187071,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        11.625,
+        -3.3
+      ],
+      "seed_offset": 795671,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        8.178,
+        -3.3
+      ],
+      "seed_offset": 718889,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        4.827,
+        -3.3
+      ],
+      "seed_offset": 317363,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        1.663,
+        -3.3
+      ],
+      "seed_offset": 388336,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        -1.772,
+        -3.3
+      ],
+      "seed_offset": 372657,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        -5.157,
+        -3.3
+      ],
+      "seed_offset": 31156,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        -7.881,
+        -3.3
+      ],
+      "seed_offset": 946779,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        -12.039,
+        -3.3
+      ],
+      "seed_offset": 343566,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        10.733,
+        4.125
+      ],
+      "seed_offset": 601467,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        5.367,
+        4.125
+      ],
+      "seed_offset": 431295,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        -0.0,
+        4.125
+      ],
+      "seed_offset": 990521,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        -5.367,
+        4.125
+      ],
+      "seed_offset": 468040,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      "pos": [
+        -19.175,
+        -10.733,
+        4.125
+      ],
+      "seed_offset": 763288,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        12.481,
+        -3.3
+      ],
+      "seed_offset": 505179,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        10.344,
+        -3.3
+      ],
+      "seed_offset": 610157,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        8.383,
+        -3.3
+      ],
+      "seed_offset": 337067,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        6.071,
+        -3.3
+      ],
+      "seed_offset": 513819,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        4.024,
+        -3.3
+      ],
+      "seed_offset": 583219,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        1.973,
+        -3.3
+      ],
+      "seed_offset": 944052,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -0.009,
+        -3.3
+      ],
+      "seed_offset": 699221,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -1.918,
+        -3.3
+      ],
+      "seed_offset": 421559,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -4.045,
+        -3.3
+      ],
+      "seed_offset": 893451,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -6.277,
+        -3.3
+      ],
+      "seed_offset": 700819,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -8.212,
+        -3.3
+      ],
+      "seed_offset": 304267,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -10.475,
+        -3.3
+      ],
+      "seed_offset": 554808,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -19.175,
+        -12.567,
+        -3.3
+      ],
+      "seed_offset": 125173,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -1.977,
+        19.0,
+        6.6
+      ],
+      "seed_offset": 192388,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        0.312,
+        19.0,
+        6.6
+      ],
+      "seed_offset": 888898,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        2.668,
+        19.0,
+        6.6
+      ],
+      "seed_offset": 752189,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        4.929,
+        19.0,
+        6.6
+      ],
+      "seed_offset": 473299,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "pos": [
+        -1.396,
+        19.0,
+        0.0
+      ],
+      "seed_offset": 789920,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "pos": [
+        1.617,
+        19.0,
+        0.0
+      ],
+      "seed_offset": 683614,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "pos": [
+        4.706,
+        19.0,
+        0.0
+      ],
+      "seed_offset": 757885,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "pos": [
+        -0.779,
+        19.0,
+        4.95
+      ],
+      "seed_offset": 123350,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "pos": [
+        3.779,
+        19.0,
+        4.95
+      ],
+      "seed_offset": 695453,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -2.097,
+        19.0,
+        0.0
+      ],
+      "seed_offset": 67049,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -0.394,
+        19.0,
+        0.0
+      ],
+      "seed_offset": 235178,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        1.341,
+        19.0,
+        0.0
+      ],
+      "seed_offset": 662209,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        3.194,
+        19.0,
+        0.0
+      ],
+      "seed_offset": 898850,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        4.965,
+        19.0,
+        0.0
+      ],
+      "seed_offset": 523563,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -1.85,
+        -19.0,
+        6.6
+      ],
+      "seed_offset": 607820,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        0.551,
+        -19.0,
+        6.6
+      ],
+      "seed_offset": 804021,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        2.993,
+        -19.0,
+        6.6
+      ],
+      "seed_offset": 206143,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "roofline",
+      "collision": "none",
+      "cover": "edge_strip",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        4.755,
+        -19.0,
+        6.6
+      ],
+      "seed_offset": 274747,
+      "size": 0.6,
+      "trim_piece": "roof_edge",
+      "uv_region": [
+        0.0,
+        0.0,
+        1.0,
+        0.1406
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pos": [
+        -2.008,
+        -19.0,
+        0.0
+      ],
+      "seed_offset": 430593,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pos": [
+        1.755,
+        -19.0,
+        0.0
+      ],
+      "seed_offset": 775863,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "wall_base",
+      "collision": "none",
+      "cover": "base_course",
+      "normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pos": [
+        5.02,
+        -19.0,
+        0.0
+      ],
+      "seed_offset": 418569,
+      "size": 0.8,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pos": [
+        -0.779,
+        -19.0,
+        4.95
+      ],
+      "seed_offset": 678897,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "exterior_light",
+      "collision": "none",
+      "cover": "conduit_run",
+      "normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "pos": [
+        3.779,
+        -19.0,
+        4.95
+      ],
+      "seed_offset": 910661,
+      "size": 0.3,
+      "trim_piece": "conduit",
+      "uv_region": [
+        0.0,
+        0.7812,
+        1.0,
+        0.8828
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -2.276,
+        -19.0,
+        0.0
+      ],
+      "seed_offset": 729073,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        -0.31,
+        -19.0,
+        0.0
+      ],
+      "seed_offset": 355390,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        1.426,
+        -19.0,
+        0.0
+      ],
+      "seed_offset": 435527,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        3.25,
+        -19.0,
+        0.0
+      ],
+      "seed_offset": 384595,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    },
+    {
+      "anchor_kind": "ground_edge",
+      "collision": "none",
+      "cover": "curb",
+      "normal": [
+        0.0,
+        -0.0,
+        1.0
+      ],
+      "pos": [
+        5.287,
+        -19.0,
+        0.0
+      ],
+      "seed_offset": 575873,
+      "size": 0.4,
+      "trim_piece": "foundation",
+      "uv_region": [
+        0.0,
+        0.5391,
+        1.0,
+        0.7812
+      ]
+    }
+  ],
+  "schema": "patina-dressing/1",
+  "seed": 1999,
+  "source": "gs.patina.glb",
+  "space": "spec/Blender Z-up raw coords",
+  "trim_regions": {
+    "conduit": [
+      0.0,
+      0.7812,
+      1.0,
+      0.8828
+    ],
+    "corner_guard": [
+      0.0,
+      0.4375,
+      1.0,
+      0.5391
+    ],
+    "flashing": [
+      0.0,
+      0.8828,
+      1.0,
+      1.0
+    ],
+    "foundation": [
+      0.0,
+      0.5391,
+      1.0,
+      0.7812
+    ],
+    "panel_seam": [
+      0.0,
+      0.1406,
+      1.0,
+      0.3203
+    ],
+    "pipe_run": [
+      0.0,
+      0.3203,
+      1.0,
+      0.4375
+    ],
+    "roof_edge": [
+      0.0,
+      0.0,
+      1.0,
+      0.1406
+    ]
+  },
+  "trim_sheet": "gs.patina.trim.png"
+}
