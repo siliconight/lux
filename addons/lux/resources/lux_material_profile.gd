@@ -35,6 +35,15 @@ const STYLIZED_SHADER := preload("res://addons/lux/shaders/spatial/lux_stylized_
 @export_range(0.0, 1.0) var grime: float = 0.0
 @export var grime_color: Color = Color(0.16, 0.13, 0.1)
 
+@export_group("Emission")
+## Neon, signage, light boxes. Texture is a mask (white = lit), color is the
+## tube/lightbox hue (black = emission off, the default). Energy ~1.0 reads as
+## a lit face; push past the active preset's glow_hdr_threshold (typ. 1.5–3.0)
+## to feed bloom without destroying legibility. Rigs may animate energy live.
+@export var emissive_color: Color = Color(0, 0, 0, 1)
+@export var emissive_texture: Texture2D = null
+@export_range(0.0, 16.0) var emissive_energy: float = 1.0
+
 @export_group("Retro")
 @export var vertex_snap_enabled: bool = false
 @export_range(32.0, 512.0) var vertex_snap_resolution: float = 160.0
@@ -79,6 +88,10 @@ func apply_to_material(mat: ShaderMaterial, palette: LuxPalette = null) -> void:
 	mat.set_shader_parameter(&"wetness", wetness)
 	mat.set_shader_parameter(&"grime", grime)
 	mat.set_shader_parameter(&"grime_color", Vector3(grime_color.r, grime_color.g, grime_color.b))
+	mat.set_shader_parameter(&"emissive_color", emissive_color)
+	mat.set_shader_parameter(&"emissive_energy", emissive_energy)
+	if emissive_texture != null:
+		mat.set_shader_parameter(&"emissive_texture", emissive_texture)
 	mat.set_shader_parameter(&"vertex_snap_enabled", vertex_snap_enabled)
 	mat.set_shader_parameter(&"vertex_snap_resolution", vertex_snap_resolution)
 	mat.set_shader_parameter(&"affine_amount", affine_amount)

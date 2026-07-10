@@ -1,0 +1,71 @@
+[gd_resource type="Resource" script_class="LuxPreset" load_steps=3 format=3 uid="uid://lux_gothic_street_night"]
+
+[ext_resource type="Script" path="res://addons/lux/resources/lux_preset.gd" id="1_preset"]
+[ext_resource type="Script" path="res://addons/lux/resources/lux_palette.gd" id="2_palette"]
+
+[sub_resource type="Resource" id="pal"]
+script = ExtResource("2_palette")
+palette_name = &"Urban Gothic Night"
+highlight = Color(0.56, 0.5, 0.42, 1)
+midtone = Color(0.44, 0.46, 0.44, 1)
+shadow = Color(0.36, 0.34, 0.46, 1)
+fog = Color(0.3, 0.3, 0.38, 1)
+accent = Color(1, 0.2, 0.72, 1)
+
+[resource]
+script = ExtResource("1_preset")
+preset_name = &"Gothic Street Night"
+description = "Source-era urban gothic night street (Bloodlines-style construction). No sun; dark green-gray FLAT ambient reveals forms and routes while fine detail collapses into graphic darkness. Practicals carry the scene: streetlight/area rigs + emissive sign faces. Sodium-amber highlights, bruised-violet shadows, one magenta accent. Crushed blacks, slightly cool, crisp image: native res, no CRT, dither low. Emissive faces at energy 1.5-3.0 clear the 1.05 glow threshold (mild bloom, legible signs). Wetness stays per-material (pavement only) - default_wetness 0."
+sky_top_color = Color(0.03, 0.035, 0.06, 1)
+sky_horizon_color = Color(0.13, 0.1, 0.11, 1)
+ground_color = Color(0.03, 0.03, 0.035, 1)
+sky_energy = 0.35
+sun_enabled = false
+sun_elevation_deg = -10.0
+sun_azimuth_deg = 200.0
+sun_color = Color(0.7, 0.75, 0.9, 1)
+sun_energy = 0.0
+sun_shadows = false
+ambient_mode = 1
+ambient_color = Color(0.13, 0.15, 0.15, 1)
+ambient_energy = 0.55
+ambient_sky_contribution = 0.0
+tonemap_mode = 2
+exposure = 1.0
+tonemap_white = 5.0
+brightness = 0.98
+contrast = 1.12
+saturation = 0.95
+warmth = -0.05
+fog_enabled = true
+fog_color = Color(0.08, 0.08, 0.11, 1)
+fog_density = 0.006
+fog_sky_affect = 0.15
+fog_height = 0.5
+fog_height_density = 0.02
+glow_enabled = true
+glow_intensity = 0.5
+glow_bloom = 0.03
+glow_hdr_threshold = 1.05
+dither_enabled = true
+dither_strength = 0.08
+color_levels = 32
+dither_cell_size = 1
+dither_distance_fade = true
+dither_fade_start = 30.0
+dither_fade_end = 80.0
+render_scale = 1.0
+nearest_neighbor_scaling = true
+crt_mask_type = 0
+crt_mask_strength = 0.0
+crt_mask_scale = 3.0
+scanline_strength = 0.0
+force_sdr_retro_on_hdr = true
+vignette_strength = 0.22
+grain_strength = 0.05
+palette_influence = 0.35
+palette = SubResource("pal")
+default_wetness = 0.0
+vertex_shading_mode = 0
+ps2_lighting_global = -1.0
+alarm_color = Color(1, 0.15, 0.22, 1)

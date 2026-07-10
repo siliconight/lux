@@ -44,6 +44,22 @@ uniform float wetness : hint_range(0.0, 1.0) = 0.0;
 uniform float grime : hint_range(0.0, 1.0) = 0.0;
 uniform vec3 grime_color = vec3(0.16, 0.13, 0.1);
 
+// Emission (neon, signage, light boxes, vending fronts)
+// Sampled with the same (affine-aware) UV as albedo. Deliberately ignores
+// vertex colour: Patina bakes AO/form into COLOR, and a lit sign must not dim
+// in a dark corner — emissive surfaces are light sources, not receivers.
+// Workflow: emissive_texture = mask (white where lit), emissive_color = tube /
+// lightbox hue, emissive_energy = brightness. For pre-coloured emissive maps,
+// set emissive_color to white. Default colour is black, so existing materials
+// are byte-identical in output.
+// Legibility rule (art brief §8/§10): energy ~1.0 reads as a lit face; push
+// just past the preset's glow_hdr_threshold (typ. 1.5–3.0) to feed bloom
+// without blowing the sign to white. Runtime rigs may animate emissive_energy
+// per-frame for neon buzz / broken-tube flicker.
+uniform sampler2D emissive_texture : source_color, hint_default_white;
+uniform vec4 emissive_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);
+uniform float emissive_energy : hint_range(0.0, 16.0) = 1.0;
+
 // Retro geometry
 uniform bool vertex_snap_enabled = false;
 uniform float vertex_snap_resolution : hint_range(32.0, 512.0) = 160.0;
@@ -121,6 +137,11 @@ void fragment() {
 	ROUGHNESS = mix(0.85, 0.15, wetness);
 	METALLIC = 0.0;
 	SPECULAR = mix(0.2, 0.6, wetness) * specular_strength * 1.6;
+
+	// Emission is added after lighting by the engine, so it survives both the
+	// modern and PS2 paths and stays visible in graphic darkness.
+	vec3 emis = texture(emissive_texture, uv).rgb * emissive_color.rgb;
+	EMISSION = emis * emissive_energy;
 }
 
 void light() {

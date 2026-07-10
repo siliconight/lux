@@ -7,6 +7,34 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.11.0] — 2026-07-09
+
+### Added
+- **Emission path** in `lux_stylized_standard.gdshader` — `emissive_texture`
+  (mask, white = lit) + `emissive_color` (tube/lightbox hue) +
+  `emissive_energy`, output as `EMISSION` so it survives both the modern and
+  PS2 paths and stays visible in graphic darkness. Deliberately ignores vertex
+  colour: a lit sign must not dim under the Patina AO bake. Defaults are inert
+  (black colour), so existing materials render byte-identical. First brick of
+  the Source-era urban gothic direction — neon, signage, light boxes, vending
+  fronts. Legibility rule: energy ~1.0 reads as a lit face; 1.5–3.0 clears a
+  ~1.05 `glow_hdr_threshold` for bloom without blowing the sign to white.
+  Rigs may animate `emissive_energy` per-frame for buzz/flicker.
+- `LuxMaterialProfile` **Emission** export group (`emissive_color`,
+  `emissive_texture`, `emissive_energy`), pushed by `apply_to_material`.
+  The texture parameter is only set when non-null so `hint_default_white`
+  survives colour-only tubes.
+- `presets/gothic_street_night.tres` — first urban-gothic preset: sun off,
+  dark green-gray **flat** ambient (0.55), crushed blacks (contrast 1.12),
+  Filmic tonemap (ACES desaturates neon hues toward white),
+  `glow_hdr_threshold` 1.05, thin ground fog, native resolution, no CRT,
+  dither 0.08. Bruised-violet shadows / sodium-amber highlights / one neon
+  magenta accent. `default_wetness` stays 0 — wetness is per-material
+  (pavement only), per the selective-wetness rule.
+
+### Changed
+- `plugin.cfg` version synced to the release (was stale at 0.8.3).
+
 ## [0.10.4] — 2026-07-09
 
 ### Fixed
