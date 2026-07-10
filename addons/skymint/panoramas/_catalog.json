@@ -1,0 +1,82 @@
+[
+ {
+  "name": "!Bonus - Techno",
+  "slug": "techno"
+ },
+ {
+  "name": "Apocalypse",
+  "slug": "apocalypse"
+ },
+ {
+  "name": "Apocalypse Land",
+  "slug": "apocalypse_land"
+ },
+ {
+  "name": "Apocalypse Ocean",
+  "slug": "apocalypse_ocean"
+ },
+ {
+  "name": "Classic",
+  "slug": "classic"
+ },
+ {
+  "name": "Classic Land",
+  "slug": "classic_land"
+ },
+ {
+  "name": "Clear",
+  "slug": "clear"
+ },
+ {
+  "name": "Clear Ocean",
+  "slug": "clear_ocean"
+ },
+ {
+  "name": "Dawn",
+  "slug": "dawn"
+ },
+ {
+  "name": "Dusk",
+  "slug": "dusk"
+ },
+ {
+  "name": "Dusk Land",
+  "slug": "dusk_land"
+ },
+ {
+  "name": "Dusk Ocean",
+  "slug": "dusk_ocean"
+ },
+ {
+  "name": "Empty Space",
+  "slug": "empty_space"
+ },
+ {
+  "name": "Gray",
+  "slug": "gray"
+ },
+ {
+  "name": "Moody",
+  "slug": "moody"
+ },
+ {
+  "name": "Netherworld",
+  "slug": "netherworld"
+ },
+ {
+  "name": "Sinister",
+  "slug": "sinister"
+ },
+ {
+  "name": "Sinister Land",
+  "slug": "sinister_land"
+ },
+ {
+  "name": "Sinister Ocean",
+  "slug": "sinister_ocean"
+ },
+ {
+  "name": "Sunshine",
+  "slug": "sunshine"
+ }
+]

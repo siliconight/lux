@@ -79,7 +79,7 @@ func _build_ui() -> void:
 	slider_label.text = "Art Sliders"
 	root.add_child(slider_label)
 
-	var scroll := ScrollContainer.new()
+	var scroll: ScrollContainer = ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.custom_minimum_size = Vector2(0, 220)
 	root.add_child(scroll)
@@ -211,14 +211,14 @@ func _scan_presets() -> void:
 	_presets.clear()
 	_preset_paths.clear()
 	_preset_option.clear()
-	var dir := DirAccess.open(PRESET_DIR)
+	var dir: DirAccess = DirAccess.open(PRESET_DIR)
 	if dir == null:
 		return
 	dir.list_dir_begin()
-	var f := dir.get_next()
+	var f: String = dir.get_next()
 	while f != "":
 		if f.ends_with(".tres"):
-			var res := ResourceLoader.load(PRESET_DIR + f)
+			var res: Resource = ResourceLoader.load(PRESET_DIR + f)
 			if res is LuxPreset:
 				_presets.append(res)
 				_preset_paths.append(PRESET_DIR + f)
@@ -230,12 +230,12 @@ func _scan_presets() -> void:
 func _get_selected_root() -> LuxRoot:
 	if _editor == null:
 		return null
-	var selection := _editor.get_selection().get_selected_nodes()
+	var selection: Array = _editor.get_selection().get_selected_nodes()
 	for n in selection:
 		if n is LuxRoot:
 			return n
 	# Fall back to the first LuxRoot in the edited scene.
-	var scene := _editor.get_edited_scene_root()
+	var scene: Node = _editor.get_edited_scene_root()
 	if scene != null:
 		return _find_lux_root(scene)
 	return null
@@ -245,22 +245,22 @@ func _find_lux_root(node: Node) -> LuxRoot:
 	if node is LuxRoot:
 		return node
 	for c in node.get_children():
-		var r := _find_lux_root(c)
+		var r: LuxRoot = _find_lux_root(c)
 		if r != null:
 			return r
 	return null
 
 
 func _on_apply_pressed() -> void:
-	var root := _get_selected_root()
+	var root: LuxRoot = _get_selected_root()
 	if root == null:
 		_set_status("[color=orange]No LuxRoot selected or found in the scene.[/color]")
 		return
-	var idx := _preset_option.selected
+	var idx: int = _preset_option.selected
 	if idx < 0 or idx >= _presets.size():
 		_set_status("[color=orange]No preset selected.[/color]")
 		return
-	var preset := _presets[idx]
+	var preset: LuxPreset = _presets[idx]
 	root.active_preset = preset
 	root.apply_preset(preset)
 	_load_sliders_from(preset)
@@ -269,10 +269,10 @@ func _on_apply_pressed() -> void:
 
 func _on_slider_changed(property: String, value: float, val_label: Label) -> void:
 	val_label.text = "%.3f" % value
-	var root := _get_selected_root()
+	var root: LuxRoot = _get_selected_root()
 	if root == null:
 		return
-	var preset := root.get_current_preset()
+	var preset: LuxPreset = root.get_current_preset()
 	if preset == null:
 		preset = root.active_preset
 	if preset == null:
@@ -296,18 +296,18 @@ func _load_sliders_from(preset: LuxPreset) -> void:
 
 
 func _on_save_override_pressed() -> void:
-	var root := _get_selected_root()
+	var root: LuxRoot = _get_selected_root()
 	if root == null:
 		_set_status("[color=orange]No LuxRoot to save an override for.[/color]")
 		return
-	var base := root.local_override if root.local_override != null else root.active_preset
+	var base: LuxPreset = root.local_override if root.local_override != null else root.active_preset
 	if base == null:
 		_set_status("[color=orange]Nothing to save; apply a preset first.[/color]")
 		return
-	var override := base.make_override(
+	var override: LuxPreset = base.make_override(
 		StringName(String(base.preset_name).trim_suffix(" (Level)") + " (Level)")
 	)
-	var scene_path := (
+	var scene_path: String = (
 		_editor.get_edited_scene_root().scene_file_path if _editor.get_edited_scene_root() else ""
 	)
 	var dir := "res://"
@@ -315,8 +315,8 @@ func _on_save_override_pressed() -> void:
 	if scene_path != "":
 		dir = scene_path.get_base_dir() + "/"
 		fname = scene_path.get_file().get_basename() + "_lux.tres"
-	var out_path := dir + fname
-	var err := ResourceSaver.save(override, out_path)
+	var out_path: String = dir + fname
+	var err: int = ResourceSaver.save(override, out_path)
 	if err == OK:
 		root.local_override = ResourceLoader.load(out_path)
 		_set_status("[color=lightgreen]Saved level override to %s[/color]" % out_path)
@@ -330,13 +330,13 @@ func _on_role_pressed(role: int) -> void:
 	if _editor == null:
 		_set_status("[color=orange]No editor interface.[/color]")
 		return
-	var nodes := _editor.get_selection().get_selected_nodes()
+	var nodes: Array = _editor.get_selection().get_selected_nodes()
 	if nodes.is_empty():
 		_set_status("[color=orange]Select one or more nodes first.[/color]")
 		return
 	# Pull the palette from the found LuxRoot's current preset, if any.
 	var palette: LuxPalette = null
-	var lux := _get_selected_root()
+	var lux: LuxRoot = _get_selected_root()
 	if lux != null:
 		var preset = lux.get_current_preset()
 		if preset == null:
@@ -355,11 +355,11 @@ func _on_role_pressed(role: int) -> void:
 
 
 func _on_validate_pressed() -> void:
-	var root := _get_selected_root()
+	var root: LuxRoot = _get_selected_root()
 	if root == null:
 		_set_status("[color=orange]No LuxRoot selected or found.[/color]")
 		return
-	var findings := LuxValidator.validate(root)
+	var findings: Array = LuxValidator.validate(root)
 	var text := ""
 	for f in findings:
 		var color := "gray"
@@ -401,11 +401,11 @@ func _on_bake_lights() -> void:
 	if scene_root == null:
 		_set_status("[color=orange]Open a scene first.[/color]")
 		return
-	var path := _lights_path_edit.text.strip_edges()
+	var path: String = _lights_path_edit.text.strip_edges()
 	if path.is_empty():
 		_set_status("[color=orange]Pick a .lights.json first (Browse).[/color]")
 		return
-	var res := LuxLightLoader.bake(path, scene_root)
+	var res: Dictionary = LuxLightLoader.bake(path, scene_root)
 	if res.get("ok", false):
 		_set_status("[color=lightgreen]%s[/color]" % res.get("msg", "Baked."))
 	else:
@@ -417,5 +417,5 @@ func _on_clear_lights() -> void:
 	if scene_root == null:
 		_set_status("[color=orange]Open a scene first.[/color]")
 		return
-	var n := LuxLightLoader.clear(scene_root)
+	var n: int = LuxLightLoader.clear(scene_root)
 	_set_status("[color=gray]Cleared %d light bake(s).[/color]" % n)

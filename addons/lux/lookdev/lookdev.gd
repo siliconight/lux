@@ -41,6 +41,15 @@ var _center := Vector3.ZERO
 var _dist := 14.0
 var _height := 6.0
 
+# walk mode: WASD + mouselook first-person, to feel the space at eye level.
+var _walking := false
+var _walk_pos := Vector3.ZERO
+var _walk_yaw := 0.0
+var _walk_pitch := 0.0
+var _walk_speed := 4.0            # m/s, ~human walk
+const _EYE_HEIGHT := 1.7          # metres — player eye level
+const _MOUSE_SENS := 0.003
+
 const PRESETS := [
 	&"Delco Summer Afternoon", &"Delco Arcade", &"Blue Hour",
 	&"Gas Station Fluorescent", &"Heavy Rain", &"Mission Goes Hot",
@@ -149,12 +158,38 @@ func _setup_hud() -> void:
 
 
 func _process(delta: float) -> void:
-	_orbit += delta * 0.15
-	if _cam:
-		_cam.position = _center + Vector3(
-			sin(_orbit) * _dist, _height - _center.y, cos(_orbit) * _dist)
-		_cam.look_at(_center, Vector3.UP)
+	if _walking:
+		_process_walk(delta)
+	else:
+		_orbit += delta * 0.15
+		if _cam:
+			_cam.position = _center + Vector3(
+				sin(_orbit) * _dist, _height - _center.y, cos(_orbit) * _dist)
+			_cam.look_at(_center, Vector3.UP)
 	_refresh_hud()
+
+
+func _process_walk(delta: float) -> void:
+	if _cam == null:
+		return
+	# WASD relative to facing; Shift = sprint, Space/Ctrl = up/down (noclip fly,
+	# so you can rise to see rooflines or drop to floor level).
+	var input := Vector3.ZERO
+	if Input.is_key_pressed(KEY_W): input.z -= 1.0
+	if Input.is_key_pressed(KEY_S): input.z += 1.0
+	if Input.is_key_pressed(KEY_A): input.x -= 1.0
+	if Input.is_key_pressed(KEY_D): input.x += 1.0
+	if Input.is_key_pressed(KEY_E): input.y += 1.0
+	if Input.is_key_pressed(KEY_Q): input.y -= 1.0
+	var speed: float = _walk_speed * (3.0 if Input.is_key_pressed(KEY_SHIFT) else 1.0)
+	# rotate horizontal input by yaw
+	var fwd := Vector3(sin(_walk_yaw), 0, cos(_walk_yaw))
+	var right := Vector3(cos(_walk_yaw), 0, -sin(_walk_yaw))
+	_walk_pos += (right * input.x + fwd * input.z + Vector3.UP * input.y) \
+		* speed * delta
+	_cam.position = _walk_pos
+	var basis: Basis = Basis.from_euler(Vector3(_walk_pitch, _walk_yaw, 0))
+	_cam.transform.basis = basis
 
 
 func _push() -> void:
@@ -172,14 +207,45 @@ func _bump(field: String, dir: int) -> void:
 
 
 func _unhandled_input(e: InputEvent) -> void:
-	# mouse wheel = zoom the orbit in/out
-	if e is InputEventMouseButton and e.pressed:
+	# mouse look while walking
+	if _walking and e is InputEventMouseMotion:
+		_walk_yaw -= e.relative.x * _MOUSE_SENS
+		_walk_pitch = clampf(_walk_pitch - e.relative.y * _MOUSE_SENS,
+			-1.4, 1.4)
+		return
+	# mouse wheel = zoom the orbit in/out (orbit mode only)
+	if not _walking and e is InputEventMouseButton and e.pressed:
 		if e.button_index == MOUSE_BUTTON_WHEEL_UP:
 			_dist = maxf(2.0, _dist * 0.9)
 		elif e.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			_dist = _dist * 1.1
 	if not (e is InputEventKey and e.pressed and not e.echo):
 		return
+
+	# Tab always toggles walk/orbit.
+	if e.keycode == KEY_TAB:
+		_toggle_walk()
+		return
+	# Escape drops mouse capture (so you can click out) but stays in walk mode.
+	if e.keycode == KEY_ESCAPE and _walking:
+		Input.mouse_mode = (Input.MOUSE_MODE_VISIBLE
+			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+			else Input.MOUSE_MODE_CAPTURED)
+		return
+
+	# While walking, WASD/QE/Shift drive movement (handled in _process), so we
+	# only listen for the non-conflicting review keys here. The grade-tuning
+	# hotkeys (which reuse Q/W/E/A/S/D) are ORBIT-ONLY to avoid clashing.
+	if _walking:
+		match e.keycode:
+			KEY_SPACE: _toggle_lux()
+			KEY_BRACKETLEFT: _shot("before")
+			KEY_BRACKETRIGHT: _shot("after")
+			KEY_F5: _dump()
+			KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6:
+				_jump_preset(e.keycode - KEY_1)
+		return
+
 	match e.keycode:
 		KEY_Q: _bump("saturation", 1)
 		KEY_A: _bump("saturation", -1)
@@ -210,13 +276,29 @@ func _unhandled_input(e: InputEvent) -> void:
 		KEY_BRACKETLEFT: _shot("before")
 		KEY_BRACKETRIGHT: _shot("after")
 		KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6:
-			var idx: int = e.keycode - KEY_1
-			if idx < PRESETS.size():
-				_lux.blend_to_preset(PRESETS[idx], 0.4)
-				await get_tree().create_timer(0.45).timeout
-				_base = _lux.active_preset.duplicate(true)
-				_live = _base.duplicate(true)
-				_lux.local_override = _live
+			_jump_preset(e.keycode - KEY_1)
+
+
+func _jump_preset(idx: int) -> void:
+	if idx < 0 or idx >= PRESETS.size():
+		return
+	_lux.blend_to_preset(PRESETS[idx], 0.4)
+	await get_tree().create_timer(0.45).timeout
+	_base = _lux.active_preset.duplicate(true)
+	_live = _base.duplicate(true)
+	_lux.local_override = _live
+
+
+func _toggle_walk() -> void:
+	_walking = not _walking
+	if _walking:
+		# start at the building's near edge, at eye height, facing the centre.
+		_walk_pos = _center + Vector3(0, _EYE_HEIGHT - _center.y + 0.5, _dist * 0.5)
+		_walk_yaw = PI                    # face -Z toward centre
+		_walk_pitch = 0.0
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
 func _toggle_lux() -> void:
@@ -257,6 +339,12 @@ func _shot(label: String) -> void:
 func _refresh_hud() -> void:
 	if _hud == null:
 		return
+	if _walking:
+		_hud.text = "WALK — WASD move, mouse look, Shift sprint, Q/E down/up\n"
+		_hud.text += "Tab → back to orbit   Esc → free mouse   [Space] Lux on/off\n"
+		_hud.text += "[1-6] preset   '[' before   ']' after   F5 dump\n"
+		_hud.text += "preset: %s" % (String(_base.preset_name) if _base else "?")
+		return
 	var p: LuxPreset = _live
 	_hud.text = "LOOK-DEV — Lux: %s   preset: %s\n" % [
 		"ON" if _lux_on else "OFF (raw bake)",
@@ -270,4 +358,4 @@ func _refresh_hud() -> void:
 	_hud.text += "exposure %.2f [Z/X]   glow-threshold %.2f [C/V]   <- the HDR pop\n" % [
 		p.exposure, p.glow_hdr_threshold]
 	_hud.text += "[1-6] preset   [Space] Lux on/off   '[' before   ']' after   F5 dump   \\ reset\n"
-	_hud.text += "wheel zoom   up/down height   Home reframe"
+	_hud.text += "wheel zoom   up/down height   Home reframe   TAB to walk"

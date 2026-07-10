@@ -7,6 +7,25 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.10.2] — 2026-07-09
+
+### Fixed
+- `lux_dock.gd` and `lux_validator.gd` failed to compile under Godot 4.7's
+  stricter type inference (method-return and dict-field `:=` inferences like
+  `omni_spot`, `shadow_casters`, `clustered`, and the dock's `_get_selected_root`
+  chain). Typed them explicitly. **This unblocks the LuxDock** — including the
+  Bake Lights section that spawns interior light rigs from a `.lights.json`.
+
+## [0.10.1] — 2026-07-09
+
+### Added
+- Look-dev harness **walk mode** (Tab to toggle): first-person WASD + mouselook
+  through the building at eye level (1.7 m), so you can feel the space and judge
+  walls/scale/mottle from a player's POV, not just orbit it. Shift sprints,
+  Q/E drop/rise (noclip fly to inspect rooflines or floor). Esc frees the mouse;
+  Tab returns to orbit. Preset jump (1-6), Lux on/off, and screenshots still work
+  while walking; the grade-tuning hotkeys stay orbit-only (they reuse WASD).
+
 ## [0.10.0] — 2026-07-09
 
 ### Added

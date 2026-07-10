@@ -24,7 +24,7 @@ static func validate(root: LuxRoot) -> Array:
 		return findings
 
 	# --- Preset present? ---
-	var preset := root.active_preset
+	var preset: LuxPreset = root.active_preset
 	if root.local_override != null:
 		preset = root.local_override
 	if preset == null:
@@ -47,14 +47,14 @@ static func validate(root: LuxRoot) -> Array:
 		)
 
 	# --- Light budget ---
-	var quality := root.get_quality_profile()
+	var quality: LuxQualityProfile = root.get_quality_profile()
 	if quality == null:
 		quality = LuxQualityProfile.make_tier(root.quality_tier)
-	var lights := _count_nodes_of_type(
+	var lights: Dictionary = _count_nodes_of_type(
 		root.get_tree().edited_scene_root if Engine.is_editor_hint() and root.get_tree() else root,
 		"Light3D"
 	)
-	var omni_spot := lights.omni + lights.spot
+	var omni_spot: int = lights.omni + lights.spot
 	if omni_spot > quality.max_dynamic_lights:
 		findings.append(
 			Finding.new(
@@ -65,7 +65,7 @@ static func validate(root: LuxRoot) -> Array:
 				)
 			)
 		)
-	var shadow_casters := lights.shadowed
+	var shadow_casters: int = lights.shadowed
 	if shadow_casters > quality.max_shadow_casters:
 		findings.append(
 			Finding.new(
@@ -95,7 +95,7 @@ static func validate(root: LuxRoot) -> Array:
 					)
 				)
 			)
-		var clustered := lights.omni + lights.spot + lights.area
+		var clustered: int = lights.omni + lights.spot + lights.area
 		if clustered > 128:
 			(
 				findings
@@ -217,7 +217,7 @@ static func validate(root: LuxRoot) -> Array:
 			)
 
 	# --- Renderer hint ---
-	var method := RenderingServer.get_rendering_device()
+	var method: RenderingDevice = RenderingServer.get_rendering_device()
 	if method == null:
 		(
 			findings
@@ -238,7 +238,7 @@ static func validate(root: LuxRoot) -> Array:
 
 
 static func _scene_has_world_environment(root: Node) -> bool:
-	var top := root
+	var top: Node = root
 	if (
 		Engine.is_editor_hint()
 		and root.get_tree() != null
@@ -252,7 +252,7 @@ static func _find_type(node: Node, type_name: String) -> Node:
 	if node.is_class(type_name):
 		return node
 	for c in node.get_children():
-		var r := _find_type(c, type_name)
+		var r: Node = _find_type(c, type_name)
 		if r != null:
 			return r
 	return null
