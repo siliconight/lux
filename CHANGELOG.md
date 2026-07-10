@@ -7,6 +7,25 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.10.4] — 2026-07-09
+
+### Fixed
+- Baked fluorescent rigs blew interiors to white: each light baked at
+  `energy = 2.2`, but rooms pack 5+ overlapping fluorescents, so their
+  contributions summed to ~10+ on nearby surfaces — clipping to white with the
+  dither screaming over the lost tonal range. Dropped baked per-light energy to
+  1.0 and range to 8.0 so a densely-lit room reads correctly. (Live exposure X/Z
+  in the harness also pulls it back for tuning.)
+
+## [0.10.3] — 2026-07-09
+
+### Fixed
+- Look-dev harness HUD showed a stale preset name after a preset jump (1-6): the
+  lighting changed but the label kept saying the old preset. `blend_to_preset`
+  applies a preset without updating `active_preset`, so the harness was reading
+  the wrong source; now it reads `get_current_preset()` (the actually-applied
+  preset) for the HUD and the tuning base.
+
 ## [0.10.2] — 2026-07-09
 
 ### Fixed

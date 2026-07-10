@@ -81,8 +81,9 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			var r := LuxLightRig.new()
 			r.rig_name = &"Fluorescent (baked)"
 			r.light_color = LuxColorTemp.cool_fluorescent()
-			r.energy = 2.2
-			r.light_range = 10.0
+			r.energy = 1.0          # per-light; rooms pack 5+ so they sum — 2.2
+			                        # each blew interiors to white. Tune per bake.
+			r.light_range = 8.0
 			r.count = int(row.get("count", 1))
 			r.spacing = float(row.get("spacing", 0.0))
 			r.mount_height = 0.0          # anchor pos is already at the ceiling

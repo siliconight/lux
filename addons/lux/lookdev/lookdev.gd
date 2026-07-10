@@ -284,9 +284,15 @@ func _jump_preset(idx: int) -> void:
 		return
 	_lux.blend_to_preset(PRESETS[idx], 0.4)
 	await get_tree().create_timer(0.45).timeout
-	_base = _lux.active_preset.duplicate(true)
+	# blend_to_preset applies the preset but doesn't touch active_preset, so read
+	# the actually-applied preset (_current) for an accurate _base and HUD label.
+	var jumped: LuxPreset = _lux.get_current_preset()
+	if jumped == null:
+		return
+	_base = jumped.duplicate(true)
 	_live = _base.duplicate(true)
 	_lux.local_override = _live
+	_push()
 
 
 func _toggle_walk() -> void:
