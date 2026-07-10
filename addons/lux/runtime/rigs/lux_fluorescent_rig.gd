@@ -22,7 +22,7 @@ func _ready() -> void:
 	if root != null:
 		for l in _lights:
 			root.register_lux_light(l)
-	set_process(rig != null and rig.flicker_amount > 0.0)
+	set_process(rig != null and rig.flicker_amount > 0.0 and rig.bake_mode != 1)
 
 
 func _rebuild() -> void:
@@ -40,6 +40,7 @@ func _rebuild() -> void:
 		lamp.omni_range = r.light_range
 		lamp.shadow_enabled = r.shadows_enabled
 		lamp.position = Vector3(start + i * r.spacing, r.mount_height, 0.0)
+		r.apply_bake_mode(lamp)
 		add_child(lamp)
 		if Engine.is_editor_hint() and get_tree() != null:
 			lamp.owner = get_tree().edited_scene_root
@@ -48,7 +49,7 @@ func _rebuild() -> void:
 
 func _process(delta: float) -> void:
 	var r := rig if rig != null else null
-	if r == null or r.flicker_amount <= 0.0:
+	if r == null or r.flicker_amount <= 0.0 or r.bake_mode == 1:
 		return
 	_flicker_phase += delta * r.flicker_speed
 	# Two-tone noise for that ballast-buzz instability.

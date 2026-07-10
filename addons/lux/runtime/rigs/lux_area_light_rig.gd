@@ -69,6 +69,8 @@ func _build() -> void:
 			area.set(&"texture", panel_texture)
 		_light = area
 
+	if rig != null:
+		rig.apply_bake_mode(_light)
 	add_child(_light)
 	if Engine.is_editor_hint() and get_tree() != null:
 		_light.owner = get_tree().edited_scene_root

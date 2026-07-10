@@ -74,6 +74,7 @@ func _rebuild() -> void:
 		lamp.shadow_enabled = r.shadows_enabled
 		lamp.position = Vector3(i * r.spacing, r.mount_height, 0.0)
 		lamp.rotation_degrees = Vector3(-90.0, 0.0, 0.0)  # point straight down
+		r.apply_bake_mode(lamp)
 		add_child(lamp)
 		if Engine.is_editor_hint() and get_tree() != null:
 			lamp.owner = get_tree().edited_scene_root

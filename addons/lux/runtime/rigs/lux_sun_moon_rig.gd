@@ -34,6 +34,8 @@ func _build() -> void:
 		_light.shadow_enabled = rig.shadows_enabled
 	_light.light_color = col
 	_light.light_energy = energy
+	if rig != null:
+		rig.apply_bake_mode(_light)
 	var basis := Basis.IDENTITY
 	basis = basis.rotated(Vector3.UP, deg_to_rad(azimuth_deg))
 	basis = basis.rotated(basis.x, -deg_to_rad(elevation_deg))

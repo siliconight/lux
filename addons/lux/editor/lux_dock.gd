@@ -14,6 +14,7 @@ var _status_label: RichTextLabel
 var _slider_box: VBoxContainer
 var _lights_path_edit: LineEdit
 var _lights_dialog: EditorFileDialog
+var _lights_static_check: CheckBox
 
 var _presets: Array[LuxPreset] = []
 var _preset_paths: Array[String] = []
@@ -142,6 +143,13 @@ func _build_ui() -> void:
 	_lights_path_edit.placeholder_text = "res://.../<name>.lights.json"
 	_lights_path_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.add_child(_lights_path_edit)
+
+	_lights_static_check = CheckBox.new()
+	_lights_static_check.text = "Lightmap static (pc2000)"
+	_lights_static_check.tooltip_text = ("Spawn rigs with Light3D bake mode STATIC and flicker off, "
+		+ "ready for a LightmapGI bake (see docs/pc2000_bake_runbook.md). "
+		+ "Leave off for the realtime delco / gothic / ps1-storm looks.")
+	root.add_child(_lights_static_check)
 
 	var lights_row := HBoxContainer.new()
 	root.add_child(lights_row)
@@ -405,7 +413,8 @@ func _on_bake_lights() -> void:
 	if path.is_empty():
 		_set_status("[color=orange]Pick a .lights.json first (Browse).[/color]")
 		return
-	var res: Dictionary = LuxLightLoader.bake(path, scene_root)
+	var want_static: bool = _lights_static_check != null and _lights_static_check.button_pressed
+	var res: Dictionary = LuxLightLoader.bake(path, scene_root, want_static)
 	if res.get("ok", false):
 		_set_status("[color=lightgreen]%s[/color]" % res.get("msg", "Baked."))
 	else:

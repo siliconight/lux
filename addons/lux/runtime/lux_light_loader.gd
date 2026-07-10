@@ -18,7 +18,13 @@ const CONTAINER := "LuxLights"
 
 ## Read `path`, replace any previous bake, and spawn a rig per anchor under a
 ## `LuxLights` container. Returns {ok, msg, count}.
-static func bake(path: String, scene_root: Node) -> Dictionary:
+##
+## `lightmap_static` (pc2000 family): spawn every rig with Light3D bake mode
+## STATIC and flicker off, ready for a LightmapGI bake. Lightmapped surfaces
+## then ignore these lights' realtime contribution (no double-lighting) while
+## dynamic objects still receive them live. NOTE: after a bake, edits to rig
+## energy/colour need a RE-BAKE to show on lightmapped geometry.
+static func bake(path: String, scene_root: Node, lightmap_static: bool = false) -> Dictionary:
 	if scene_root == null:
 		return {"ok": false, "msg": "Open a scene first."}
 	if not FileAccess.file_exists(path):
@@ -42,6 +48,8 @@ static func bake(path: String, scene_root: Node) -> Dictionary:
 		if node == null:
 			skipped += 1
 			continue
+		if lightmap_static:
+			_make_lightmap_static(node)
 		container.add_child(node)          # _ready builds the lights here
 		node.owner = scene_root
 		_reown(node, scene_root)
@@ -51,6 +59,8 @@ static func bake(path: String, scene_root: Node) -> Dictionary:
 	var has_root := not scene_root.get_tree().get_nodes_in_group(
 		&"lux_root").is_empty()
 	var msg := "Baked %d light rig(s)" % made
+	if lightmap_static:
+		msg += " [lightmap static]"
 	if skipped > 0:
 		msg += " (%d unsupported skipped)" % skipped
 	if not has_root:
@@ -119,6 +129,18 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			return ar
 		_:
 			return null   # 'sun' is owned by the preset/SkyMint; others skipped
+
+
+## Flip a freshly-built rig's resource to bake-static BEFORE it enters the
+## tree (so _ready spawns the lights already carrying BAKE_STATIC). Flicker is
+## zeroed — a frozen lightmap can't flicker, and half-flickering dynamic
+## objects against a steady baked room reads as a bug.
+static func _make_lightmap_static(node: Node3D) -> void:
+	var rr: Variant = node.get(&"rig")
+	if rr is LuxLightRig:
+		var r := rr as LuxLightRig
+		r.bake_mode = 1
+		r.flicker_amount = 0.0
 
 
 static func _place(node: Node3D, a: Dictionary) -> void:

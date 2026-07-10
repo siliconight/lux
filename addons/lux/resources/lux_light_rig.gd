@@ -25,3 +25,25 @@ extends Resource
 ## Subtle instability for fluorescents / failing bulbs. 0 = steady.
 @export_range(0.0, 1.0) var flicker_amount: float = 0.0
 @export_range(0.1, 30.0) var flicker_speed: float = 8.0
+
+@export_group("Lightmap Baking")
+## How spawned lights participate in a LightmapGI bake (pc2000 family):
+##   Realtime — leave the engine default untouched (existing scenes render
+##              byte-identical).
+##   Static   — direct + indirect light are baked; lightmapped surfaces then
+##              ignore the light's realtime contribution (no double-lighting)
+##              while dynamic objects (characters, guns) still receive it live.
+##   Dynamic  — only indirect is baked; direct stays realtime everywhere.
+## Flicker on a Static light only shows on dynamic objects (the lightmap is
+## frozen), so rigs disable flicker when Static.
+@export_enum("Realtime (engine default)", "Static (baked)", "Dynamic (indirect only)")
+var bake_mode: int = 0
+
+
+## Applies this rig's bake_mode to a spawned light. Duck-typed (`set`) so it
+## also covers AreaLight3D instantiated via ClassDB. Mode 0 touches nothing.
+func apply_bake_mode(light: Object) -> void:
+	if light == null or bake_mode == 0:
+		return
+	var mode: int = Light3D.BAKE_STATIC if bake_mode == 1 else Light3D.BAKE_DYNAMIC
+	light.set(&"light_bake_mode", mode)

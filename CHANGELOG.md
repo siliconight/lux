@@ -7,6 +7,42 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.13.0] — 2026-07-10
+
+### Added
+- **SoF PC2000 look family** (fourth family alongside delco / gothic /
+  ps1-storm): "premium PC shooter, 1999–2002" — hard LightmapGI baked light
+  pools, imported per-pixel `StandardMaterial3D` on level geo (bilinear +
+  mipmaps, explicitly NOT the PS1 look), Lux running **grade-only**.
+- `presets/sof_pc2000.tres` — restrained Filmic, exposure 0.95, saturation
+  0.9, contrast 1.06; glow/dither/CRT/vignette/grain all OFF, native res
+  bilinear, low flat ambient (the lightmap owns darkness), light distance fog.
+- `LuxLightRig.bake_mode` (Realtime / Static / Dynamic) +
+  `apply_bake_mode()`; all four rigs (fluorescent, streetlight, area,
+  sun/moon) apply it to spawned lights. Default Realtime leaves existing
+  scenes byte-identical. Static zeroes flicker (frozen lightmaps can't
+  flicker).
+- `LuxLightLoader.bake(path, scene_root, lightmap_static := false)` — static
+  mode flips every spawned rig to `BAKE_STATIC` before it enters the tree.
+  Dock gained a **"Lightmap static (pc2000)"** checkbox in the Level Lights
+  section.
+- `LuxMaterialApplier.apply_role_lightmapped(root, role)` — pc2000 role path:
+  keeps materials per-pixel engine-standard, sets `gi_mode` STATIC
+  (LEVEL/PROP) or DYNAMIC (CHARACTER/GUN), skips the `lux_materials` group so
+  presets can't restyle these surfaces.
+- `lookdev/pc2000_bake.tscn` + `lookdev/pc2000_lookdev.gd` — bake/judge scene
+  with gs.patina.glb instanced EDITOR-TIME (lightmaps only survive on meshes
+  present at bake; the base harness's runtime-load path can't carry them),
+  LuxRoot on the SoF preset, and a configured LightmapGI node.
+- `docs/pc2000_bake_runbook.md` — exact 4.7 reimport/bake/judge steps, what
+  "landed" looks like, and the known retunes (baked interior energies,
+  AreaLight3D bake support unverified, Patina double-AO in corners).
+
+### Changed
+- `walk/gs.patina.glb.import`: `meshes/light_baking` 1 → 2 (Static
+  Lightmaps) so the import generates UV2 for the bake (texel 0.2 unchanged).
+- Synced the stale root `VERSION` marker (was still 0.11.0).
+
 ## [0.12.0] — 2026-07-10
 
 ### Added

@@ -74,6 +74,40 @@ static func _apply_to_mesh(
 	return touched
 
 
+## pc2000 / lightmapped path: materials stay PER-PIXEL engine-standard
+## (LightmapGI owns light, Lux runs grade-only) and each mesh gets the GI mode
+## it needs for a LightmapGI bake:
+##   LEVEL / PROP    -> GI_MODE_STATIC   (baked into the lightmap; needs UV2 —
+##                      import the GLB with Light Baking = Static Lightmaps)
+##   CHARACTER / GUN -> GI_MODE_DYNAMIC  (lit by the bake's probes + realtime)
+##   UI_UNLIT        -> unshaded, GI disabled
+## Deliberately does NOT flip per-vertex shading and does NOT join the
+## "lux_materials" group — pc2000 surfaces must stay out of preset restyling.
+## The Patina form bake still multiplies through via the imported material's
+## vertex_color_use_as_albedo. Returns the number of meshes touched.
+static func apply_role_lightmapped(root: Node, role: int) -> int:
+	if root == null:
+		return 0
+	var count := 0
+	for mi_v in _all_mesh_instances(root):
+		var mi := mi_v as MeshInstance3D
+		if mi == null or mi.mesh == null:
+			continue
+		match role:
+			LuxRole.Role.LEVEL, LuxRole.Role.PROP:
+				mi.gi_mode = GeometryInstance3D.GI_MODE_STATIC
+			LuxRole.Role.CHARACTER, LuxRole.Role.GUN:
+				mi.gi_mode = GeometryInstance3D.GI_MODE_DYNAMIC
+			_:
+				mi.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+				for s in mi.mesh.get_surface_count():
+					var mat := _ensure_standard_material(mi, s)
+					mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mi.set_meta(&"lux_role", LuxRole.role_name(role) + " (lightmapped)")
+		count += 1
+	return count
+
+
 ## Returns a writable StandardMaterial3D override for a surface, preserving an
 ## existing BaseMaterial3D's albedo texture/color if present.
 static func _ensure_standard_material(mi: MeshInstance3D, surface: int) -> BaseMaterial3D:

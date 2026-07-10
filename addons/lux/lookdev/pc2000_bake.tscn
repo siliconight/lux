@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://lux_pc2000_bake"]
+
+[ext_resource type="Script" path="res://addons/lux/lookdev/pc2000_lookdev.gd" id="1_pc2000"]
+[ext_resource type="Script" path="res://addons/lux/runtime/lux_root.gd" id="2_luxroot"]
+[ext_resource type="Resource" path="res://addons/lux/presets/sof_pc2000.tres" id="3_preset"]
+[ext_resource type="PackedScene" path="res://walk/gs.patina.glb" id="4_building"]
+
+[node name="PC2000Bake" type="Node3D"]
+script = ExtResource("1_pc2000")
+start_preset_name = &"SoF PC2000"
+
+[node name="Building" parent="." instance=ExtResource("4_building")]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.94, 0.34, 0, -0.34, 0.94, 0, 6, 14)
+fov = 60.0
+
+[node name="LuxRoot" type="Node3D" parent="."]
+script = ExtResource("2_luxroot")
+active_preset = ExtResource("3_preset")
+
+[node name="LightmapGI" type="LightmapGI" parent="."]
+quality = 1
+bounces = 3
+generate_probes_subdiv = 2

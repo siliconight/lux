@@ -1,0 +1,71 @@
+[gd_resource type="Resource" script_class="LuxPreset" load_steps=3 format=3 uid="uid://lux_sof_pc2000"]
+
+[ext_resource type="Script" path="res://addons/lux/resources/lux_preset.gd" id="1_preset"]
+[ext_resource type="Script" path="res://addons/lux/resources/lux_palette.gd" id="2_palette"]
+
+[sub_resource type="Resource" id="pal"]
+script = ExtResource("2_palette")
+palette_name = &"PC 2000 Neutral"
+highlight = Color(0.9, 0.88, 0.82, 1)
+midtone = Color(0.5, 0.5, 0.5, 1)
+shadow = Color(0.22, 0.22, 0.26, 1)
+fog = Color(0.55, 0.56, 0.58, 1)
+accent = Color(0.95, 0.6, 0.2, 1)
+
+[resource]
+script = ExtResource("1_preset")
+preset_name = &"SoF PC2000"
+description = "Fourth look family: 'premium PC shooter, 1999-2002' (Soldier of Fortune brief). Sharp, direct, game-like - NOT PS1-chunk and NOT modern-cinematic. CONTRACT: Lux is GRADE-ONLY here. Level geometry keeps its imported per-pixel StandardMaterial3D (bilinear + mipmaps) and is lit by a LightmapGI bake - hard authored light pools with crisp baked shadow edges. Do not role-apply LEVEL with the stylized path; use LuxMaterialApplier.apply_role_lightmapped + the dock's 'Lightmap static' bake (docs/pc2000_bake_runbook.md). Grade: restrained Filmic, exposure just under neutral, saturation 0.9, mild contrast. Glow OFF, dither OFF, CRT OFF, vignette/grain 0, native res bilinear. Flat ambient kept LOW on purpose - the lightmap owns darkness; raise it and you wash out the bake. Light distance fog only; volumetrics are per-location set dressing, not a preset default."
+sky_top_color = Color(0.35, 0.45, 0.6, 1)
+sky_horizon_color = Color(0.7, 0.68, 0.62, 1)
+ground_color = Color(0.3, 0.28, 0.24, 1)
+sky_energy = 1.0
+sun_enabled = true
+sun_elevation_deg = 42.0
+sun_azimuth_deg = 205.0
+sun_color = Color(1, 0.96, 0.88, 1)
+sun_energy = 1.3
+sun_shadows = true
+ambient_mode = 1
+ambient_color = Color(0.42, 0.43, 0.47, 1)
+ambient_energy = 0.35
+ambient_sky_contribution = 0.0
+tonemap_mode = 2
+exposure = 0.95
+tonemap_white = 6.0
+brightness = 1.0
+contrast = 1.06
+saturation = 0.9
+warmth = 0.02
+fog_enabled = true
+fog_color = Color(0.55, 0.56, 0.58, 1)
+fog_density = 0.0015
+fog_sky_affect = 0.2
+fog_height = 0.0
+fog_height_density = 0.0
+glow_enabled = false
+glow_intensity = 0.0
+glow_bloom = 0.0
+glow_hdr_threshold = 2.5
+dither_enabled = false
+dither_strength = 0.0
+color_levels = 64
+dither_cell_size = 1
+dither_distance_fade = true
+dither_fade_start = 25.0
+dither_fade_end = 70.0
+render_scale = 1.0
+nearest_neighbor_scaling = false
+crt_mask_type = 0
+crt_mask_strength = 0.0
+crt_mask_scale = 3.0
+scanline_strength = 0.0
+force_sdr_retro_on_hdr = true
+vignette_strength = 0.0
+grain_strength = 0.0
+palette_influence = 0.0
+palette = SubResource("pal")
+default_wetness = 0.0
+vertex_shading_mode = 0
+ps2_lighting_global = -1.0
+alarm_color = Color(1, 0.15, 0.22, 1)
