@@ -7,6 +7,27 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.12.0] — 2026-07-10
+
+### Added
+- `presets/ps1_storm_night.tres` — first preset of the **PS1-chunk storm
+  family** (third look family alongside delco + gothic): hard 0.25
+  `render_scale` with nearest-neighbor upscale (480×270 at 1080p), sun off,
+  flat teal-navy ambient, **Linear** tonemap (sixth-gen had none, and Filmic
+  mutes the saturated storm palette), dither 0.7 / 12 colour levels /
+  distance fade **off** so the sky dithers uniformly, `default_wetness` 0.5,
+  "Storm Sodium" palette (teal shadows, sodium highlights, cyan accent).
+  Pair with a SkyMint storm sky. Tune dither AT 0.25 scale — each dither
+  pixel is 4× fatter than at native.
+- **Light cones** on `LuxStreetlightRig` — fake-volumetric additive cone per
+  lamp (`shaders/spatial/lux_light_cone.gdshader`): flat apex→ground alpha
+  gradient (no fresnel), per-frame camera fade to zero when the player walks
+  under the lamp (kills the full-screen additive wash). Cosmetic only —
+  never touches the SpotLight3D energy. `cone_enabled` defaults **off** so
+  existing scenes render byte-identical (same contract as the emission
+  defaults). `cone_angle_deg` (default 25°) is deliberately tighter than
+  `spot_angle` — a matching cone reads as a wall of light, not a beam.
+
 ## [0.11.0] — 2026-07-09
 
 ### Added

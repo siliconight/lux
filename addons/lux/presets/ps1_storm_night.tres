@@ -1,0 +1,67 @@
+[gd_resource type="Resource" script_class="LuxPreset" load_steps=3 format=3 uid="uid://lux_ps1_storm"]
+
+[ext_resource type="Script" path="res://addons/lux/resources/lux_preset.gd" id="1_preset"]
+[ext_resource type="Script" path="res://addons/lux/resources/lux_palette.gd" id="2_palette"]
+
+[sub_resource type="Resource" id="pal"]
+script = ExtResource("2_palette")
+palette_name = &"Storm Sodium"
+highlight = Color(0.58, 0.52, 0.42, 1)
+midtone = Color(0.48, 0.5, 0.53, 1)
+shadow = Color(0.4, 0.47, 0.53, 1)
+fog = Color(0.44, 0.5, 0.55, 1)
+accent = Color(0.25, 0.95, 0.95, 1)
+
+[resource]
+script = ExtResource("1_preset")
+preset_name = &"PS1 Storm Night"
+description = "Hard low-res chunk: storm-night street, teal ambient, sodium pools, cyan neon accents. Pair with a SkyMint storm sky; tune dither AT 0.25 scale, not native."
+sky_top_color = Color(0.05, 0.09, 0.13, 1)
+sky_horizon_color = Color(0.09, 0.14, 0.18, 1)
+ground_color = Color(0.02, 0.03, 0.04, 1)
+sky_energy = 0.35
+sun_enabled = false
+sun_elevation_deg = 10.0
+sun_azimuth_deg = 200.0
+sun_color = Color(0.7, 0.8, 1, 1)
+sun_energy = 0.2
+sun_shadows = false
+ambient_mode = 1
+ambient_color = Color(0.106, 0.165, 0.2, 1)
+ambient_energy = 0.5
+ambient_sky_contribution = 0.4
+tonemap_mode = 0
+exposure = 1.0
+tonemap_white = 6.0
+brightness = 1.0
+contrast = 1.18
+saturation = 1.15
+warmth = 0.0
+fog_enabled = true
+fog_color = Color(0.14, 0.22, 0.27, 1)
+fog_density = 0.015
+fog_sky_affect = 0.1
+glow_enabled = true
+glow_intensity = 0.6
+glow_bloom = 0.1
+glow_hdr_threshold = 1.0
+dither_enabled = true
+dither_strength = 0.7
+color_levels = 12
+dither_cell_size = 1
+dither_distance_fade = false
+dither_fade_start = 25.0
+dither_fade_end = 70.0
+render_scale = 0.25
+nearest_neighbor_scaling = true
+crt_mask_type = 0
+crt_mask_strength = 0.0
+crt_mask_scale = 3.0
+scanline_strength = 0.0
+force_sdr_retro_on_hdr = true
+vignette_strength = 0.15
+grain_strength = 0.0
+palette_influence = 0.6
+palette = SubResource("pal")
+default_wetness = 0.5
+alarm_color = Color(1, 0.15, 0.22, 1)
