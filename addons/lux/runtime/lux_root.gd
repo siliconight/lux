@@ -296,6 +296,31 @@ func unregister_lux_light(light: Node3D) -> void:
 		_lighting.unregister_light(light)
 
 
+func register_fixture_emissive(mat: BaseMaterial3D) -> void:
+	if _lighting != null:
+		_lighting.register_emissive(mat)
+
+
+## Building power on/off: kills every non-alarm rig light and the fixture
+## glow bound by bind_fixture_emissives(). Alarm-group lights stay (battery
+## strobes). The classic heist beat — cut the power, the block goes dark.
+func set_fixtures_powered(on: bool) -> void:
+	if _lighting != null:
+		_lighting.set_fixtures_powered(on)
+
+
+## Scan for Zoo fixture lit-face materials (M_*_Lens / _Diffuser / _Face)
+## and bind them so set_fixtures_powered drives them. Call once after the
+## level (and its fixtures GLBs) loads; safe to call again after re-imports.
+func bind_fixture_emissives(search_root: Node = null) -> Dictionary:
+	var root := search_root
+	if root == null and get_tree() != null:
+		root = get_tree().current_scene
+	if root == null:
+		root = self
+	return LuxEmissiveBinder.bind(root, self)
+
+
 # ---------------------------------------------------------------------------
 # Internals
 # ---------------------------------------------------------------------------

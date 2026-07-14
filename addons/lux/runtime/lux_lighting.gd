@@ -7,6 +7,10 @@ extends Node
 
 var sun: DirectionalLight3D
 var _registered: Array[Node3D] = []
+# Fixture lit-face materials bound by LuxEmissiveBinder (v0.14), and the
+# building-power state that gates them together with the non-alarm lights.
+var _emissives: Array[BaseMaterial3D] = []
+var _fixtures_powered: bool = true
 
 # Alarm pulse state
 var _alarm_active: bool = false
@@ -53,6 +57,37 @@ func register_light(light: Node3D) -> void:
 
 func unregister_light(light: Node3D) -> void:
 	_registered.erase(light)
+
+
+func register_emissive(mat: BaseMaterial3D) -> void:
+	if mat != null and not _emissives.has(mat):
+		_emissives.append(mat)
+		_apply_emissive_power(mat)
+
+
+## The power-cut heist beat: kills every registered rig light AND the bound
+## fixture glow (lenses, diffusers, sign faces). Lights in the "lux_alarm"
+## group stay — alarm strobes run on battery. Restoring power brings each
+## material back to the base energy the binder stamped into its meta.
+func set_fixtures_powered(on: bool) -> void:
+	_fixtures_powered = on
+	for n in _registered:
+		if is_instance_valid(n) and n is Light3D and not n.is_in_group(&"lux_alarm"):
+			(n as Light3D).visible = on
+	for m in _emissives:
+		if m != null:
+			_apply_emissive_power(m)
+
+
+func fixtures_powered() -> bool:
+	return _fixtures_powered
+
+
+func _apply_emissive_power(mat: BaseMaterial3D) -> void:
+	var base: float = 1.0
+	if mat.has_meta(LuxEmissiveBinder.BASE_META):
+		base = float(mat.get_meta(LuxEmissiveBinder.BASE_META))
+	mat.emission_energy_multiplier = base if _fixtures_powered else 0.0
 
 
 func pulse_alarm(intensity: float, duration: float) -> void:

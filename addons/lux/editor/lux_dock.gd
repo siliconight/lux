@@ -166,6 +166,13 @@ func _build_ui() -> void:
 	clear_b.text = "Clear"
 	clear_b.pressed.connect(_on_clear_lights)
 	lights_row.add_child(clear_b)
+	var bind_b := Button.new()
+	bind_b.text = "Bind Emissives"
+	bind_b.tooltip_text = ("Bind Zoo fixture lit faces (M_*_Lens / _Diffuser "
+		+ "/ _Face) to this scene's LuxRoot, so set_fixtures_powered(false) "
+		+ "kills sign/lens glow with the lamps.")
+	bind_b.pressed.connect(_on_bind_emissives)
+	lights_row.add_child(bind_b)
 
 	_lights_dialog = EditorFileDialog.new()
 	_lights_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
@@ -419,6 +426,18 @@ func _on_bake_lights() -> void:
 		_set_status("[color=lightgreen]%s[/color]" % res.get("msg", "Baked."))
 	else:
 		_set_status("[color=orange]%s[/color]" % res.get("msg", "Bake failed."))
+
+
+func _on_bind_emissives() -> void:
+	var scene_root: Node = _editor.get_edited_scene_root() if _editor != null else null
+	if scene_root == null:
+		_set_status("[color=orange]Open a scene first.[/color]")
+		return
+	var res: Dictionary = LuxEmissiveBinder.bind(scene_root)
+	if res.get("ok", false):
+		_set_status("[color=lightgreen]%s[/color]" % res.get("msg", "Bound."))
+	else:
+		_set_status("[color=orange]%s[/color]" % res.get("msg", "Bind failed."))
 
 
 func _on_clear_lights() -> void:

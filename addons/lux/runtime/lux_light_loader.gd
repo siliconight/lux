@@ -11,7 +11,10 @@ extends RefCounted
 ##
 ## The anchor `type` maps 1:1 onto a Lux rig:
 ##   fluorescent -> LuxFluorescentRig   window / sign -> LuxAreaLightRig
-##   streetlight -> LuxStreetlightRig    sun          -> handled by the preset
+##   streetlight -> LuxStreetlightRig    wall_pack    -> LuxStreetlightRig (x1)
+##   sun -> handled by the preset. Zoo's fixture pass (--fixtures) bakes the
+##   matching HARDWARE at the same anchors; LuxEmissiveBinder ties its lit
+##   faces to set_fixtures_powered.
 
 const CONTAINER := "LuxLights"
 
@@ -114,6 +117,23 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			rs.mount_height = 0.0
 			s.rig = rs
 			return s
+		"wall_pack":
+			# A wall pack is one downward warm spot — the streetlight rig
+			# with count 1 is exactly that. The anchor sits proud of the
+			# wall in free air (DC v1.1), so the spot is never inside the
+			# hardware Zoo bakes at the same anchor.
+			var wp := LuxStreetlightRig.new()
+			wp.name = String(a.get("id", "wall_pack"))
+			var rw := LuxLightRig.new()
+			rw.rig_name = &"Wall Pack (baked)"
+			rw.light_color = LuxColorTemp.kelvin(LuxColorTemp.HALOGEN)
+			rw.energy = 2.5
+			rw.light_range = 7.0
+			rw.count = 1
+			rw.spacing = 0.0
+			rw.mount_height = 0.0
+			wp.rig = rw
+			return wp
 		"window", "sign":
 			var ar := LuxAreaLightRig.new()
 			ar.name = String(a.get("id", "window"))

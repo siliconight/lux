@@ -7,6 +7,27 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.14.0] — 2026-07-14
+
+### Added
+- **LuxEmissiveBinder** (`runtime/lux_emissive_binder.gd`): binds Zoo
+  fixture lit-face materials (`M_*_Lens` / `_Diffuser` / `_Face`, glTF
+  emissive from `zoo --fixtures`) to the LuxRoot, stamping each base
+  emission energy into resource meta (idempotent across re-imports).
+- **Building power switch**: `LuxRoot.set_fixtures_powered(on)` /
+  `LuxRuntimeAPI.fixtures_powered(tree, on)` — kills every registered
+  non-alarm rig light AND the bound fixture glow; `lux_alarm`-group lights
+  stay (battery strobes). `LuxRoot.bind_fixture_emissives()` /
+  `LuxRuntimeAPI.bind_emissives(tree)` for after level load; dock gains a
+  **Bind Emissives** button next to Bake Lights for editor verification.
+- **`wall_pack` anchor type** in LuxLightLoader (DC lights.json 1.1): one
+  downward warm (3000 K halogen) spot per exterior-door anchor, energy 2.5
+  range 7 — a LuxStreetlightRig with count 1. The `sign` type already
+  mapped to the area rig; DC now derives those anchors too.
+- Pairs with **deli_counter v0.75.0** (derives `wall_pack` + storefront
+  `sign` anchors, emitters proud of the wall) and **zoo v0.29.0**
+  (`wall_pack` + `sign_box` hardware at the same anchors).
+
 ## [0.13.1] — 2026-07-14
 
 ### Fixed

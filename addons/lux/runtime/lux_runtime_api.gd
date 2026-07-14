@@ -37,6 +37,21 @@ static func alarm(tree: SceneTree, intensity: float, duration: float) -> void:
 		r.pulse_alarm_lights(intensity, duration)
 
 
+## Building power on/off — kills non-alarm rig lights + bound fixture glow.
+static func fixtures_powered(tree: SceneTree, on: bool) -> void:
+	var r := get_root(tree)
+	if r != null:
+		r.set_fixtures_powered(on)
+
+
+## Bind Zoo fixture lit-face materials after the level loads.
+static func bind_emissives(tree: SceneTree, search_root: Node = null) -> Dictionary:
+	var r := get_root(tree)
+	if r != null:
+		return r.bind_fixture_emissives(search_root)
+	return {"ok": false, "msg": "No LuxRoot in the tree.", "count": 0}
+
+
 static func weather(tree: SceneTree, profile: LuxWeatherProfile, blend_time: float = 5.0) -> void:
 	var r := get_root(tree)
 	if r != null:
