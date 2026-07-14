@@ -2,7 +2,8 @@
 class_name LuxStreetlightRig
 extends Node3D
 ## Streetlight row rig (TDD §16 rig #3). Spawns a line of downward sodium-vapor
-## spotlights along +X — parking lots, street blocks, the Wawa lot. Reads a
+## spotlights along local X, CENTERED on the node (v0.13.1 — matches
+## LuxFluorescentRig and Lot's path-midpoint anchors) — parking lots, street blocks, the Wawa lot. Reads a
 ## LuxLightRig resource for count/spacing/height/color.
 
 @export var rig: LuxLightRig:
@@ -63,6 +64,11 @@ func _rebuild() -> void:
 	_cones.clear()
 	set_process(cone_enabled)
 	var r := rig if rig != null else _default_rig()
+	# Center the row on the rig node, same as LuxFluorescentRig. Lot writes
+	# path-MIDPOINT anchors; an uncentered row lit half the path and overshot
+	# the end. Zoo's fixture pass (v0.28) expands rows with this exact math,
+	# so every pole sits under its lamp.
+	var start := -(r.count - 1) * 0.5 * r.spacing
 	for i in r.count:
 		var lamp := SpotLight3D.new()
 		lamp.name = &"Street_%d" % i
@@ -72,7 +78,7 @@ func _rebuild() -> void:
 		lamp.spot_angle = 55.0
 		lamp.spot_angle_attenuation = 1.2
 		lamp.shadow_enabled = r.shadows_enabled
-		lamp.position = Vector3(i * r.spacing, r.mount_height, 0.0)
+		lamp.position = Vector3(start + i * r.spacing, r.mount_height, 0.0)
 		lamp.rotation_degrees = Vector3(-90.0, 0.0, 0.0)  # point straight down
 		r.apply_bake_mode(lamp)
 		add_child(lamp)
@@ -96,8 +102,10 @@ func _spawn_cone(index: int, r: LuxLightRig) -> void:
 	var mi := MeshInstance3D.new()
 	mi.name = &"Cone_%d" % index
 	mi.mesh = mesh
-	# Cylinder is centered on its origin: offset down so the apex sits at the lamp.
-	mi.position = Vector3(index * r.spacing, r.mount_height * 0.5, 0.0)
+	# Cylinder is centered on its origin: offset down so the apex sits at the
+	# lamp — whose row is centered on the node (see _rebuild).
+	var start := -(r.count - 1) * 0.5 * r.spacing
+	mi.position = Vector3(start + index * r.spacing, r.mount_height * 0.5, 0.0)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var mat := ShaderMaterial.new()
 	mat.shader = _CONE_SHADER

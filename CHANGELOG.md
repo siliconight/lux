@@ -7,6 +7,21 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.13.1] — 2026-07-14
+
+### Fixed
+- **LuxStreetlightRig rows now center on the rig node** (same
+  `start = -(count-1)/2 * spacing` as LuxFluorescentRig). Lot writes
+  path-MIDPOINT streetlight anchors, so the old from-the-node expansion lit
+  only half the path and overshot the far end by ~half the row. Cone meshes
+  (`cone_enabled`) follow their lamps. Behavior change is placement-only:
+  any baked streetlight row shifts back by `(count-1)/2 * spacing` along
+  its local X — re-run Bake Lights on site scenes. Fluorescent/area/sun
+  rigs untouched.
+- Pairs with **zoo v0.28.0**, whose fixture pass (`--fixtures
+  <lights.json>`) expands rows with this exact math — every pole Zoo bakes
+  sits under the lamp this rig spawns.
+
 ## [0.13.0] — 2026-07-10
 
 ### Added
