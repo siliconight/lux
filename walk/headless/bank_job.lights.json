@@ -1,0 +1,237 @@
+{
+  "light_manifest_version": "1.0.0",
+  "building_id": "bank_job",
+  "theme": "greybox",
+  "space": "Blender Z-up, meters; rot_y = degrees about up; pos is the fixture location",
+  "rig_library": "lux",
+  "anchors": [
+    {
+      "id": "lobby_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        0.0,
+        -4.5,
+        3.5
+      ],
+      "rot_y": 0.0,
+      "room": "lobby",
+      "row": {
+        "count": 5,
+        "spacing": 6.0
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "manager_office_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        -7.5,
+        6.5,
+        3.5
+      ],
+      "rot_y": 0.0,
+      "room": "manager_office",
+      "row": {
+        "count": 5,
+        "spacing": 3.0
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "security_room_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        7.5,
+        6.5,
+        3.5
+      ],
+      "rot_y": 0.0,
+      "room": "security_room",
+      "row": {
+        "count": 5,
+        "spacing": 3.0
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "vault_room_ceiling",
+      "type": "fluorescent",
+      "source": "derived",
+      "pos": [
+        0.0,
+        0.0,
+        -0.1
+      ],
+      "rot_y": 0.0,
+      "room": "vault_room",
+      "row": {
+        "count": 5,
+        "spacing": 6.0
+      },
+      "reacts_to_alarm": true
+    },
+    {
+      "id": "ext_0_S_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        6.0,
+        -11.0,
+        1.75
+      ],
+      "rot_y": 90.0,
+      "size": [
+        2.4,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_0_S_window_2",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        12.0,
+        -11.0,
+        1.75
+      ],
+      "rot_y": 90.0,
+      "size": [
+        2.4,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_N_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        -7.5,
+        11.0,
+        5.35
+      ],
+      "rot_y": 270.0,
+      "size": [
+        1.6,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_N_window_2",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        7.5,
+        11.0,
+        5.35
+      ],
+      "rot_y": 270.0,
+      "size": [
+        1.6,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_S_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        -7.5,
+        -11.0,
+        5.35
+      ],
+      "rot_y": 90.0,
+      "size": [
+        1.6,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_S_window_2",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        7.5,
+        -11.0,
+        5.35
+      ],
+      "rot_y": 90.0,
+      "size": [
+        1.6,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_E_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        15.0,
+        -5.5,
+        5.35
+      ],
+      "rot_y": 180.0,
+      "size": [
+        1.6,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_E_window_2",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        15.0,
+        5.5,
+        5.35
+      ],
+      "rot_y": 180.0,
+      "size": [
+        1.6,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_W_window_1",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        -15.0,
+        -5.5,
+        5.35
+      ],
+      "rot_y": 0.0,
+      "size": [
+        1.6,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    },
+    {
+      "id": "ext_1_W_window_2",
+      "type": "window",
+      "source": "derived",
+      "pos": [
+        -15.0,
+        5.5,
+        5.35
+      ],
+      "rot_y": 0.0,
+      "size": [
+        1.6,
+        1.4
+      ],
+      "reacts_to_alarm": false
+    }
+  ]
+}

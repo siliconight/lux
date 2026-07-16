@@ -7,6 +7,65 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.15.3] - Strict-clean under engine defaults
+
+### Fixed
+- `lux_root.gd` blend_to_preset: `var p := _preset_library.get(...)` inferred
+  from Variant — engine-DEFAULT GDScript warning config treats that as a
+  load-killing parse error (the lux project's own config downgrades it, which
+  is why it never fired at home). Failed the script + two dependents in
+  Level Factory's clean-project portability check; now explicitly typed
+  LuxPreset. Pairs with LF v0.10.3, whose exported project.godot also
+  downgrades the warning as defense in depth.
+
+## [0.15.2] - Spawned rigs no longer wear the marker prefix
+
+### Fixed
+- `LuxFixtureSpawner`: spawned rigs are named `Spawned_<type>...` instead of
+  inheriting the marker's `LuxEmit_*` name via the anchor id — reusing the
+  name made every prefix-based scan double-count (the co-location validator
+  reported 40 "markers" for 20 on the first hardware run). Gates were
+  unaffected (rigs sit exactly on their markers), but counts now tell the
+  truth and re-scans can't mistake a rig for hardware.
+
+## [0.15.1] - Runners homed in-repo
+
+### Added
+- `tools/headless_walk.ps1` (v4) and `tools/visual_pass.ps1`: the harness
+  and screenshot-pass runners now live beside the scripts they drive and
+  derive every path from the repo location — no factory-root copies. Both
+  execute the repo-homed `res://tools/*.gd`; Godot capture rules
+  (console exe preference, Start-Process redirect, handle caching,
+  timeouts) unchanged.
+
+## [0.15.0] - Emitter-marker spawning + co-location gate (pairs with Zoo v0.30.0)
+
+### Added
+- **`LuxFixtureSpawner`** (`runtime/lux_fixture_spawner.gd`): spawns one rig
+  per `LuxEmit_<type>` emitter marker in Zoo v0.30+ fixture GLBs — markers
+  are per-lamp (Zoo expanded rows once, at the source), type read from node
+  metadata (glTF extras) with name-parse fallback, tuning reused from the
+  loader's one table via the new `LuxLightLoader.rig_for_anchor()`. Drag a
+  fixtures GLB anywhere — Level Factory or by hand — call
+  `LuxFixtureSpawner.spawn(level_root)`, and the lamp lands inside the
+  hardware. Daylight (window/sun) has no markers and stays on the manifest
+  bake path, which also makes `set_fixtures_powered(false)` semantics exact:
+  spawned lights are building power; window light survives a power cut.
+- **Dock: "Spawn From Fixtures"** button beside Bind Emissives.
+- **`LuxValidator.check_fixture_colocation()`**: dark-hardware (marker with
+  no lamp within tolerance) and floating-light (spawned lamp off its marker)
+  are ERROR findings; wired into `validate()`. This is the fixture-pass
+  thesis as a permanent machine gate.
+- **`tools/walk_harness.gd` + `tools/visual_pass.gd`** homed in-repo: the
+  headless walkabout harness (Phase A manifest bake gates + Phase B marker
+  gates; hardware-proven frame-wait/settle/LuxSun-exclusion rules encoded)
+  and the windowed screenshot pass.
+
+### Changed
+- `LuxLightLoader`: new public `rig_for_anchor(a)` — the single rig tuning
+  table now serves both the manifest bake and the marker spawner.
+
+
 ## [0.14.0] — 2026-07-14
 
 ### Added

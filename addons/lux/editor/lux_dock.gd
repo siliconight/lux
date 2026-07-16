@@ -173,6 +173,13 @@ func _build_ui() -> void:
 		+ "kills sign/lens glow with the lamps.")
 	bind_b.pressed.connect(_on_bind_emissives)
 	lights_row.add_child(bind_b)
+	var spawn_b := Button.new()
+	spawn_b.text = "Spawn From Fixtures"
+	spawn_b.tooltip_text = ("Spawn a lamp at every LuxEmit_* emitter marker "
+		+ "in the scene (Zoo v0.30+ fixture GLBs). Per-lamp markers — no "
+		+ "manifest needed; the fixture hardware is the placement truth.")
+	spawn_b.pressed.connect(_on_spawn_from_fixtures)
+	lights_row.add_child(spawn_b)
 
 	_lights_dialog = EditorFileDialog.new()
 	_lights_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
@@ -438,6 +445,18 @@ func _on_bind_emissives() -> void:
 		_set_status("[color=lightgreen]%s[/color]" % res.get("msg", "Bound."))
 	else:
 		_set_status("[color=orange]%s[/color]" % res.get("msg", "Bind failed."))
+
+
+func _on_spawn_from_fixtures() -> void:
+	var scene_root: Node = _editor.get_edited_scene_root() if _editor != null else null
+	if scene_root == null:
+		_set_status("[color=orange]Open a scene first.[/color]")
+		return
+	var res: Dictionary = LuxFixtureSpawner.spawn(scene_root)
+	if res.get("ok", false) and int(res.get("count", 0)) > 0:
+		_set_status("[color=lightgreen]%s[/color]" % res.get("msg", "Spawned."))
+	else:
+		_set_status("[color=orange]%s[/color]" % res.get("msg", "Nothing spawned."))
 
 
 func _on_clear_lights() -> void:

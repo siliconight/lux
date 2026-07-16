@@ -1,0 +1,50 @@
+{
+  "a_colocation": {
+    "avg": 1.67916927014788,
+    "max": 6.90963554382324,
+    "min": 0.0490500926971436
+  },
+  "a_colocation_fluoro_note": "min over ALL lamps incl. window/area (no hardware by design)",
+  "a_directional_excluded": 1,
+  "a_lights": 30,
+  "a_powered_gate": {
+    "glow_before": 1.86000001430511,
+    "glow_off": 0.0,
+    "kill": true,
+    "non_alarm_before": 49.1832756996155,
+    "non_alarm_off": 0.0,
+    "restore": true
+  },
+  "b_lights": 20,
+  "b_markers": 20,
+  "b_powered_gate": {
+    "glow_before": 1.86000001430511,
+    "glow_off": 0.0,
+    "kill": true,
+    "non_alarm_before": 19.9770557880402,
+    "non_alarm_off": 0.0,
+    "restore": true
+  },
+  "b_validator_errors": 0,
+  "bake": {
+    "count": 14,
+    "msg": "Baked 14 light rig(s)",
+    "ok": true
+  },
+  "bind": {
+    "count": 1,
+    "msg": "Bound 1 fixture emissive material(s)",
+    "ok": true
+  },
+  "inputs": {
+    "fixtures": "res://walk/headless/bank_job_fixtures.glb",
+    "lights": "res://walk/headless/bank_job.lights.json",
+    "shell": "res://walk/headless/bank_job.glb"
+  },
+  "spawn": {
+    "count": 20,
+    "msg": "Spawned 20 fixture light(s) from 20 marker(s)",
+    "ok": true,
+    "skipped": []
+  }
+}

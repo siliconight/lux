@@ -71,6 +71,14 @@ static func bake(path: String, scene_root: Node, lightmap_static: bool = false) 
 	return {"ok": true, "msg": msg, "count": made}
 
 
+## The rig for an anchor dict — the one tuning table for both paths: the
+## manifest bake above and LuxFixtureSpawner's marker path (v0.15). An
+## anchor without a `row` is a single lamp. Returns null for daylight /
+## unknown types.
+static func rig_for_anchor(a: Dictionary) -> Node3D:
+	return _rig_for(a)
+
+
 ## Remove a previous bake (the whole LuxLights container). Returns how many.
 static func clear(scene_root: Node) -> int:
 	if scene_root == null:

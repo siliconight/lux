@@ -215,7 +215,11 @@ func apply_preset(preset: LuxPreset, blend_time: float = 0.0) -> void:
 
 
 func blend_to_preset(preset_name: StringName, blend_time: float) -> void:
-	var p := _preset_library.get(String(preset_name))
+	# Typed, not inferred: Dictionary.get returns Variant, and engine-DEFAULT
+	# warning config escalates inference-on-Variant to a load-killing parse
+	# error — this one line failed the whole script (plus two dependents as
+	# compile knock-ons) in Level Factory's clean-project portability check.
+	var p: LuxPreset = _preset_library.get(String(preset_name))
 	if p == null:
 		push_warning("Lux: preset '%s' not found in library." % preset_name)
 		return

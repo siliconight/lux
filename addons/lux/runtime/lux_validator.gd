@@ -50,10 +50,12 @@ static func validate(root: LuxRoot) -> Array:
 	var quality: LuxQualityProfile = root.get_quality_profile()
 	if quality == null:
 		quality = LuxQualityProfile.make_tier(root.quality_tier)
-	var lights: Dictionary = _count_nodes_of_type(
-		root.get_tree().edited_scene_root if Engine.is_editor_hint() and root.get_tree() else root,
-		"Light3D"
-	)
+	var scan_root: Node = (
+		root.get_tree().edited_scene_root
+		if Engine.is_editor_hint() and root.get_tree() else root)
+	for f in check_fixture_colocation(scan_root):
+		findings.append(f)
+	var lights: Dictionary = _count_nodes_of_type(scan_root, "Light3D")
 	var omni_spot: int = lights.omni + lights.spot
 	if omni_spot > quality.max_dynamic_lights:
 		findings.append(
@@ -281,3 +283,79 @@ static func _walk_lights(node: Node, result: Dictionary) -> void:
 
 static func _tier_name(t: int) -> String:
 	return ["High", "Medium", "Low", "Compatibility"][clampi(t, 0, 3)]
+
+## Fixture co-location gate (v0.15): the fixture-pass thesis, as a check.
+## (a) Every LuxEmit_* emitter marker must have a lamp within `tolerance` —
+## a miss is DARK HARDWARE (fixture geometry with no light in it).
+## (b) Every lamp under a LuxFixtureLights container must sit within
+## `tolerance` of a marker — a miss is a FLOATING LIGHT (spawner output
+## drifted from the hardware). Manifest-baked lights (LuxLights) are not
+## judged here: window/area lamps legitimately sit far from any hardware.
+## Returns Finding entries; empty array when there are no markers at all.
+static func check_fixture_colocation(scene_root: Node, tolerance: float = 0.1) -> Array:
+	var findings: Array = []
+	if scene_root == null:
+		return findings
+	var markers: Array = []
+	LuxFixtureSpawner.collect_markers(scene_root, markers)
+	if markers.is_empty():
+		return findings
+
+	var lamps: Array = []
+	_collect_positional_lights(scene_root, lamps)
+	var dark := 0
+	var worst_dark := 0.0
+	for m in markers:
+		var mp: Vector3 = (m as Node3D).global_position
+		var best := 1e9
+		for l in lamps:
+			var d: float = (mp - (l as Node3D).global_position).length()
+			if d < best:
+				best = d
+		if best > tolerance:
+			dark += 1
+			worst_dark = maxf(worst_dark, best)
+	if dark > 0:
+		findings.append(Finding.new(Severity.ERROR,
+			"%d fixture marker(s) have no lamp within %.2f m (worst %.2f m) — dark hardware. Run Spawn From Fixtures (or Bake Lights for manifest scenes)."
+			% [dark, tolerance, worst_dark]))
+
+	var spawned: Array = []
+	_collect_spawned_lights(scene_root, spawned)
+	var floating := 0
+	var worst_float := 0.0
+	for l in spawned:
+		var lp: Vector3 = (l as Node3D).global_position
+		var best2 := 1e9
+		for m2 in markers:
+			var d2: float = (lp - (m2 as Node3D).global_position).length()
+			if d2 < best2:
+				best2 = d2
+		if best2 > tolerance:
+			floating += 1
+			worst_float = maxf(worst_float, best2)
+	if floating > 0:
+		findings.append(Finding.new(Severity.ERROR,
+			"%d spawned lamp(s) sit more than %.2f m from any marker (worst %.2f m) — floating light."
+			% [floating, tolerance, worst_float]))
+
+	if dark == 0 and floating == 0:
+		findings.append(Finding.new(Severity.OK,
+			"Fixture co-location: %d marker(s) lit, %d spawned lamp(s) on hardware (tolerance %.2f m)."
+			% [markers.size(), spawned.size(), tolerance]))
+	return findings
+
+
+static func _collect_positional_lights(node: Node, out: Array) -> void:
+	if node is Light3D and not node is DirectionalLight3D:
+		out.append(node)
+	for c in node.get_children():
+		_collect_positional_lights(c, out)
+
+
+static func _collect_spawned_lights(node: Node, out: Array) -> void:
+	if node is Node and String(node.name) == LuxFixtureSpawner.CONTAINER:
+		_collect_positional_lights(node, out)
+		return
+	for c in node.get_children():
+		_collect_spawned_lights(c, out)
