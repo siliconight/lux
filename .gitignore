@@ -18,3 +18,4 @@ mono_crash.*.json
 *.swp
 .DS_Store
 Thumbs.db
+walk/headless/
