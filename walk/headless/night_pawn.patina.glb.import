@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://7fbfynqfy7ev"
-path="res://.godot/imported/bank_job.glb-aad3edad161bd833000d34aa21f3e033.scn"
+uid="uid://b3frawin3ysiw"
+path="res://.godot/imported/night_pawn.patina.glb-61fa6f41c2c5772984809b3f0d027e72.scn"
 
 [deps]
 
-source_file="res://walk/headless/bank_job.glb"
-dest_files=["res://.godot/imported/bank_job.glb-aad3edad161bd833000d34aa21f3e033.scn"]
+source_file="res://walk/headless/night_pawn.patina.glb"
+dest_files=["res://.godot/imported/night_pawn.patina.glb-61fa6f41c2c5772984809b3f0d027e72.scn"]
 
 [params]
 

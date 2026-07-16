@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://drc4odrjpqba4"
-path="res://.godot/imported/bank_job_fixtures.glb-cdff9d6a910acd6861c84d99bf0a644a.scn"
+uid="uid://cpwkf37f3kka5"
+path="res://.godot/imported/wall_delco_01_w25.glb-ee6fcb849e00e5a5ec8f6a03bfe3ea35.scn"
 
 [deps]
 
-source_file="res://walk/headless/bank_job_fixtures.glb"
-dest_files=["res://.godot/imported/bank_job_fixtures.glb-cdff9d6a910acd6861c84d99bf0a644a.scn"]
+source_file="res://walk/headless/wall_delco_01_w25.glb"
+dest_files=["res://.godot/imported/wall_delco_01_w25.glb-ee6fcb849e00e5a5ec8f6a03bfe3ea35.scn"]
 
 [params]
 

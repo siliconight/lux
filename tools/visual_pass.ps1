@@ -17,7 +17,9 @@ $GodotGui = "C:\Godot\4.7\Godot_v4.7-stable_win64.exe"
 $GodotCon = "C:\Godot\4.7\Godot_v4.7-stable_win64_console.exe"
 $Stage    = Join-Path $LuxProj "walk\headless"
 $Stamp    = Get-Date -Format "yyyyMMdd_HHmmss"
-$Res      = Join-Path $Factory ("shots_" + $Stamp)
+$Runs     = Join-Path $Factory "_runs"
+New-Item -ItemType Directory -Path $Runs -Force | Out-Null
+$Res      = Join-Path $Runs ("shots_" + $Stamp)
 New-Item -ItemType Directory -Path $Res -Force | Out-Null
 $Log      = Join-Path $Res "visual_pass.log"
 
@@ -72,7 +74,7 @@ if (Test-Path $ShotsDir) {
 } else {
     W "NO SHOTS PRODUCED - see runner.log"
 }
-$Zip = Join-Path $Factory ("shots_" + $Stamp + ".zip")
+$Zip = Join-Path $Runs ("shots_" + $Stamp + ".zip")
 try { Compress-Archive -Path (Join-Path $Res "*") -DestinationPath $Zip -Force; W ("SHOTS ZIP -> " + $Zip) } catch { W ("zip failed - folder: " + $Res) }
 W ""
 W ("Share the PNGs in " + $Res + " (or the zip). Reframe by editing SHOT_LIST in visual_pass.gd and re-running.")

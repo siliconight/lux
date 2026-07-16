@@ -16,7 +16,9 @@ $Factory  = (Resolve-Path (Join-Path $LuxProj "..")).Path
 $GodotGui = "C:\Godot\4.7\Godot_v4.7-stable_win64.exe"
 $GodotCon = "C:\Godot\4.7\Godot_v4.7-stable_win64_console.exe"
 $Stamp    = Get-Date -Format "yyyyMMdd_HHmmss"
-$Res      = Join-Path $Factory ("headless_" + $Stamp)
+$Runs     = Join-Path $Factory "_runs"
+New-Item -ItemType Directory -Path $Runs -Force | Out-Null
+$Res      = Join-Path $Runs ("headless_" + $Stamp)
 New-Item -ItemType Directory -Path $Res -Force | Out-Null
 $Log      = Join-Path $Res "headless.log"
 
@@ -92,7 +94,7 @@ foreach ($f in @("headless_report.json","headless_walk.tscn")) {
     $p = Join-Path $Stage $f
     if (Test-Path $p) { Copy-Item $p -Destination $Res; W ("  collected " + $f) } else { W ("  MISSING " + $f) }
 }
-$Zip = Join-Path $Factory ("headless_" + $Stamp + ".zip")
+$Zip = Join-Path $Runs ("headless_" + $Stamp + ".zip")
 try {
     Compress-Archive -Path (Join-Path $Res "*") -DestinationPath $Zip -Force
     W ("RESULTS ZIP -> " + $Zip)

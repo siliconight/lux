@@ -7,6 +7,12 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.15.4] - Run artifacts land in _runs\
+
+- `tools/headless_walk.ps1` + `tools/visual_pass.ps1` write run folders and results zips under the factory's `_runs\`
+  directory instead of the factory root — tool repos and the coordination
+  files stay alone at the top level. No behavior change.
+
 ## [0.15.3] - Strict-clean under engine defaults
 
 ### Fixed
