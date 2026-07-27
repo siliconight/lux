@@ -1,5 +1,17 @@
 # Lux
 
+
+> **Read [`../PIPELINE_MAP.md`](../PIPELINE_MAP.md) before changing anything here.**
+> It covers every repo's role, the job DAG, where artifacts land, and the two
+> rules everything follows from: the deliverable is a level shell that must work
+> standalone in somebody else's Godot project with none of these tools present,
+> and **these tools are not the authority on gameplay or networking**.
+>
+> This repo owns the lighting pass over the composed scene, and the light-fixture gate (whose findings DO block: a floating light is broken output).
+> It does not decide geometry.
+>
+> Live state of the current work: [`../PIPELINE_ROADMAP.md`](../PIPELINE_ROADMAP.md).
+
 **A warm, sixth-gen-console rendering framework for Godot 4.7.**
 
 Drop `LuxRoot` into a level, pick a look preset, nudge a few art sliders, and the
