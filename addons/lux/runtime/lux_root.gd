@@ -90,9 +90,12 @@ var _preset_library := {}
 func _ready() -> void:
 	add_to_group(&"lux_root")
 	_quality = LuxQualityProfile.make_tier(quality_tier)
+	# Resolve the sun link BEFORE building modules. _build_modules() decides
+	# whether to manufacture a sun, and it cannot honour a link that has not
+	# been worked out yet.
+	_resolve_sun_link()
 	_build_modules()
 	_load_default_library()
-	_resolve_sun_link()
 	_initialized = true
 	set_process(true)
 	if apply_on_ready:
@@ -146,7 +149,31 @@ func set_sun_light(light: DirectionalLight3D) -> void:
 		_push_material_state(_current)
 
 
+## Build Lux's module nodes. IDEMPOTENT BY CONSTRUCTION: lux_root is @tool, so
+## _ready() -- and therefore this -- runs again on every script reload and scene
+## reopen. The module objects below are replaced each time, but the nodes they
+## parent onto this LuxRoot are not: they outlive the object that made them, and
+## every per-module guard (`if sun != null`, and friends) is an instance
+## variable on the object that was just replaced, so it is always null exactly
+## when it needed to be set.
+##
+## Left alone, one LuxRoot accumulated three DirectionalLight3D and three CRT
+## post stacks -- three times the preset's key light, and three shadow casters
+## whose self-shadowing cross-hatched into a jagged band along every grazing
+## surface.
+##
+## Clearing first is what makes running this N times equal running it once.
+## Only DIRECT children of the LuxRoot are touched, and only the node types
+## Lux's own modules create. The level's own sun and WorldEnvironment are
+## siblings of this node, never children, so Sun Link stays safe.
 func _build_modules() -> void:
+	for child in get_children():
+		if child is DirectionalLight3D or child is CanvasLayer \
+				or child is WorldEnvironment or child is LuxEnvironment \
+				or child is LuxLighting or child is LuxPostFX:
+			remove_child(child)
+			child.queue_free()
+
 	_env = LuxEnvironment.new()
 	_env.name = &"LuxEnvironment"
 	add_child(_env)
@@ -161,6 +188,15 @@ func _build_modules() -> void:
 	_lighting = LuxLighting.new()
 	_lighting.name = &"LuxLighting"
 	add_child(_lighting)
+	# SUN LINK MEANS DRIVE THE LEVEL'S SUN, NOT ADD ONE BESIDE IT. Without this
+	# assignment ensure_sun() manufactures a LuxSun regardless, leaving two
+	# DirectionalLight3D in the scene: the one Lot emits and the one Lux adds.
+	# Two suns is twice the preset's energy, and two shadow casters at different
+	# angles cross-hatch their self-shadowing into a jagged band along every
+	# wall-to-floor junction. ensure_sun() already returns early when `sun` is
+	# valid, so this is the whole fix.
+	if sun_light != null:
+		_lighting.sun = sun_light
 	_lighting.ensure_sun(self)
 
 	_post = LuxPostFX.new()
