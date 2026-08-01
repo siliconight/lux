@@ -7,6 +7,33 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.16.0] - Sun Link drives the level's sun instead of adding one beside it
+
+### Fixed
+- `lux_root.gd` `_build_modules`: when `sun_light` resolves, it is handed to
+  `LuxLighting.sun` before `ensure_sun()`, which already early-returns on a
+  valid sun. Without it `ensure_sun()` manufactured a `LuxSun` regardless of
+  what `_resolve_sun_link()` found, leaving two DirectionalLight3D in any
+  scene that ships its own -- measured on 4.7.stable at 1 degree apart in
+  elevation, which cross-hatches two shadow maps into acne along every
+  grazing surface rather than reading as a second sun. Measured: 2 visible
+  DirectionalLight3D against 1, and the adopted sun carrying the preset's
+  energy (1.500) instead of the level sun's untouched 1.000.
+
+  The scene side of this is `tools/lux_inject.py` in the factory root: a
+  Node-typed export is only resolved when the `[node]` header declares it in
+  `node_paths`, so the NodePath it wrote was dropped on type with no error
+  and `sun_light` was null at `_ready`. Both halves are required; this one
+  alone changes nothing.
+
+### Changed
+- `_build_modules` clears the direct children it owns before rebuilding, so
+  running it N times equals running it once. This is idempotence hygiene and
+  is **not** the fix for editor-side accumulation: that is `owner`. Of the six
+  children Lux parents onto a LuxRoot, exactly the three carrying
+  `owner = edited_scene_root` are the three that survive into a saved scene.
+  Nine assignment sites across the addon; tracked as roadmap item 24.
+
 ## [0.15.4] - Run artifacts land in _runs\
 
 - `tools/headless_walk.ps1` + `tools/visual_pass.ps1` write run folders and results zips under the factory's `_runs\`
