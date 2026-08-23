@@ -104,7 +104,16 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			r.light_color = LuxColorTemp.cool_fluorescent()
 			r.energy = 1.0          # per-light; rooms pack 5+ so they sum — 2.2
 			                        # each blew interiors to white. Tune per bake.
-			r.light_range = 8.0
+			# 4.5, down from 8.0 (roadmap 54, walked 2026-08-23). Range is not
+			# just falloff: the engine binds a light to every MESH its range
+			# touches, THROUGH WALLS, and each mesh renders at most
+			# `max_lights_per_object` of them. At 8.0 the worst ceiling tile
+			# had 23 claimants for 8 slots, adjacent tiles bound DIFFERENT
+			# sets, and the walk at the engine default showed the difference
+			# as a hard-edged brightness grid across every ceiling, floor and
+			# roof. 4.5 keeps a fixture inside its own room; if interiors read
+			# too dark between fixtures after this, raise `energy`, never this.
+			r.light_range = 4.5
 			r.count = int(row.get("count", 1))
 			r.spacing = float(row.get("spacing", 0.0))
 			r.mount_height = 0.0          # anchor pos is already at the ceiling
@@ -136,7 +145,11 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			rw.rig_name = &"Wall Pack (baked)"
 			rw.light_color = LuxColorTemp.kelvin(LuxColorTemp.HALOGEN)
 			rw.energy = 2.5
-			rw.light_range = 7.0
+			# 5.5, down from 7.0 — same per-mesh budget law as the
+			# fluorescent trim above, scaled for an outdoor pool. Wall packs
+			# face exterior walls and ground tiles, and at 7.0 they stacked
+			# with streetlights on the path tiles.
+			rw.light_range = 5.5
 			rw.count = 1
 			rw.spacing = 0.0
 			rw.mount_height = 0.0

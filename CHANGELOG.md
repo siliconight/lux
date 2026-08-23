@@ -7,6 +7,25 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.18.0] - a light's range is a budget claim, and 8 metres claimed through walls
+
+The walk that ruled on this (2026-08-23, lot_demo_001 at the engine's own
+`max_lights_per_object=8`): hard-edged brightness quads gridding every
+ceiling, floor and roof. The engine binds a light to every MESH whose AABB
+its range touches -- through walls, occlusion never enters it -- and renders
+at most 8 of them per mesh. With fluorescents at range 8.0, the worst ceiling
+tile had 23 claimants for 8 slots, adjacent tiles bound DIFFERENT winning
+sets, and the set difference drew the tile boundaries. Item 54 split the
+room-spanning meshes; this trims the claims so the budget fits.
+
+### Changed
+- `LuxLightLoader` tuning table: fluorescent `light_range` 8.0 -> 4.5 (a
+  fixture lights its own room and stops claiming slots two rooms away),
+  wall_pack 7.0 -> 5.5 (stops stacking with streetlights on path tiles).
+  Energy is deliberately untouched: if interiors read too dark between
+  fixtures, raise `energy` -- range is a budget claim first and a look
+  second, and the comment at the value now says so.
+
 ## [0.17.0] - every fixture light existed twice, and the census caught the twins
 
 Measured 2026-08-23 by `tools/mesh_light_census.py` (factory root) on
