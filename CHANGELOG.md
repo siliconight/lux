@@ -7,6 +7,23 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.19.0] - the range follows the room down to its floor
+
+0.18.0's flat 4.5 fixed the budget grid and broke tall rooms the same hour:
+the walk found the arena's ~5.7 m hall with a lit ceiling over a PITCH-BLACK
+floor, because attenuation reaches hard zero at the range and no energy
+value lights a floor the range does not reach. A flat number cannot serve a
+3.3 m office and a 5.7 m hall; the room's height can, and Deli Counter is
+the layer that knows it.
+
+### Changed
+- `LuxLightLoader`: a fluorescent anchor carrying `drop` (deli_counter >=
+  0.97 stamps the lamp's distance to its own room's floor) gets
+  `light_range = clamp(drop + 1.5, 4.5, 8.0)` -- a floor pool about
+  sqrt(3 x drop) metres wide in every room, with the clamp keeping low
+  rooms at the 0.18.0 trim and stopping tall halls from re-claiming the
+  whole per-mesh budget. Anchors without a drop keep the flat 4.5.
+
 ## [0.18.0] - a light's range is a budget claim, and 8 metres claimed through walls
 
 The walk that ruled on this (2026-08-23, lot_demo_001 at the engine's own

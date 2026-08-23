@@ -104,16 +104,24 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			r.light_color = LuxColorTemp.cool_fluorescent()
 			r.energy = 1.0          # per-light; rooms pack 5+ so they sum — 2.2
 			                        # each blew interiors to white. Tune per bake.
-			# 4.5, down from 8.0 (roadmap 54, walked 2026-08-23). Range is not
-			# just falloff: the engine binds a light to every MESH its range
-			# touches, THROUGH WALLS, and each mesh renders at most
-			# `max_lights_per_object` of them. At 8.0 the worst ceiling tile
-			# had 23 claimants for 8 slots, adjacent tiles bound DIFFERENT
-			# sets, and the walk at the engine default showed the difference
-			# as a hard-edged brightness grid across every ceiling, floor and
-			# roof. 4.5 keeps a fixture inside its own room; if interiors read
-			# too dark between fixtures after this, raise `energy`, never this.
-			r.light_range = 4.5
+			# RANGE IS DERIVED FROM THE ANCHOR'S DROP TO ITS FLOOR
+			# (deli_counter >= 0.97 stamps `drop`), because a flat number was
+			# wrong at both ends inside one day. At a flat 8.0 the engine
+			# bound every lamp to every MESH within range THROUGH WALLS --
+			# each mesh renders at most `max_lights_per_object` of its
+			# claimants, the worst ceiling tile had 23 for 8 slots, adjacent
+			# tiles bound DIFFERENT winning sets, and the walk at the engine
+			# default showed the difference as a hard-edged brightness grid
+			# (roadmap 54). At a flat 4.5 the arena's ~5.7 m hall had a lit
+			# ceiling over a PITCH-BLACK floor: attenuation reaches hard zero
+			# at the range, so no energy value lights a floor the range does
+			# not reach. drop + 1.5 gives every room a floor pool about
+			# sqrt(3 * drop) metres wide; the clamp keeps low rooms at the
+			# short trim and stops tall halls from re-claiming the whole
+			# per-mesh budget. If interiors read too dark BETWEEN fixtures,
+			# raise `energy`, never this.
+			var drop := float(a.get("drop", 0.0))
+			r.light_range = clampf(drop + 1.5, 4.5, 8.0) if drop > 0.0 else 4.5
 			r.count = int(row.get("count", 1))
 			r.spacing = float(row.get("spacing", 0.0))
 			r.mount_height = 0.0          # anchor pos is already at the ceiling
