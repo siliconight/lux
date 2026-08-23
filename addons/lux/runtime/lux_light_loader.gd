@@ -122,13 +122,47 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			# raise `energy`, never this.
 			var drop := float(a.get("drop", 0.0))
 			r.light_range = clampf(drop + 1.5, 4.5, 8.0) if drop > 0.0 else 4.5
+			# Inverse-square falloff: at the default near-linear 1.0 the pool
+			# cuts to zero AT the range and rims every ceiling with a visible
+			# circle (walked 2026-08-23, zoo corridor). 2.0 fades out inside
+			# the range and the edge disappears.
+			r.attenuation = 2.0
 			r.count = int(row.get("count", 1))
 			r.spacing = float(row.get("spacing", 0.0))
-			r.mount_height = 0.0          # anchor pos is already at the ceiling
+			# A hand's width BELOW the anchor: a lamp sitting on the ceiling
+			# plane spends half its sphere grazing the ceiling -- streaks at
+			# glancing angles and a scorched ring around the fixture (same
+			# walk). Real tubes hang; ours do now too.
+			r.mount_height = -0.25
 			r.flicker_amount = 0.12
 			r.flicker_speed = 9.0
 			f.rig = r
 			return f
+		"pendant":
+			# The 90s below-grade bulb (deli_counter >= 0.98 derives the
+			# type: basements and objective rooms trade the office row for
+			# sparse pendants). The fluorescent rig's machinery -- a row of
+			# omnis -- wearing an incandescent costume: warm, tight, and
+			# wavering slightly the way a filament does, not the way a tube
+			# stutters.
+			var b := LuxFluorescentRig.new()
+			b.name = String(a.get("id", "pendant"))
+			var rb := LuxLightRig.new()
+			rb.rig_name = &"Bare Bulb (baked)"
+			rb.light_color = LuxColorTemp.kelvin(LuxColorTemp.INCANDESCENT)
+			rb.energy = 1.3
+			# Tighter clamp than the fluorescent on purpose: a bare bulb is
+			# a pool, not a wash -- but the pool still has to reach the
+			# floor, so the drop rule applies (see the fluorescent comment).
+			var bdrop := float(a.get("drop", 0.0))
+			rb.light_range = clampf(bdrop + 1.0, 3.5, 6.5) if bdrop > 0.0 else 4.0
+			rb.count = int(row.get("count", 1))
+			rb.spacing = float(row.get("spacing", 0.0))
+			rb.mount_height = 0.0
+			rb.flicker_amount = 0.06
+			rb.flicker_speed = 2.5
+			b.rig = rb
+			return b
 		"streetlight":
 			var s := LuxStreetlightRig.new()
 			s.name = String(a.get("id", "streetlight"))
@@ -140,6 +174,14 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			rs.count = int(row.get("count", 1))
 			rs.spacing = float(row.get("spacing", 8.0))
 			rs.mount_height = 0.0
+			# BUZZING POLES (90s decay): every third pole gets the dying
+			# ballast. Keyed on the anchor's own id -- deterministic, so the
+			# SAME pole buzzes in every build of every seed, and an authored
+			# rename is the only thing that moves it. Position would drift
+			# with layout; ids are the stable name for a place.
+			if String(a.get("id", "")).hash() % 3 == 0:
+				rs.flicker_amount = 0.22
+				rs.flicker_speed = 7.0
 			s.rig = rs
 			return s
 		"wall_pack":

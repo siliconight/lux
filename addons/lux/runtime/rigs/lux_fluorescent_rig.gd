@@ -50,6 +50,7 @@ func _rebuild() -> void:
 		lamp.light_color = r.light_color
 		lamp.light_energy = r.energy
 		lamp.omni_range = r.light_range
+		lamp.omni_attenuation = r.attenuation
 		lamp.shadow_enabled = r.shadows_enabled
 		lamp.position = Vector3(start + i * r.spacing, r.mount_height, 0.0)
 		r.apply_bake_mode(lamp)

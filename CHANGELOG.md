@@ -7,6 +7,45 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.20.0] - the 90s palette: bare bulbs below grade, and every third pole buzzes
+
+Roadmap 57's first palette entries. One fixture type per world is how a
+level reads as generated; 90s Philadelphia is sodium amber outside, tube
+white in the front of house, and a bare filament over anything worth
+stealing.
+
+### Added
+- `pendant` in the loader's tuning table (deli_counter >= 0.98 derives the
+  type for basements and objective rooms): the fluorescent rig's machinery
+  wearing an incandescent costume -- `LuxColorTemp.INCANDESCENT`, energy
+  1.3, a TIGHTER drop clamp (`drop + 1.0`, 3.5..6.5 -- a pool, not a wash),
+  and a slow shallow filament waver (0.06 @ 2.5) where a tube stutters.
+- Buzzing poles: every third streetlight -- keyed on the anchor's own id,
+  deterministic across builds and seeds -- gets the dying ballast
+  (flicker 0.22 @ 7.0). Position would drift with layout; ids are the
+  stable name for a place.
+
+- `LuxLightRig.attenuation` (default 1.0 = engine default = byte-identical
+  for every existing rig): the distance-falloff exponent, applied by the
+  fluorescent and streetlight rigs. The near-linear default cuts to zero AT
+  the range and rims every pool with a visible circle (walked 2026-08-23 on
+  the zoo corridor ceiling); the loader now tunes fluorescents and pendants
+  to 2.0 -- inverse-square, the pool fades out inside the range and the
+  edge disappears.
+- Fluorescent tubes hang 0.25 m below their anchor (`mount_height = -0.25`
+  in the loader): a lamp sitting ON the ceiling plane spends half its
+  sphere grazing the ceiling -- streaks at glancing angles and a scorched
+  ring around the fixture, same walk. Real tubes hang; ours do now.
+- `docs/film_emulsion_tdd.md`: the Optional Color-Preserving Film Emulsion
+  TDD (roadmap 61) -- committed beside the code it specifies.
+
+### Fixed
+- `LuxStreetlightRig` never PROCESSED flicker: the rig resource always
+  carried the fields and this rig ignored them, so a buzzing streetlight
+  tuned anywhere was silently steady. It now runs the fluorescent rig's
+  two-tone noise over its spotlights when tuned, and `set_process` accounts
+  for flicker as well as cones.
+
 ## [0.19.0] - the range follows the room down to its floor
 
 0.18.0's flat 4.5 fixed the budget grid and broke tall rooms the same hour:

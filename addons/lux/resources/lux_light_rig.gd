@@ -13,6 +13,14 @@ extends Resource
 @export_range(0.0, 16.0) var energy: float = 2.0
 ## For OmniLight/SpotLight rigs.
 @export_range(0.5, 60.0) var light_range: float = 12.0
+## Distance-falloff exponent (Omni/Spot `*_attenuation`). 1.0 is the engine
+## default and what every rig shipped with -- near-linear, which cuts to zero
+## AT the range and draws the pool's edge as a visible circle on any surface
+## the light grazes. 2.0 is the physical inverse-square shape: the pool fades
+## out well inside the range and the edge disappears. Walked 2026-08-23 on
+## the zoo corridor: the hard-rimmed ceiling pools are this number, not the
+## range.
+@export_range(0.5, 3.0) var attenuation: float = 1.0
 @export var shadows_enabled: bool = false
 
 @export_group("Layout")

@@ -42,6 +42,7 @@ const _CONE_SHADER := preload("res://addons/lux/shaders/spatial/lux_light_cone.g
 
 var _lights: Array[SpotLight3D] = []
 var _cones: Array[MeshInstance3D] = []
+var _flicker_phase: float = 0.0
 
 
 func _ready() -> void:
@@ -67,8 +68,12 @@ func _rebuild() -> void:
 			c.free()
 	_lights.clear()
 	_cones.clear()
-	set_process(cone_enabled)
 	var r := rig if rig != null else _default_rig()
+	# Process when the cones need camera fade OR the rig flickers. The rig
+	# resource always carried flicker fields; this rig ignored them, so a
+	# "buzzing streetlight" tuned in the loader was silently steady.
+	set_process(cone_enabled
+			or (r.flicker_amount > 0.0 and r.bake_mode != 1))
 	# Center the row on the rig node, same as LuxFluorescentRig. Lot writes
 	# path-MIDPOINT anchors; an uncentered row lit half the path and overshot
 	# the end. Zoo's fixture pass (v0.28) expands rows with this exact math,
@@ -80,6 +85,7 @@ func _rebuild() -> void:
 		lamp.light_color = r.light_color
 		lamp.light_energy = r.energy
 		lamp.spot_range = r.light_range
+		lamp.spot_attenuation = r.attenuation
 		lamp.spot_angle = 55.0
 		lamp.spot_angle_attenuation = 1.2
 		lamp.shadow_enabled = r.shadows_enabled
@@ -136,6 +142,18 @@ func _update_cone_params() -> void:
 
 
 func _process(_delta: float) -> void:
+	# Dying-ballast buzz, same two-tone noise as the fluorescent rig -- a
+	# sodium lamp warming and cutting is THE 90s parking-lot sound made
+	# visible. Only poles the loader tuned with flicker_amount > 0 pay.
+	var fr := rig if rig != null else null
+	if fr != null and fr.flicker_amount > 0.0 and fr.bake_mode != 1:
+		_flicker_phase += _delta * fr.flicker_speed
+		var n := sin(_flicker_phase) * 0.5 + sin(_flicker_phase * 3.7) * 0.5
+		var flick := 1.0 - maxf(0.0, n) * fr.flicker_amount * 0.5
+		for fl in _lights:
+			if is_instance_valid(fl):
+				fl.light_energy = fr.energy * flick
+
 	# Fade each cone out as the camera walks under it (full-screen additive
 	# wash otherwise). Alpha 0 inside the base radius, full at 1.5x.
 	if _cones.is_empty():
