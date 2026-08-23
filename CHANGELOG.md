@@ -7,6 +7,32 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.17.0] - every fixture light existed twice, and the census caught the twins
+
+Measured 2026-08-23 by `tools/mesh_light_census.py` (factory root) on
+lot_demo_001's walk preview: 272 positional lights visible against an
+authored 136 -- exactly x2 -- and ALL 272 within 10 cm of another light. The
+pairs named the mechanism: `Spawned_fluorescent_NNN/Fluoro_0` beside
+`Spawned_fluorescent_NNN/@OmniLight3D@N`. Sun Link's disease, one rig down:
+the bake SAVES each rig's built lamps into the scene (they are given an
+owner, so they serialize), and a rig loaded from that scene arrives with its
+lamps already as children while its fresh `_lights` array is empty -- so
+`_rebuild()` freed nothing, built a second set beside the first, and the
+name collision left the runtime copy @-renamed and unaddressable. Every
+per-mesh light count in the level was doubled, and the package's
+`max_renderable_lights=136` sat at HALF the real population (roadmap 56).
+
+### Fixed
+- `LuxFluorescentRig._rebuild`, `LuxStreetlightRig._rebuild`,
+  `LuxAreaLightRig._build`: sweep every built CHILD by type (lamps; the
+  streetlight's cones; the area rig's panel light and surface quad) before
+  building, instead of trusting the instance's own bookkeeping arrays --
+  which cannot know about children a scene file delivered. Immediate
+  `free()`, not `queue_free()`: a deferred corpse holds its name for the
+  rest of the frame, so the replacement would be renamed `@OmniLight3D@N`
+  (item 55 documents what @-names cost downstream). Editor rebuilds get the
+  same idempotence for free.
+
 ## [0.16.0] - Sun Link drives the level's sun instead of adding one beside it
 
 ### Fixed

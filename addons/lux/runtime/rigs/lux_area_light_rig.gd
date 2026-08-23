@@ -39,6 +39,22 @@ func _ready() -> void:
 
 
 func _build() -> void:
+	# Sweep the built children of any PREVIOUS build first -- including the
+	# ones a baked scene saved (they are given an owner, so they serialize)
+	# that a fresh instance's `_light` / `_quad` know nothing about. Without
+	# this, a loaded rig builds a second panel light and a second surface
+	# quad beside the saved pair; the census measured the light half of that
+	# doubling on every fixture rig, and the runtime-renamed leftovers are
+	# item 55's unaddressable @-nodes. Immediate free() so the saved names
+	# are released before the rebuilt children claim them.
+	for c in get_children():
+		if c is Light3D or (c is MeshInstance3D
+				and String(c.name).contains("AreaPanel")):
+			remove_child(c)
+			c.free()
+	_light = null
+	_quad = null
+
 	var compat := _is_compatibility()
 	var col := Color(1.0, 0.96, 0.9)
 	var energy := 3.0

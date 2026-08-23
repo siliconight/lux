@@ -26,9 +26,21 @@ func _ready() -> void:
 
 
 func _rebuild() -> void:
-	for l in _lights:
-		if is_instance_valid(l):
-			l.queue_free()
+	# Free EVERY lamp child, not just what this instance's `_lights` tracks.
+	# The lux bake saves built lamps into the scene (they are given an owner,
+	# so they serialize), and a rig LOADED from that scene arrives with its
+	# lamps already as children and a fresh, EMPTY `_lights` -- the old loop
+	# freed nothing, built a second set beside the first, and the per-mesh
+	# light census read every fixture TWICE (272 visible against an authored
+	# 136, each within 10 cm of its twin). The file said one lamp; the running
+	# level had two -- Sun Link's disease, one rig down. Immediate free(), not
+	# queue_free(): a deferred corpse still holds its name for the rest of the
+	# frame, so the replacement would be renamed @OmniLight3D@N and become
+	# unaddressable (item 55 documents what @-names cost downstream).
+	for c in get_children():
+		if c is OmniLight3D:
+			remove_child(c)
+			c.free()
 	_lights.clear()
 	var r := rig if rig != null else _default_rig()
 	var start := -(r.count - 1) * 0.5 * r.spacing

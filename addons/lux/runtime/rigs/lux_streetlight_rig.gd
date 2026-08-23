@@ -54,13 +54,18 @@ func _ready() -> void:
 
 
 func _rebuild() -> void:
-	for l in _lights:
-		if is_instance_valid(l):
-			l.queue_free()
+	# Sweep every built child by TYPE, not just what this instance's arrays
+	# track. Lamps and cones saved into a baked scene arrive as children of a
+	# fresh instance whose `_lights` / `_cones` are empty, so the old loops
+	# freed nothing and built a second set beside the first (the fluorescent
+	# rig's census-measured doubling, same mechanism). Immediate free() so the
+	# saved names are released before the rebuilt children claim them.
+	for c in get_children():
+		if c is SpotLight3D or (c is MeshInstance3D
+				and String(c.name).contains("Cone")):
+			remove_child(c)
+			c.free()
 	_lights.clear()
-	for c in _cones:
-		if is_instance_valid(c):
-			c.queue_free()
 	_cones.clear()
 	set_process(cone_enabled)
 	var r := rig if rig != null else _default_rig()
