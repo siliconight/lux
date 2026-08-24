@@ -7,6 +7,27 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.23.0] - the fluorescent pays its range bill
+
+Census #6 (2026-08-24, lot_demo_001) was the first with `drop` alive end to
+end -- the range histogram finally spread (min 3.6, median 4.9, max 7.1,
+zero twins) -- and the roadmap-54 gate still failed by a hair: 14 meshes at
+9-10 claimants for 8 slots, every one a horizontal plate (slabs, floor
+panels, a roof panel). Plates are where the lamps hang: every lamp within
+range claims a slot on the tile above it, the next room's lamps included,
+because the engine binds a range SPHERE against an AABB and walls are not
+part of the question. With the geometry already budget-sized (0.49.0's
+tiling) and the population already deduplicated (0.17.0), range is the one
+knob left that pays this bill without rebuilding shells.
+
+### Changed
+- Fluorescent range: `clampf(drop + 1.0, 4.0, 7.5)`, fallback 4.0 (was
+  `drop + 1.5`, 4.5..8.0, fallback 4.5). The floor pool under each lamp is
+  sqrt(2*drop + 1) m -- arena 3.5 m, office 2.7 m, against Deli Counter's
+  4.0 m row spacing -- so floors stay lit while each sphere stops claiming
+  per-mesh slots on tiles it could not visibly brighten anyway
+  (attenuation 2.0 is near zero at the rim).
+
 ## [0.22.0] - the payload was in a box named "extras" all along
 
 The probe that settled it (2026-08-24, lot_demo_001's walk preview): 145

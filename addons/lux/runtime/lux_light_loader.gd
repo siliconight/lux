@@ -115,13 +115,19 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			# (roadmap 54). At a flat 4.5 the arena's ~5.7 m hall had a lit
 			# ceiling over a PITCH-BLACK floor: attenuation reaches hard zero
 			# at the range, so no energy value lights a floor the range does
-			# not reach. drop + 1.5 gives every room a floor pool about
-			# sqrt(3 * drop) metres wide; the clamp keeps low rooms at the
-			# short trim and stops tall halls from re-claiming the whole
-			# per-mesh budget. If interiors read too dark BETWEEN fixtures,
-			# raise `energy`, never this.
+			# not reach. drop + 1.5 lit every floor, and census #6 (the
+			# first with `drop` alive end to end, 2026-08-24) priced it: 14
+			# ceiling plates at 9-10 claimants for 8 slots. Plates are where
+			# lamps HANG, so every lamp within range claims a slot on them,
+			# the next room's included -- walls are not part of the engine's
+			# binding question. drop + 1.0 still floors a
+			# sqrt(2 * drop + 1) m pool under each lamp (arena 3.5 m, office
+			# 2.7 m, against DC's 4.0 m row spacing), and the clamp keeps
+			# low rooms at the short trim and stops tall halls from
+			# re-claiming the whole per-mesh budget. If interiors read too
+			# dark BETWEEN fixtures, raise `energy`, never this.
 			var drop := float(a.get("drop", 0.0))
-			r.light_range = clampf(drop + 1.5, 4.5, 8.0) if drop > 0.0 else 4.5
+			r.light_range = clampf(drop + 1.0, 4.0, 7.5) if drop > 0.0 else 4.0
 			# Inverse-square falloff: at the default near-linear 1.0 the pool
 			# cuts to zero AT the range and rims every ceiling with a visible
 			# circle (walked 2026-08-23, zoo corridor). 2.0 fades out inside
