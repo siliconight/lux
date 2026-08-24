@@ -7,6 +7,26 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.25.0] - the four lights that hang on the envelope learn what a wall is
+
+Roadmap 60's first tier, sized by its second sighting (2026-08-24):
+arena_a03's interior ceiling carried the wash of the sign OUTSIDE its own
+south wall. An area rig is mounted ON the building envelope at energy 3.0,
+so half its range sphere is always inside the building -- and collision
+never blocks light in GL Compatibility; a shadow map is the only occlusion
+that exists. Shadowing everything is unaffordable (~128 interior fixtures,
+each a cube map); shadowing THIS class is nearly free: lot_demo_001 ships
+four area rigs, total. Doorway spill survives -- a shadow map blocks walls,
+not openings.
+
+### Changed
+- The loader's `window`/`sign` arm sets `shadows_enabled = true` on its
+  rig -- the machinery already existed end to end (`LuxLightRig` carried
+  the field, `LuxAreaLightRig` applies it on both the AreaLight3D path and
+  the Compatibility omni fallback); nothing had ever turned it on. These
+  are the only shadowed lights in the package; interiors stay unshadowed
+  pending item 60's quality-profile decision.
+
 ## [0.24.0] - a quarter metre, priced by the census
 
 Census #7 (2026-08-24) ran with margin forensics: the census now names each

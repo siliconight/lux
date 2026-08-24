@@ -229,6 +229,19 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			ra.rig_name = &"Window (baked)"
 			ra.light_color = LuxColorTemp.kelvin(LuxColorTemp.DAYLIGHT)
 			ra.energy = 3.0
+			# THE ONLY SHADOWED LIGHTS IN THE PACKAGE (roadmap 60, first
+			# tier). An area rig hangs ON the building envelope at energy
+			# 3.0, so half its sphere is always inside the building it is
+			# mounted to: walked 2026-08-24, arena_a03's interior ceiling
+			# carried the wash of the sign OUTSIDE its own south wall.
+			# Collision never blocks light in GL Compatibility -- a shadow
+			# map is the only occlusion that exists -- and this is the one
+			# class where it is affordable: lot_demo_001 ships FOUR area
+			# rigs against ~128 interior fixtures. Legitimate spill
+			# survives (a shadow map blocks walls, not doorways). If
+			# interiors ever earn shadows, that is the quality-profile
+			# decision item 60 still owns -- do not default them on there.
+			ra.shadows_enabled = true
 			ar.rig = ra
 			return ar
 		_:
