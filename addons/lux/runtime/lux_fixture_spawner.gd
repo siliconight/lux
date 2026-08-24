@@ -74,7 +74,7 @@ static func spawn(scene_root: Node, parent: Node = null) -> Dictionary:
 		# black floor). Zoo >= 0.50 stamps `lux_drop` on each marker.
 		var rig := LuxLightLoader.rig_for_anchor({"type": t,
 			"id": "Spawned_" + String(mk.name).trim_prefix(MARKER_PREFIX).trim_prefix("_"),
-			"drop": float(mk.get_meta(&"lux_drop", 0.0))})
+			"drop": float(marker_payload(mk, "lux_drop", 0.0))})
 		if rig == null:
 			skipped.append({"marker": String(mk.name),
 				"reason": "no rig for type '%s'" % t})
@@ -112,11 +112,33 @@ static func collect_markers(node: Node, out: Array) -> void:
 		collect_markers(c, out)
 
 
-## A marker's anchor type: metadata first (glTF extras -> node meta, exact),
-## name parse second (strip prefix, drop numeric dedup suffixes).
+## One field of a marker's placement payload, wherever the importer put it.
+##
+## Godot imports a glTF node's `extras` as ONE metadata entry named
+## "extras" holding the whole dictionary -- NOT as individual keys. The
+## probe that settled this (2026-08-24, lot_demo_001): 145 markers, 145
+## with metadata, 0 with a `lux_drop` key, every one carrying
+## keys=['extras'] with the full payload inside. Which means
+## `get_meta("lux_type")` has returned null since v0.30 and the name-parse
+## fallback silently carried the whole marker contract -- the type is also
+## in the node name, so nothing ever noticed. Read the dictionary first,
+## tolerate a flat key anyway (importers change), fall back last.
+static func marker_payload(mk: Node, key: String, fallback: Variant) -> Variant:
+	if mk.has_meta(&"extras"):
+		var ex: Variant = mk.get_meta(&"extras")
+		if ex is Dictionary and (ex as Dictionary).has(key):
+			return (ex as Dictionary)[key]
+	if mk.has_meta(key):
+		return mk.get_meta(key)
+	return fallback
+
+
+## A marker's anchor type: payload first (exact), name parse second (strip
+## prefix, drop numeric dedup suffixes).
 static func marker_type(mk: Node) -> String:
-	if mk.has_meta(&"lux_type"):
-		return String(mk.get_meta(&"lux_type"))
+	var t := String(marker_payload(mk, "lux_type", ""))
+	if t != "":
+		return t
 	var s := String(mk.name).trim_prefix(MARKER_PREFIX).trim_prefix("_")
 	var parts := s.split("_")
 	while parts.size() > 1 and parts[parts.size() - 1].is_valid_int():

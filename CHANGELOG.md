@@ -7,6 +7,28 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.22.0] - the payload was in a box named "extras" all along
+
+The probe that settled it (2026-08-24, lot_demo_001's walk preview): 145
+markers, 145 with metadata, 0 with a `lux_drop` key -- every marker carries
+exactly ONE metadata entry, named `extras`, holding the whole placement
+dictionary. Godot imports glTF node extras as that single dictionary, not
+as flattened keys, so `get_meta("lux_type")` has returned null since v0.30
+and the name-parse fallback silently carried the entire marker contract --
+the type is also in the node name, so nothing ever noticed. Sun Link's
+lesson again: the instrument that looks at the RUNNING tree is the only one
+that can see this class of defect.
+
+### Fixed
+- `LuxFixtureSpawner.marker_payload`: reads a field out of the imported
+  `extras` dictionary first, tolerates a flat metadata key (importers
+  change), falls back last. `marker_type` and the spawn path's `drop` now
+  go through it -- so for the first time since the marker contract was
+  born, the payload Zoo writes is the payload Lux reads: type exact (no
+  more trusting Blender's dedup-suffix name mangling), `lux_drop` live,
+  and `lux_anchor_id` / `lux_slot` / `lux_reacts_to_alarm` finally
+  reachable for whatever needs them next.
+
 ## [0.21.0] - the marker path finally tells the tuning table what it knows
 
 0.19.0 taught the tuning table to derive range from an anchor's `drop`, and
