@@ -66,8 +66,15 @@ static func spawn(scene_root: Node, parent: Node = null) -> Dictionary:
 		# spawned rigs the LuxEmit prefix, double-counting them in every
 		# prefix-based scan (validator counted 40 "markers" for 20 on the
 		# first hardware run).
+		# The marker path is how lights SHIP, so it must hand the tuning
+		# table everything placement knows -- {type, id} alone sent every
+		# fluorescent to the no-drop range fallback while the manifest
+		# chain carried `drop` end to end (measured on lot_demo_001: 96
+		# lamps flat at 4.5, the arena's 5.6 m hall lit-ceiling over a
+		# black floor). Zoo >= 0.50 stamps `lux_drop` on each marker.
 		var rig := LuxLightLoader.rig_for_anchor({"type": t,
-			"id": "Spawned_" + String(mk.name).trim_prefix(MARKER_PREFIX).trim_prefix("_")})
+			"id": "Spawned_" + String(mk.name).trim_prefix(MARKER_PREFIX).trim_prefix("_"),
+			"drop": float(mk.get_meta(&"lux_drop", 0.0))})
 		if rig == null:
 			skipped.append({"marker": String(mk.name),
 				"reason": "no rig for type '%s'" % t})

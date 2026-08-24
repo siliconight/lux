@@ -7,6 +7,21 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.21.0] - the marker path finally tells the tuning table what it knows
+
+0.19.0 taught the tuning table to derive range from an anchor's `drop`, and
+the census then measured every fluorescent at the fallback anyway: the
+manifest chain carried `drop` end to end, but the pipeline ships its
+interior lights through `LuxFixtureSpawner` -- the MARKER path -- which
+handed `rig_for_anchor` only `{type, id}`. Right rule, wrong door.
+
+### Changed
+- `LuxFixtureSpawner.spawn` passes `drop` from the marker's `lux_drop`
+  metadata (Zoo >= 0.50 stamps it) into `rig_for_anchor`, so the drop rule
+  fires on the path lights actually ship through. Markers without the key
+  read 0.0 and keep the fallback -- older fixture GLBs light exactly as
+  before.
+
 ## [0.20.0] - the 90s palette: bare bulbs below grade, and every third pole buzzes
 
 Roadmap 57's first palette entries. One fixture type per world is how a
