@@ -7,6 +7,24 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.24.0] - a quarter metre, priced by the census
+
+Census #7 (2026-08-24) ran with margin forensics: the census now names each
+offending mesh's claimants and exactly how much range each would have to
+lose. Verdict on the six meshes still over 8: building b0's three slab
+tiles are over by fluorescents that bind with 0.17 m to spare -- a range
+problem, payable; b1's two tiles (slimmest margins 0.44 and 0.69) and b2's
+52 m parapet (1.59, on claimants whose formula has no 1.59 to give without
+un-lighting their own floors) are geometry problems, and no honest range
+number clears them. This release pays the payable one and leaves the
+geometry bill where it belongs (roadmap 54: Deli Counter parapet tiling).
+
+### Changed
+- Fluorescent range: `clampf(drop + 0.75, 4.0, 7.5)` (was `drop + 1.0`).
+  Sheds every 0.17 m claimant while the floor pool stays
+  sqrt(1.5*drop + 0.5625) m -- arena 3.0 m against the 2.83 m a 4 m grid
+  diagonal needs, office 2.4 m against 2.0 m rows.
+
 ## [0.23.0] - the fluorescent pays its range bill
 
 Census #6 (2026-08-24, lot_demo_001) was the first with `drop` alive end to
