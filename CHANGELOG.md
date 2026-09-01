@@ -7,6 +7,62 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.26.0] - the fixture gate stops measuring bracket-to-bulb
+
+Roadmap item 71, which was filed as a Lux placement bug and is not one. The
+lamps were always where they belong.
+
+`check_fixture_colocation` measured from each `LuxEmit_*` marker to the
+nearest `Light3D`, and back from each spawned `Light3D` to the nearest marker,
+against a flat 0.10 m tolerance. But a spawned fluorescent is not supposed to
+sit on its marker. `lux_light_loader.gd` gives that branch alone
+`mount_height = -0.25`, under a comment from the 2026-08-23 walk: a lamp
+sitting on the ceiling plane spends half its sphere grazing the ceiling, which
+streaks at glancing angles and scorches a ring around the fixture. Real tubes
+hang. `LuxFixtureSpawner` puts the rig ROOT on the marker; the rig then hangs
+its bulb 0.25 m below. The check measured that drop and called it a floating
+light.
+
+Measured on two Level Factory cold runs, which is how it surfaced -- 37
+markers and 20 flagged on one, 19 and 12 on the other, **worst 0.25 m on
+both**, across two themes, two archetypes and two Zoo kits. A distance that
+does not move when everything else does is a constant, not a defect. Pendant,
+streetlight and wall_pack all set `mount_height = 0.0` and never tripped it.
+
+The drop is not incidental: **0.20.0 shipped it deliberately**, from the same
+2026-08-23 walk, and said so -- "Real tubes hang; ours do now." So the gate has
+been wrong since 0.20.0, and removing the offset to satisfy it would have
+re-introduced the streaking that walk was run to find.
+
+It had been wrong for as long as fluorescents have hung, and nothing saw it:
+Level Factory was discounting the blockers as belonging to an eliminated
+candidate (LF 0.50.0 fixed that on 2026-08-27). A silent gate and a lying
+aggregator cancel out and the run reports clean.
+
+### Changed
+- `runtime/lux_validator.gd`: `check_fixture_colocation` compares markers to
+  RIG ROOTS. A light's anchor is its rig root when it was spawned into the
+  `LuxFixtureLights` container, and the light itself otherwise -- so
+  manifest-baked lamps still satisfy a marker, keeping "or Bake Lights for
+  manifest scenes" a true answer to the dark-hardware finding. The floating
+  half measures each spawned rig root rather than its bulbs. Where a bulb
+  sits inside its own rig is this repo's business, tuned per type; the gate
+  no longer has an opinion about it.
+
+  A per-type tolerance would also have worked and is worse: it needs updating
+  every time a mount height is tuned, which is the coupling that produced
+  this.
+
+### Added
+- `tools/colocation_selftest.gd` -- `godot --headless --path . -s
+  res://tools/colocation_selftest.gd`. Four cases, and the first one is the
+  point: **case 0 asserts the 0.25 m drop is really there** before anything
+  else runs, because a fix that makes the check stop complaining is
+  indistinguishable from a fix that makes it stop working. Then a correctly
+  hung fixture passes, a rig moved 5 m fails with BOTH findings and recovers
+  when moved back, an unspawned scene reports dark hardware, and a
+  manifest-baked lamp on a marker satisfies it.
+
 ## [0.25.0] - the four lights that hang on the envelope learn what a wall is
 
 Roadmap 60's first tier, sized by its second sighting (2026-08-24):

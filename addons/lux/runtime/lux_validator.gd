@@ -287,11 +287,18 @@ static func _tier_name(t: int) -> String:
 ## Fixture co-location gate (v0.15): the fixture-pass thesis, as a check.
 ## (a) Every LuxEmit_* emitter marker must have a lamp within `tolerance` —
 ## a miss is DARK HARDWARE (fixture geometry with no light in it).
-## (b) Every lamp under a LuxFixtureLights container must sit within
+## (b) Every spawned RIG under a LuxFixtureLights container must sit within
 ## `tolerance` of a marker — a miss is a FLOATING LIGHT (spawner output
 ## drifted from the hardware). Manifest-baked lights (LuxLights) are not
 ## judged here: window/area lamps legitimately sit far from any hardware.
 ## Returns Finding entries; empty array when there are no markers at all.
+##
+## BOTH HALVES MEASURE TO THE RIG ROOT, NOT TO THE BULB (roadmap 71). A
+## spawned light is not supposed to sit on its marker: `lux_light_loader`
+## gives the fluorescent branch `mount_height = -0.25` so real tubes hang
+## below the ceiling plane instead of grazing it. The rig root is what lands
+## on the marker. Measuring the bulb reported every fluorescent in the factory
+## as floating light at exactly 0.25 m and blocked two cold runs.
 static func check_fixture_colocation(scene_root: Node, tolerance: float = 0.1) -> Array:
 	var findings: Array = []
 	if scene_root == null:
@@ -301,15 +308,15 @@ static func check_fixture_colocation(scene_root: Node, tolerance: float = 0.1) -
 	if markers.is_empty():
 		return findings
 
-	var lamps: Array = []
-	_collect_positional_lights(scene_root, lamps)
+	var anchors: Array = []
+	_collect_light_anchors(scene_root, anchors)
 	var dark := 0
 	var worst_dark := 0.0
 	for m in markers:
 		var mp: Vector3 = (m as Node3D).global_position
 		var best := 1e9
-		for l in lamps:
-			var d: float = (mp - (l as Node3D).global_position).length()
+		for a in anchors:
+			var d: float = (mp - (a as Node3D).global_position).length()
 			if d < best:
 				best = d
 		if best > tolerance:
@@ -321,7 +328,7 @@ static func check_fixture_colocation(scene_root: Node, tolerance: float = 0.1) -
 			% [dark, tolerance, worst_dark]))
 
 	var spawned: Array = []
-	_collect_spawned_lights(scene_root, spawned)
+	_collect_spawned_rigs(scene_root, spawned)
 	var floating := 0
 	var worst_float := 0.0
 	for l in spawned:
@@ -341,7 +348,7 @@ static func check_fixture_colocation(scene_root: Node, tolerance: float = 0.1) -
 
 	if dark == 0 and floating == 0:
 		findings.append(Finding.new(Severity.OK,
-			"Fixture co-location: %d marker(s) lit, %d spawned lamp(s) on hardware (tolerance %.2f m)."
+			"Fixture co-location: %d marker(s) lit, %d spawned rig(s) on hardware (tolerance %.2f m)."
 			% [markers.size(), spawned.size(), tolerance]))
 	return findings
 
@@ -359,3 +366,47 @@ static func _collect_spawned_lights(node: Node, out: Array) -> void:
 		return
 	for c in node.get_children():
 		_collect_spawned_lights(c, out)
+
+
+## The LuxFixtureLights container, or null when nothing has been spawned.
+static func _spawn_container(node: Node) -> Node:
+	if node is Node and String(node.name) == LuxFixtureSpawner.CONTAINER:
+		return node
+	for c in node.get_children():
+		var found: Node = _spawn_container(c)
+		if found != null:
+			return found
+	return null
+
+
+## Every spawned RIG ROOT -- the container's direct children, which is what
+## `LuxFixtureSpawner.spawn` lands on each marker. NOT their Light3D
+## descendants: a rig hangs its own bulbs wherever its type says (roadmap 71).
+static func _collect_spawned_rigs(scene_root: Node, out: Array) -> void:
+	var container: Node = _spawn_container(scene_root)
+	if container == null:
+		return
+	for c in container.get_children():
+		if c is Node3D:
+			out.append(c)
+
+
+## The point each light is ANCHORED to, which is not always the light itself.
+##
+## A spawned fixture light anchors to its RIG ROOT, because that is what the
+## spawner placed on the marker and the bulb's offset inside the rig is
+## deliberate. Any other positional light -- a manifest bake, a hand-placed
+## lamp -- anchors to itself, which keeps "or Bake Lights for manifest scenes"
+## a true answer to the dark-hardware finding.
+static func _collect_light_anchors(scene_root: Node, out: Array) -> void:
+	var container: Node = _spawn_container(scene_root)
+	if container != null:
+		for c in container.get_children():
+			if c is Node3D:
+				out.append(c)
+	var all_lights: Array = []
+	_collect_positional_lights(scene_root, all_lights)
+	for l in all_lights:
+		if container != null and container.is_ancestor_of(l as Node):
+			continue
+		out.append(l)
