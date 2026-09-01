@@ -36,6 +36,13 @@ signal blend_finished(preset_name: StringName)
 @export_group("Startup")
 @export var apply_on_ready: bool = true
 
+## Bind Zoo's fixture lit-face materials (M_*_Lens / _Diffuser / _Face) when
+## this node is ready, so `set_fixtures_powered` drives the GLOW as well as the
+## rig lights. Off means the level keeps its emissive faces lit through a power
+## cut, which is the pre-0.27.0 behaviour and is almost never what anyone wants
+## -- it exists so a project doing its own emissive management can say so.
+@export var bind_emissives_on_ready: bool = true
+
 @export_group("Sun Link")
 ## Track a live DirectionalLight3D as the key light instead of the preset's
 ## static sun. When set, Lux reads this light's world direction, color, and
@@ -102,6 +109,23 @@ func _ready() -> void:
 		var start := local_override if local_override != null else active_preset
 		if start != null:
 			apply_preset(start)
+	# BINDING HAS TO HAPPEN AT LOAD, WHICH IS WHY IT IS HERE AND NOT IN A
+	# PIPELINE DRIVER. Neither half of a bind survives `PackedScene.pack`: the
+	# registration is runtime state on this node, and the base energy is
+	# `set_meta` on a material owned by an imported GLB, an external resource
+	# the packed scene only references. A driver that bound before packing
+	# would report a success the shipped scene does not contain.
+	#
+	# AFTER `_build_modules`, not before: that call REPLACES `_lighting`, and
+	# `_emissives` lives on it. Binding first would register into the module
+	# that is about to be thrown away -- so an editor script reload, which
+	# re-runs this whole function, must re-bind too. It is safe to: the binder
+	# only stamps `BASE_META` when it is absent, and `register_emissive`
+	# ignores a material it already holds.
+	if bind_emissives_on_ready:
+		var bound: Dictionary = bind_fixture_emissives()
+		print("[lux] %s (searched %s)" % [String(bound.get("msg", "")),
+			String(bound.get("search_root", "?"))])
 
 
 ## Resolves which DirectionalLight3D drives the vertex-lighting key. Priority:
@@ -352,13 +376,31 @@ func set_fixtures_powered(on: bool) -> void:
 ## Scan for Zoo fixture lit-face materials (M_*_Lens / _Diffuser / _Face)
 ## and bind them so set_fixtures_powered drives them. Call once after the
 ## level (and its fixtures GLBs) loads; safe to call again after re-imports.
+## ROOT RESOLUTION IS THE WHOLE RISK IN THIS FUNCTION. It used to fall back to
+## `get_tree().current_scene` and then to `self`. In a `godot --headless -s
+## driver.gd` run there IS no current scene -- nothing was ever loaded as one --
+## so an unqualified call landed on `self`: a LuxRoot with no mesh children,
+## zero materials found, `ok: true`, and a level whose glow nothing drives.
+## Both of Level Factory's drivers run exactly that way.
+##
+## `owner` first (the scene this node was saved into), then the parent, then
+## current_scene. Every one of those actually contains the fixtures, and the
+## chosen root comes back in the result so a count of zero can be told apart
+## from a search of nothing -- which is the difference between "this GLB has no
+## lit faces" and "we looked in the wrong place".
 func bind_fixture_emissives(search_root: Node = null) -> Dictionary:
 	var root := search_root
+	if root == null:
+		root = owner
+	if root == null:
+		root = get_parent()
 	if root == null and get_tree() != null:
 		root = get_tree().current_scene
 	if root == null:
 		root = self
-	return LuxEmissiveBinder.bind(root, self)
+	var res: Dictionary = LuxEmissiveBinder.bind(root, self)
+	res["search_root"] = String(root.name)
+	return res
 
 
 # ---------------------------------------------------------------------------

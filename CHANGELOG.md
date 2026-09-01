@@ -7,6 +7,64 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.27.0] - the glow was bound everywhere except where levels are built
+
+Roadmap item 94. `LuxEmissiveBinder` has worked correctly since 0.14 and
+every harness Lux ships calls it -- `tools/visual_pass.gd`,
+`tools/walk_harness.gd`, both `walk/headless/` night-strip scripts, and the
+dock's "Bind Emissives" button. Level Factory's two drivers,
+`run_lux_apply.gd` and `run_fixture_gate.gd`, do not. So a level walked in
+Lux's own harness has its lit faces bound to `set_fixtures_powered`, and a
+level BUILT BY THE PIPELINE does not: `_emissives` is empty, the power cut
+takes the rig lights, and every lens, diffuser and sign face keeps glowing.
+
+The symptom was already written down, from the other end, in a Level Factory
+flag's help text -- `--no-fixture-lights` explains itself by saying fixtures
+are lit by the glow pass "whether or not any light is cast, so the eye cannot
+separate a working fixture from a dead one." That is this, described by
+somebody who did not have the binder in mind.
+
+**WHY THE FIX IS HERE AND NOT IN THE DRIVER.** Adding a bind call to
+`run_lux_apply.gd` would bind at apply time and then `PackedScene.pack` the
+result, and neither half of a bind survives packing: the registration is
+runtime state on a LuxRoot instance, and the base energy is `set_meta` on a
+material owned by an imported GLB -- an external resource the packed scene
+references rather than owns. The driver would report a success the shipped
+scene does not contain. Binding has to happen at load, every load, which
+makes it the level node's job.
+
+**AND THE BIND ITSELF WAS AIMING AT NOTHING IN A HEADLESS RUN.**
+`bind_fixture_emissives(null)` fell back to `get_tree().current_scene`, then
+to `self`. In a `godot --headless -s driver.gd` run there is no current scene
+-- nothing was ever loaded as one -- so the fallback landed on `self`, a
+LuxRoot with no mesh children: zero materials, `ok: true`, no warning. Both
+Level Factory drivers run exactly that way, so wiring the call without this
+fix would have changed nothing and reported that it had.
+
+### Added
+- `LuxRoot.bind_emissives_on_ready` (default `true`, Startup group): binds
+  Zoo's fixture lit-face materials when the node is ready, so
+  `set_fixtures_powered` drives the glow as well as the lamps. Set it false
+  only for a project managing emissives itself. The bind runs AFTER
+  `_build_modules`, which replaces `_lighting` and therefore empties
+  `_emissives` -- binding before it would register into the module about to
+  be discarded, and an editor script reload re-runs both.
+- `bind_fixture_emissives` returns `search_root`, the name of the node it
+  actually walked, so a count of zero can be told apart from a search of
+  nothing.
+
+### Fixed
+- `LuxRoot.bind_fixture_emissives` resolves its search root as `owner`, then
+  the parent, then `get_tree().current_scene`, then `self`. Every one of the
+  first three actually contains the fixtures in the contexts Lux is driven
+  from; the old order reached `self` first in every headless run.
+
+### Verification
+Both changed scripts pass `tools/gdcheck.py` (gdparse plus the three traps).
+NOT yet exercised in a Godot run: no engine was available to the session that
+wrote this, so the bind count on a real fixtures GLB is unmeasured. The
+Level Factory 0.52.0 gate is the instrument that measures it.
+
 ## [0.26.0] - the fixture gate stops measuring bracket-to-bulb
 
 Roadmap item 71, which was filed as a Lux placement bug and is not one. The
