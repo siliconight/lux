@@ -59,6 +59,51 @@ signal blend_finished(preset_name: StringName)
 ## isn't present, Lux falls back to the preset sun.
 @export var auto_find_skymint: bool = true
 
+@export_group("Optional Rendering Features")
+## Global film emulsion switch -- the player-facing key of TDD section 10.
+## Defaults ON so a preset that asks for film gets it; presets ship with
+## film_emulsion_enabled false, so this alone changes nothing. Toggling it
+## re-applies the current preset and nothing else: no scene reload, no
+## WorldEnvironment rebuild, no material or lighting change (section 14).
+##
+## Placed last in the export list deliberately: it is the only property
+## here that is a PLAYER setting rather than an authoring one, and a new
+## group inserted mid-list would silently re-parent the property that
+## follows it into the wrong inspector section.
+@export var film_emulsion_enabled: bool = true:
+	set(value):
+		film_emulsion_enabled = value
+		_push_film_master()
+
+## Raise the viewport to a floating-point 2D render target while film
+## emulsion is actually running, and put it back afterwards.
+##
+## WHY THIS IS NOT JUST A PROJECT SETTING. `rendering/viewport/hdr_2d`
+## belongs to the consuming project, and Lux is an addon -- it cannot
+## edit the project.godot of every game that installs it. Doing it here
+## also scopes the cost to the case that needs it: film is off in every
+## shipped preset, so by default this changes nothing at all.
+##
+## MEASURED BEFORE IT WAS WIRED (2026-09-02, tools/film_render_probe.py):
+##   - the target goes 8-bit integer -> floating point, and back, at
+##     runtime, in both directions, with no reload;
+##   - a 3D scene resolved into it still lands on the SAME values, only
+##     more precisely (0.25098/0.50196/0.74902 at 8 bits against
+##     0.24915/0.50098/0.74951), NOT on their linearised equivalents
+##     (0.05088/0.21404/0.52252). That is the fact this switch depends
+##     on: the post stack keys its contrast pivot, palette zones and
+##     quantization levels off 0.5, and if the target had gone linear,
+##     every one of those thresholds would have moved and every preset
+##     would need retuning. They do not move.
+##   - it costs +0.043 ms on the post pass at 1080p on an RTX 2060 --
+##     0.26% of a 60 fps frame -- and about 7.5 MiB at that resolution.
+##
+## What it buys is in docs/film_emulsion_phase1_audit.md: at 8-bit output
+## the default grain spans three codes, and the TDD's own section 45
+## acceptance metric moves 70% between one GPU and another because what
+## it measures there is per-channel rounding.
+@export var film_manage_hdr_2d: bool = true
+
 # Modules
 var _env: LuxEnvironment
 var _lighting: LuxLighting
@@ -227,6 +272,7 @@ func _build_modules() -> void:
 	_post.name = &"LuxPostFX"
 	add_child(_post)
 	_post.ensure_pass(self)
+	_post.set_film_emulsion_master_enabled(film_emulsion_enabled)
 
 
 func _load_default_library() -> void:
@@ -341,6 +387,64 @@ func set_player_damage_intensity(value: float) -> void:
 	_post.apply(override, _quality)
 
 
+## TDD section 14/15. Changing this must not reload the scene, the
+## WorldEnvironment, materials, the preset, lighting, or gameplay state --
+## it re-applies the post stack and stops there.
+func set_film_emulsion_enabled(enabled: bool) -> void:
+	film_emulsion_enabled = enabled  # the setter does the work
+
+
+## Set only while THIS node has raised the target, so the restore puts back
+## what was there rather than assuming it was off. A project that already
+## renders 2D in HDR must not be switched out of it by a preset change.
+var _hdr_2d_saved: bool = false
+var _hdr_2d_raised: bool = false
+
+
+## Follows film activity. Called after every post apply, including each
+## frame of a blend, so it is written to be idempotent and cheap.
+func _sync_film_precision() -> void:
+	var vp := get_viewport()
+	if vp == null or not ("use_hdr_2d" in vp):
+		return  # older engine, or no viewport yet
+	var want: bool = (
+		film_manage_hdr_2d and _post != null and _post.is_film_active()
+	)
+	if want and not _hdr_2d_raised:
+		_hdr_2d_saved = bool(vp.use_hdr_2d)
+		_hdr_2d_raised = true
+		if not _hdr_2d_saved:
+			vp.use_hdr_2d = true
+	elif not want and _hdr_2d_raised:
+		_hdr_2d_raised = false
+		vp.use_hdr_2d = _hdr_2d_saved
+
+
+## Leaving a raised target behind would outlive the node that raised it --
+## a level that unloads its LuxRoot would keep paying for a format it no
+## longer uses, and nothing left in the tree would know to put it back.
+func _exit_tree() -> void:
+	if _hdr_2d_raised:
+		var vp := get_viewport()
+		if vp != null and "use_hdr_2d" in vp:
+			vp.use_hdr_2d = _hdr_2d_saved
+		_hdr_2d_raised = false
+
+
+func _push_film_master() -> void:
+	if _post == null:
+		return  # pre-_ready: _build_modules pushes the value when it builds
+	if not _post.set_film_emulsion_master_enabled(film_emulsion_enabled):
+		return  # unchanged, so there is nothing to re-apply
+	if _current != null:
+		_post.apply(_current, _quality)
+		_sync_film_precision()
+
+
+func is_film_emulsion_active() -> bool:
+	return _post != null and _post.is_film_active()
+
+
 func set_quality_profile(profile: LuxQualityProfile) -> void:
 	if profile == null:
 		return
@@ -413,6 +517,7 @@ func _apply_immediate(preset: LuxPreset) -> void:
 	_env.apply(preset, _quality)
 	_lighting.apply(preset, _quality)
 	_post.apply(preset, _quality)
+	_sync_film_precision()
 	_apply_retro_scaling(preset)
 	_push_material_state(preset)
 	_sync_camera_planes()
@@ -489,6 +594,7 @@ func _process(delta: float) -> void:
 		_env.apply(mid, _quality)
 		_lighting.apply(mid, _quality)
 		_post.apply(mid, _quality)
+		_sync_film_precision()
 		_apply_retro_scaling(mid)
 		if k >= 1.0:
 			_blending = false
@@ -580,6 +686,21 @@ func _lerp_preset(a: LuxPreset, b: LuxPreset, k: float) -> LuxPreset:
 	p.dither_distance_fade = b.dither_distance_fade if k >= 0.5 else a.dither_distance_fade
 	p.dither_fade_start = lerpf(a.dither_fade_start, b.dither_fade_start, k)
 	p.dither_fade_end = lerpf(a.dither_fade_end, b.dither_fade_end, k)
+
+	# Film emulsion. Enablement and mode are switches, not curves, so they
+	# snap at the midpoint the way every other switch in this function does;
+	# the amplitudes interpolate. Omitting them here is how a blend silently
+	# reverts to the script defaults -- this function is exhaustive by
+	# contract, and a new preset field that is not listed is a bug.
+	p.film_emulsion_enabled = b.film_emulsion_enabled if k >= 0.5 else a.film_emulsion_enabled
+	p.grain_mode = b.grain_mode if k >= 0.5 else a.grain_mode
+	p.film_grain_strength = lerpf(a.film_grain_strength, b.film_grain_strength, k)
+	p.film_chroma_ratio = lerpf(a.film_chroma_ratio, b.film_chroma_ratio, k)
+	p.film_grain_fps = lerpf(a.film_grain_fps, b.film_grain_fps, k)
+	p.film_grain_scale = lerpf(a.film_grain_scale, b.film_grain_scale, k)
+	p.dither_chroma_coherence = lerpf(
+		a.dither_chroma_coherence, b.dither_chroma_coherence, k)
+	p.dither_luma_scale = lerpf(a.dither_luma_scale, b.dither_luma_scale, k)
 
 	p.vignette_strength = lerpf(a.vignette_strength, b.vignette_strength, k)
 	p.grain_strength = lerpf(a.grain_strength, b.grain_strength, k)

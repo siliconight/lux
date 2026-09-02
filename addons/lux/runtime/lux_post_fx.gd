@@ -13,6 +13,14 @@ extends Node
 
 const DITHER_SHADER := preload("res://addons/lux/shaders/post/lux_ordered_dither.gdshader")
 const CRT_SHADER := preload("res://addons/lux/shaders/post/lux_crt_mask.gdshader")
+## Film emulsion runs as a SEPARATE shader rather than a branch, so the
+## baseline path pays nothing for it (TDD section 35/36). See the film
+## shader's own header for why.
+const FILM_SHADER := preload("res://addons/lux/shaders/post/lux_ordered_dither_film.gdshader")
+const FILM_GRAIN_TEX := preload("res://addons/lux/resources/film/grain_balanced.png")
+
+## LuxPreset.grain_mode
+enum GrainMode { OFF = 0, SIMPLE = 1, FILM_EMULSION = 2 }
 
 var layer: CanvasLayer
 var rect: ColorRect
@@ -27,6 +35,21 @@ var _crt_mat: ShaderMaterial
 
 var _enabled: bool = true
 var _time: float = 0.0
+
+# --- Film emulsion state (TDD section 25) ---
+# The material for the film variant is built alongside the baseline one so a
+# toggle never allocates. Note that Godot compiles a shader on its first DRAW,
+# not on material creation, so "precompiled" in section 35 is only true here in
+# the common case where film is decided at level load. A mid-play toggle can
+# still cost one compile; a warm-up draw would close that and is not built.
+var _film_mat: ShaderMaterial
+## Master switch pushed down from LuxRoot -- the third of the three keys.
+var _film_master: bool = true
+## All three keys agreed AND the preset asked for the film grain mode.
+var _film_active: bool = false
+var _film_frame: int = 0
+var _film_accumulator: float = 0.0
+var _film_grain_fps: float = 24.0
 
 
 func ensure_pass(parent: Node) -> void:
@@ -47,6 +70,9 @@ func ensure_pass(parent: Node) -> void:
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_mat = ShaderMaterial.new()
 	_mat.shader = DITHER_SHADER
+	_film_mat = ShaderMaterial.new()
+	_film_mat.shader = FILM_SHADER
+	_film_mat.set_shader_parameter(&"film_grain_tex", FILM_GRAIN_TEX)
 	rect.material = _mat
 	# Screen texture is fed via hint in the shader through the backbuffer.
 	rect.color = Color(0, 0, 0, 0)
@@ -93,29 +119,73 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 	if layer != null:
 		layer.visible = post_on
 	if not post_on:
+		# Clear film state on the way out. Leaving it set means a preset that
+		# was running film before the tier dropped to one with no post FX keeps
+		# ticking the film frame against an invisible layer -- section 36 wants
+		# zero film-frame updates when film is not running, and "the layer is
+		# hidden" is not the same as "the feature is off".
+		_film_active = false
 		return
 
+	# --- Which of the two post shaders runs -------------------------------
+	# TDD section 10's three-key AND, literally. `grain_mode` is NOT a fourth
+	# key: the keys decide whether film is PERMITTED, and grain_mode is how the
+	# preset chooses among what is permitted. A preset that asks for film grain
+	# on a tier that refuses it falls back to Simple, which is section 54 --
+	# a feature that cannot run leaves the render alone rather than blanking it.
+	var film_permitted := (
+		_film_master
+		and preset.film_emulsion_enabled
+		and quality.allow_film_emulsion
+	)
+	_film_active = film_permitted and preset.grain_mode == GrainMode.FILM_EMULSION
+	var mat: ShaderMaterial = _film_mat if _film_active else _mat
+	if rect != null and rect.material != mat:
+		rect.material = mat
+	_film_grain_fps = maxf(preset.film_grain_fps, 1.0)
+
 	var dither_on := preset.dither_enabled and quality.allow_dithering
-	_mat.set_shader_parameter(&"strength", preset.dither_strength if dither_on else 0.0)
-	_mat.set_shader_parameter(&"color_levels", preset.color_levels)
-	_mat.set_shader_parameter(&"cell_size", preset.dither_cell_size)
-	_mat.set_shader_parameter(&"distance_fade_enabled", preset.dither_distance_fade)
-	_mat.set_shader_parameter(&"fade_start", preset.dither_fade_start)
-	_mat.set_shader_parameter(&"fade_end", preset.dither_fade_end)
+	mat.set_shader_parameter(&"strength", preset.dither_strength if dither_on else 0.0)
+	mat.set_shader_parameter(&"color_levels", preset.color_levels)
+	mat.set_shader_parameter(&"cell_size", preset.dither_cell_size)
+	mat.set_shader_parameter(&"distance_fade_enabled", preset.dither_distance_fade)
+	mat.set_shader_parameter(&"fade_start", preset.dither_fade_start)
+	mat.set_shader_parameter(&"fade_end", preset.dither_fade_end)
 
-	_mat.set_shader_parameter(&"brightness", preset.brightness)
-	_mat.set_shader_parameter(&"contrast", preset.contrast)
-	_mat.set_shader_parameter(&"saturation", preset.saturation)
-	_mat.set_shader_parameter(&"warmth", preset.warmth)
+	mat.set_shader_parameter(&"brightness", preset.brightness)
+	mat.set_shader_parameter(&"contrast", preset.contrast)
+	mat.set_shader_parameter(&"saturation", preset.saturation)
+	mat.set_shader_parameter(&"warmth", preset.warmth)
 
-	_mat.set_shader_parameter(&"vignette_strength", preset.vignette_strength)
-	_mat.set_shader_parameter(&"grain_strength", preset.grain_strength)
+	mat.set_shader_parameter(&"vignette_strength", preset.vignette_strength)
+
+	if _film_active:
+		# Section 11: never Simple and Film at once. The film shader has no
+		# Simple grain to disable -- it simply does not contain the code.
+		mat.set_shader_parameter(&"film_grain_strength", preset.film_grain_strength)
+		mat.set_shader_parameter(&"film_chroma_ratio", preset.film_chroma_ratio)
+		mat.set_shader_parameter(&"film_grain_scale", preset.film_grain_scale)
+		mat.set_shader_parameter(&"film_frame", _film_frame)
+		# The rainbow the whole feature is aimed at lives in the quantization,
+		# not the grain, so these ride with film rather than with the dither
+		# group -- the baseline shader has neither uniform.
+		mat.set_shader_parameter(
+			&"dither_chroma_coherence", preset.dither_chroma_coherence)
+		mat.set_shader_parameter(&"dither_luma_scale", preset.dither_luma_scale)
+	else:
+		# EXACTLY AS BEFORE, and deliberately so. `grain_mode` selects among what
+		# the FILM path offers and has no vote here -- letting it gate the
+		# legacy grain would make a film property change the render of a scene
+		# that never asked for film, and the point of this feature is that it is
+		# entirely optional. Anyone wanting no grain on this path sets
+		# `grain_strength` to 0, which has always worked.
+		mat.set_shader_parameter(&"grain_strength", preset.grain_strength)
 
 	var pal := preset.get_palette_or_neutral()
-	_mat.set_shader_parameter(&"palette_influence", preset.palette_influence)
-	_mat.set_shader_parameter(&"palette_shadow", Vector3(pal.shadow.r, pal.shadow.g, pal.shadow.b))
-	_mat.set_shader_parameter(&"palette_mid", Vector3(pal.midtone.r, pal.midtone.g, pal.midtone.b))
-	_mat.set_shader_parameter(
+	mat.set_shader_parameter(&"palette_influence", preset.palette_influence)
+	mat.set_shader_parameter(&"palette_shadow", Vector3(pal.shadow.r, pal.shadow.g, pal.shadow.b))
+	mat.set_shader_parameter(&"palette_mid", Vector3(pal.midtone.r, pal.midtone.g, pal.midtone.b))
+	mat.set_shader_parameter(
 		&"palette_highlight", Vector3(pal.highlight.r, pal.highlight.g, pal.highlight.b)
 	)
 
@@ -134,21 +204,55 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 
 
 func set_camera_planes(near: float, far: float) -> void:
-	if _mat != null:
-		_mat.set_shader_parameter(&"cam_near", near)
-		_mat.set_shader_parameter(&"cam_far", far)
+	# Both materials, not just the active one. These are called outside apply(),
+	# so setting only the live material leaves the other stale and the staleness
+	# surfaces as a one-frame pop the moment film is toggled.
+	for m: ShaderMaterial in [_mat, _film_mat]:
+		if m != null:
+			m.set_shader_parameter(&"cam_near", near)
+			m.set_shader_parameter(&"cam_far", far)
 
 
 ## When true, the display is in HDR output (Godot 4.7) and the preset asked to
 ## let the retro grade follow it; when false (the default retro case), the post
 ## pass clamps to the SDR range so dithering/quantization read as authored.
 func set_hdr_output(hdr_passthrough: bool) -> void:
-	if _mat != null:
-		_mat.set_shader_parameter(&"hdr_passthrough", hdr_passthrough)
+	for m: ShaderMaterial in [_mat, _film_mat]:
+		if m != null:
+			m.set_shader_parameter(&"hdr_passthrough", hdr_passthrough)
+
+
+## The third key (TDD section 14). Pushed down from LuxRoot; takes effect on the
+## next apply(). Returns true when the value actually changed, so the caller can
+## avoid a redundant re-apply.
+func set_film_emulsion_master_enabled(enabled: bool) -> bool:
+	if _film_master == enabled:
+		return false
+	_film_master = enabled
+	return true
+
+
+func is_film_active() -> bool:
+	return _film_active
 
 
 func process(delta: float) -> void:
 	if not _enabled or _mat == null:
+		return
+	if _film_active:
+		# Section 24: grain advances at a photographic cadence, NOT once per
+		# rendered frame. At 120 fps and 24 grain fps that is one uniform write
+		# every fifth frame instead of five.
+		#
+		# Section 36 is why this is inside the branch rather than guarded by a
+		# strength test: with film off there must be zero film-frame updates.
+		_film_accumulator += delta
+		var interval: float = 1.0 / maxf(_film_grain_fps, 1.0)
+		if _film_accumulator >= interval:
+			_film_accumulator = fmod(_film_accumulator, interval)
+			_film_frame += 1
+			if _film_mat != null:
+				_film_mat.set_shader_parameter(&"film_frame", _film_frame)
 		return
 	_time += delta
 	_mat.set_shader_parameter(&"time_seed", fmod(_time, 1000.0))

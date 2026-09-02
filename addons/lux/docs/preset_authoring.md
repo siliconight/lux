@@ -17,7 +17,9 @@ response. Presets are the primary unit of art direction in Lux.
      knob for mood (positive = orange, negative = blue).
    - **Fog**: keep density low (0.003–0.012); raise `fog_sky_affect` for haze.
    - **Dithering**: leave `dither_strength` subtle (0.2–0.35) and
-     `color_levels` ≥ 20 to stay readable.
+     `color_levels` ≥ 20 to stay readable. If the quantization reads as colour
+     speckle on coloured surfaces rather than as banding, that is per-channel
+     quantization and there is a dial for it — see **Film Emulsion** below.
    - **Palette**: assign a `LuxPalette` for shadow/mid/highlight tints.
 4. Drop it into the dock list by saving it under `addons/lux/presets/`, or
    register it at runtime with `lux_root.register_preset(my_preset)`.
@@ -29,6 +31,31 @@ A **LuxPalette** defines color families authored around mid-gray (0.5 = neutral)
 `shadow` and `highlight` also drive the stylized material's shaded/lit tinting.
 `accent` is a convenience color for signage and alarms. Keep values near 0.5 for
 subtle grading; push further for stylized, faction-coded looks.
+
+## Film emulsion (optional, off by default)
+
+A preset can ask for a photographic response instead of the default grain:
+`film_emulsion_enabled`, `grain_mode`, `film_grain_strength`,
+`film_chroma_ratio`, and the two quantization dials
+`dither_chroma_coherence` / `dither_luma_scale`.
+
+Nothing happens until a preset asks. All nine shipped presets leave it off, the
+baseline post shader is untouched, and a preset that never asks cannot be
+affected by anything in that group.
+
+Two things worth knowing before you author with it:
+
+- **`dither_chroma_coherence` is the one that removes the RGB speckle.** The
+  rainbow in the retro look comes from quantizing R, G and B independently, not
+  from any grain. At the default it bands *more finely* than per-channel while
+  moving saturation by nothing.
+- **It is loud in shadow and silent in light** — about 30:1 across a single
+  frame. Enabling it on a bright daylight look buys almost nothing.
+
+**Where to use it is a real art-direction question**, and it has its own page:
+see `film_emulsion_authoring.md`. The short version is that interiors, night,
+and coloured practicals are where it pays, and that leaving it off elsewhere is
+what makes it mean something when it appears.
 
 ## Naming presets
 

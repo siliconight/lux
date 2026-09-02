@@ -86,6 +86,63 @@ extends Resource
 ## look consistent by clamping the post stack's effective range.
 @export var force_sdr_retro_on_hdr: bool = true
 
+@export_group("Film Emulsion")
+## Photographic film response (see docs/film_emulsion_tdd.md). One of the three
+## keys that must all agree before film emulsion runs; the other two are
+## LuxQualityProfile.allow_film_emulsion and LuxRoot.film_emulsion_enabled.
+## Off by default so every existing preset renders exactly as it did.
+@export var film_emulsion_enabled: bool = false
+## Which grain the FILM path applies. This property has no effect at all unless
+## film emulsion is running -- the baseline post shader keeps using
+## `grain_strength` exactly as it always has, so a preset that never asked for
+## film cannot be changed by anything in this group.
+##
+## Off = no grain on the film path. Simple = not available there (TDD section
+## 11: never Simple and Film at once), so it reads as Film's own grain.
+## Film Emulsion = the density model.
+##
+## DEFAULT DIVERGES FROM THE TDD ON PURPOSE. TDD section 12 writes
+## `grain_mode: int = 0` (Off), but the same section requires "existing presets
+## must remain unchanged" and section 34 requires they "continue using Simple
+## grain unless explicitly migrated". A `.tres` written before this property
+## existed loads with the script default, so Simple is the default that keeps
+## the promise. The enum ORDER is the TDD's.
+@export_enum("Off", "Simple", "Film Emulsion") var grain_mode: int = 1
+## Density amplitude, in stops of transmission (TDD section 27). Much smaller
+## than `grain_strength` because it multiplies rather than adds.
+@export_range(0.0, 0.10, 0.001) var film_grain_strength: float = 0.025
+## Chromatic dye variation as a fraction of the neutral signal. Restrained on
+## purpose: section 45 requires chroma noise under 0.4x luma noise and prefers
+## under 0.2x.
+##
+## DEFAULT DIVERGES FROM THE TDD, AND THE TDD IS INCONSISTENT WITH ITSELF HERE.
+## Section 31 gives the default as "approximately 12%". Measured on the shipped
+## grain asset by tools/film_math_probe.py, 0.12 scores 0.2251 on section 45's
+## metric -- inside the hard bar, OUTSIDE the preferred one. The relationship is
+## very nearly linear (ratio ~= 1.876 x this value), so 0.10 scores about 0.188
+## and clears both. An explicit acceptance threshold outranks an approximate
+## default, so the shipped default is the one that passes the shipped test.
+## The range still reaches 0.25 for anyone who wants the TDD's figure or more.
+@export_range(0.0, 0.25, 0.01) var film_chroma_ratio: float = 0.10
+## Grain states per second. Photographic cadence, deliberately below frame rate
+## (TDD section 24); the grain must not reseed every rendered frame.
+@export_range(1.0, 60.0, 1.0) var film_grain_fps: float = 24.0
+## Grain tile scale. 1.0 samples the 128px tile at one screen pixel per texel.
+@export_range(0.5, 3.0, 0.05) var film_grain_scale: float = 1.0
+## How much of the quantization decision is SHARED across channels, on the film
+## path only (the baseline shader is untouched). Ordered dithering quantizes R,
+## G and B independently, and a channel that crosses a level boundary on its own
+## is pure chroma noise -- that is the "rainbow" in the retro look, and it comes
+## from here rather than from any grain. 1.0 quantizes luminance and scales the
+## colour by the ratio, so hue and saturation survive exactly. 0.0 is the
+## classic per-channel behaviour.
+@export_range(0.0, 1.0, 0.01) var dither_chroma_coherence: float = 1.0
+## Luminance level multiplier for the coherent path. One shared decision is
+## coarser than three interleaved ones, so the luma levels are scaled up to
+## match: measured on a coloured gradient, per-channel at 24 levels gives 36
+## luminance steps, and coherent gives 13 at 1x, 26 at 2x, 38 at 3x.
+@export_range(1.0, 4.0, 0.05) var dither_luma_scale: float = 3.0
+
 @export_group("Post Finish")
 @export_range(0.0, 1.0) var vignette_strength: float = 0.15
 @export_range(0.0, 0.3) var grain_strength: float = 0.03

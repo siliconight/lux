@@ -52,6 +52,25 @@ static func bind_emissives(tree: SceneTree, search_root: Node = null) -> Diction
 	return {"ok": false, "msg": "No LuxRoot in the tree.", "count": 0}
 
 
+## Film emulsion on/off, for a graphics menu (TDD section 15). This is the
+## GLOBAL key only -- a preset that never asked for film, or a quality tier that
+## refuses it, is unaffected by turning this on. Ask is_film_emulsion_active()
+## for what is actually running.
+static func film_emulsion(tree: SceneTree, enabled: bool) -> void:
+	var r := get_root(tree)
+	if r != null:
+		r.set_film_emulsion_enabled(enabled)
+
+
+## Whether film emulsion is actually rendering right now -- all three keys open
+## and the preset asking for the film grain mode. A settings screen wants this
+## as well as the switch, so a toggle that legitimately does nothing on this
+## tier can say so instead of looking broken.
+static func is_film_emulsion_active(tree: SceneTree) -> bool:
+	var r := get_root(tree)
+	return r != null and r.is_film_emulsion_active()
+
+
 static func weather(tree: SceneTree, profile: LuxWeatherProfile, blend_time: float = 5.0) -> void:
 	var r := get_root(tree)
 	if r != null:

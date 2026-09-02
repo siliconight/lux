@@ -13,6 +13,11 @@ extends Resource
 @export var allow_glow: bool = true
 @export var allow_sun_shadows: bool = true
 @export var allow_volumetric_fog: bool = true
+## Hardware permission for film emulsion (TDD section 13). The middle of the
+## three keys: a preset may ask for film and the player may leave it on, and
+## this still refuses on a tier that cannot afford it. Allowed on High and
+## Medium, disabled on Low and Compatibility.
+@export var allow_film_emulsion: bool = true
 
 @export_group("Budgets")
 @export var max_dynamic_lights: int = 24
@@ -37,6 +42,7 @@ static func make_tier(t: int) -> LuxQualityProfile:
 			q.allow_volumetric_fog = false
 			q.max_dynamic_lights = 8
 			q.max_shadow_casters = 0
+			q.allow_film_emulsion = false
 			q.dither_note()
 		3:  # Compatibility
 			q.allow_post_fx = false
@@ -46,6 +52,7 @@ static func make_tier(t: int) -> LuxQualityProfile:
 			q.allow_volumetric_fog = false
 			q.max_dynamic_lights = 6
 			q.max_shadow_casters = 0
+			q.allow_film_emulsion = false
 	return q
 
 
