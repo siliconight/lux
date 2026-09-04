@@ -16,8 +16,23 @@ const CRT_SHADER := preload("res://addons/lux/shaders/post/lux_crt_mask.gdshader
 ## Film emulsion runs as a SEPARATE shader rather than a branch, so the
 ## baseline path pays nothing for it (TDD section 35/36). See the film
 ## shader's own header for why.
-const FILM_SHADER := preload("res://addons/lux/shaders/post/lux_ordered_dither_film.gdshader")
-const FILM_GRAIN_TEX := preload("res://addons/lux/resources/film/grain_balanced.png")
+##
+## PATHS, LOADED LAZILY -- NOT `preload`, AND THIS IS THE WHOLE POINT.
+## These were `const ... := preload(...)` for exactly one run, and that run
+## proved why they must not be. A `preload` is resolved when the SCRIPT loads:
+## if either resource is missing or not yet imported, `lux_post_fx.gd` itself
+## fails to load, `LuxPostFX.new()` returns null, and `_post` is null -- so an
+## OPTIONAL feature's asset takes out the ENTIRE post stack. Observed on a
+## project whose `.godot/` predated the grain texture: every frame threw
+## "Nonexistent function 'apply' in base 'Nil'" from LuxRoot._process and there
+## was no post processing at all.
+##
+## TDD section 54 is explicit that a feature which cannot run leaves the render
+## alone. A class-scope preload cannot honour that, because it fails before any
+## of this code gets a say. Loaded on demand, a missing asset costs exactly the
+## film path and nothing else.
+const FILM_SHADER_PATH := "res://addons/lux/shaders/post/lux_ordered_dither_film.gdshader"
+const FILM_GRAIN_PATH := "res://addons/lux/resources/film/grain_balanced.png"
 
 ## LuxPreset.grain_mode
 enum GrainMode { OFF = 0, SIMPLE = 1, FILM_EMULSION = 2 }
@@ -43,6 +58,8 @@ var _time: float = 0.0
 # the common case where film is decided at level load. A mid-play toggle can
 # still cost one compile; a warm-up draw would close that and is not built.
 var _film_mat: ShaderMaterial
+## Reported once. A missing optional asset should not print every frame.
+var _film_warned: bool = false
 ## Master switch pushed down from LuxRoot -- the third of the three keys.
 var _film_master: bool = true
 ## All three keys agreed AND the preset asked for the film grain mode.
@@ -70,9 +87,7 @@ func ensure_pass(parent: Node) -> void:
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_mat = ShaderMaterial.new()
 	_mat.shader = DITHER_SHADER
-	_film_mat = ShaderMaterial.new()
-	_film_mat.shader = FILM_SHADER
-	_film_mat.set_shader_parameter(&"film_grain_tex", FILM_GRAIN_TEX)
+	_film_mat = _try_build_film_material()
 	rect.material = _mat
 	# Screen texture is fed via hint in the shader through the backbuffer.
 	rect.color = Color(0, 0, 0, 0)
@@ -111,6 +126,35 @@ func ensure_pass(parent: Node) -> void:
 		crt_rect.owner = root2
 
 
+## Build the film material, or return null if its assets are not available.
+##
+## `ResourceLoader.exists` first, because `load()` on a missing path prints an
+## error of its own, and a missing OPTIONAL asset is not an error -- it is a
+## feature that will not be offered. Reported once, not per frame.
+func _try_build_film_material() -> ShaderMaterial:
+	if not ResourceLoader.exists(FILM_SHADER_PATH) \
+			or not ResourceLoader.exists(FILM_GRAIN_PATH):
+		_warn_film_unavailable("assets not found (has the project been imported?)")
+		return null
+	var sh: Shader = load(FILM_SHADER_PATH) as Shader
+	var tex: Texture2D = load(FILM_GRAIN_PATH) as Texture2D
+	if sh == null or tex == null:
+		_warn_film_unavailable("assets did not load as a Shader and a Texture2D")
+		return null
+	var mat := ShaderMaterial.new()
+	mat.shader = sh
+	mat.set_shader_parameter(&"film_grain_tex", tex)
+	return mat
+
+
+func _warn_film_unavailable(why: String) -> void:
+	if _film_warned:
+		return
+	_film_warned = true
+	push_warning("[lux] film emulsion unavailable: %s. The rest of the post "
+		% why + "stack is unaffected.")
+
+
 func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 	if preset == null or _mat == null:
 		return
@@ -138,7 +182,13 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 		and preset.film_emulsion_enabled
 		and quality.allow_film_emulsion
 	)
-	_film_active = film_permitted and preset.grain_mode == GrainMode.FILM_EMULSION
+	# `_film_mat == null` means the assets are not there. Section 54: a feature
+	# that cannot run leaves the render alone rather than failing the frame.
+	_film_active = (
+		film_permitted
+		and preset.grain_mode == GrainMode.FILM_EMULSION
+		and _film_mat != null
+	)
 	var mat: ShaderMaterial = _film_mat if _film_active else _mat
 	if rect != null and rect.material != mat:
 		rect.material = mat
@@ -163,6 +213,14 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 		# Section 11: never Simple and Film at once. The film shader has no
 		# Simple grain to disable -- it simply does not contain the code.
 		mat.set_shader_parameter(&"film_grain_strength", preset.film_grain_strength)
+		mat.set_shader_parameter(&"film_base_fog", preset.film_base_fog)
+		mat.set_shader_parameter(&"film_grain_ref_width",
+			preset.film_grain_ref_width)
+		mat.set_shader_parameter(&"film_grain_octaves", preset.film_grain_octaves)
+		mat.set_shader_parameter(&"film_grain_lacunarity",
+			preset.film_grain_lacunarity)
+		mat.set_shader_parameter(&"film_grain_persistence",
+			preset.film_grain_persistence)
 		mat.set_shader_parameter(&"film_chroma_ratio", preset.film_chroma_ratio)
 		mat.set_shader_parameter(&"film_grain_scale", preset.film_grain_scale)
 		mat.set_shader_parameter(&"film_frame", _film_frame)

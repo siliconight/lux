@@ -252,9 +252,15 @@ func _build_overlay() -> void:
 	layer.layer = 3
 	root.add_child(layer)
 
+	# TOP-LEFT, BELOW THE SAMPLE SCENE'S OWN TWO-LINE HUD. It was anchored
+	# BOTTOM-left with a hand-guessed -190 px offset, and the panel is taller
+	# than that -- so its lower half, which is where the rainbow switch lives,
+	# rendered off the bottom of the window where it could not be read or even
+	# known about. Anchored to the top it grows downward into empty space and
+	# cannot clip itself no matter how many lines it gains.
 	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	panel.position = Vector2(16, -190)
+	panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	panel.position = Vector2(16, 96)
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layer.add_child(panel)
 
@@ -301,15 +307,19 @@ func refresh() -> void:
 		"",
 		"  [F] film master     %s" % ("ON" if _lux.film_emulsion_enabled else "off"),
 		"  [G] grain mode      %s" % MODES[clampi(_preset.grain_mode, 0, 2)],
-		"      RUNNING NOW     %s" % ("FILM" if active
-			else ("SIMPLE" if _preset.grain_mode == 1 else "no grain")),
+		"      RUNNING NOW     %s" % ("FILM EMULSION" if active
+			else ("SIMPLE (legacy)" if _preset.grain_mode == 1 else "no grain")),
+		"      %s" % _why_not_film(active),
 		"",
 		"  [ ] strength        %.3f   (density, stops)" % _preset.film_grain_strength,
 		"  ; ' chroma ratio    %.3f" % _preset.film_chroma_ratio,
 		"",
-		"  [N] chroma coherence %s   <- the rainbow lives HERE, in the dither"
-			% ("SHARED (no rainbow)" if _preset.dither_chroma_coherence > 0.5
-			   else "per-channel (classic)"),
+		"",
+		"  >>> [N] THE RAINBOW SWITCH:  %s"
+			% ("SHARED  (rings clean)" if _preset.dither_chroma_coherence > 0.5
+			   else "PER-CHANNEL  (rings rainbow)"),
+		"      the coloured rings around a light are the DITHER quantizing",
+		"      R, G and B separately. Needs grain mode = Film Emulsion.",
 		"  [M] dither/quantize %s%s" % [
 			"on (%d levels)" % _preset.color_levels if _preset.dither_strength > 0.0
 				else "OFF", "   <- Natural Mode" if _preset.dither_strength <= 0.0 else ""],
@@ -320,6 +330,25 @@ func refresh() -> void:
 		"  [P] screenshot   [Esc] quit",
 		"  Look at the SHADOWS -- that is where the two models differ most.",
 	])
+
+
+## Which of the conditions is closed. A readout that says "no grain" states the
+## symptom and leaves the operator guessing among four causes -- and one of
+## those causes was a bug that shipped, where the assets failed to load and the
+## only visible evidence was this line saying nothing useful.
+func _why_not_film(active: bool) -> String:
+	if active:
+		return "^ the rainbow switch below is live"
+	if not _lux.film_emulsion_enabled:
+		return "^ film master is OFF -- press F"
+	if _preset.grain_mode != 2:
+		return "^ grain mode is not Film Emulsion -- press G"
+	if not _preset.film_emulsion_enabled:
+		return "^ this preset does not ask for film"
+	var q: LuxQualityProfile = _lux.get_quality_profile()
+	if q != null and not q.allow_film_emulsion:
+		return "^ this quality tier refuses film (Low / Compatibility)"
+	return "^ film assets unavailable -- import the project"
 
 
 func toggle_film() -> void:

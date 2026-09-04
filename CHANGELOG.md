@@ -7,6 +7,671 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.29.0] - grain with a crystal size, and the walk walked
+
+The goal was never "add grain". It is the organic movement of different
+patterns of silver halide crystals over the light -- and stating it that way is
+what produced everything below, because it named two things the feature did not
+have.
+
+### Added
+- **`film_base_fog`** -- additive shadow grain, the emulsion's base-plus-fog
+  floor. The multiplicative density is silent on pure black by construction
+  (`col *= exp2(-d)` is zero wherever col is zero), so it left a night frame's
+  void perfectly flat where real film is grainiest. Measured, frozen viewpoint:
+
+  | state | fizz | pure black |
+  |---|---|---|
+  | film, base_fog 0.000 | 0.00406 | 88.3% |
+  | film, base_fog 0.020 | 0.00548 | 77.4% |
+  | film, base_fog 0.040 | 0.00720 | 63.7% |
+  | baseline, legacy grain 0.05 | 0.01014 | 56.4% |
+
+  **The obvious implementation was checked first and does not work.** Lifting
+  the black floor and letting the existing density modulate it gives amplitude
+  `f * ln2 * strength` -- 0.00035 at a floor of 0.02, against 0.025 for the
+  legacy grain. Matching would need a floor of **1.44**, black as light grey.
+
+  It reuses the density's own `neutral_noise`, so it is monochrome by
+  construction and cannot reintroduce the rainbow, and its `exposure_mask`, so
+  it is a shadow grain rather than an overlay. It does not inherit the legacy
+  grain's defects: that one washes colour out of the shadows as it rises (dark
+  saturation 0.0428 -> 0.0411 across its range, §3a) where base fog does not
+  (0.0433 -> 0.0448), it is applied before the quantize rather than after
+  (§3b), and its frequency does not drift with playtime (§3c).
+
+- **`film_grain_ref_width`** -- **grain size relative to frame width, not to
+  pixels.** A crystal is a physical object on a strip of film; how many pixels
+  it covers depends on how finely that strip was scanned. Lux pinned one grain
+  texel to one PIXEL, so the shipped asset's fine band is 1.42 px across at
+  every resolution -- against grain sized as a fraction of the frame that is
+  about 2x too coarse at 720p and 1.45x too fine at 4K. **Too fine is the one
+  that hurts: it lands near Nyquist and fizzes.** The reference is 2048, which
+  is where the asset already sits, so the authored look holds at ~1440p and is
+  corrected everywhere else; 0.0 restores the old behaviour.
+
+- **`film_grain_octaves`** (plus `film_grain_lacunarity`,
+  `film_grain_persistence`) -- more scales summed. **The claim first made for
+  this was wrong and is withdrawn:** Lux was NOT sampling grain at one scale.
+  The shipped asset is built from four band-limited streams, and the neutral
+  signal is `R_fine * 0.68 + G_coarse * 0.32` -- R_fine at 28-62 cycles/tile
+  (radius 1.42 px), G_coarse at 6-20 (radius 4.92 px). That is already a
+  two-scale crystal distribution, and its weights are the SAME 0.68/0.32 the
+  filmify photochemical profile derives for its own two crystal scales, at a
+  scale ratio of 3.46 against filmify's 2.91. Two implementations arrived at
+  the same model independently. This uniform stacks further octaves on top of
+  a distribution that already existed, which is why it measurably helps but
+  is not the missing piece it was described as. At base_fog 0.060:
+
+  | octaves | fizz (3x3) | body (7x7) | body/fizz |
+  |---|---|---|---|
+  | 1 | 0.01024 | 0.01601 | 1.56 |
+  | 2 | 0.00843 | 0.01565 | 1.86 |
+  | 3 | 0.00766 | 0.01508 | **1.97** |
+
+  Three octaves removes 25% of the fine fizz while keeping 94% of the grain
+  body. Default 1 is the previous behaviour bit for bit.
+
+- `tools/film_walk_live.py` + `.gd` -- **the walk, walked.** First person on the
+  staged night strip with the treatment on a key, because
+  `film_walk_probe.py` opens Godot, shoots sixteen stills and quits, and grain
+  is temporal: a frozen frame cannot show either the good half of it or the bad
+  half. Carries a gamma null test in the HUD (see Unresolved) and a
+  `LUX_WALK_SELFTEST` path that freezes the viewpoint and sweeps every knob.
+
+### Rejected, and recorded rather than quietly dropped
+- **Coarse crystals persisting across frames while fine ones scintillate.**
+  Built, then removed. Wrong physically -- every frame of motion picture film
+  is a different piece of emulsion, so the crystals in frame 2 are not frame
+  1's crystals moved, they are different crystals -- and wrong empirically:
+  coarse turnover against fine measured **1.07 at one octave, 1.02 at three**,
+  i.e. every scale still turned over together. The offsets come from a hash of
+  the frame number, so consecutive frames are fully decorrelated by
+  construction. The organic quality is spatial structure turning over
+  completely at §24's cadence, not temporal persistence.
+
+### Fixed
+- `film_base_fog` was inside a guard on `film_grain_strength`, so a preset
+  asking for shadow grit with the density off would have got nothing, silently.
+  Guard widened to either term, with a permanent self-test case.
+- `LuxRoot._load_default_library()` scans the presets directory instead of
+  carrying a hardcoded list of six while **nine** ship. `Gothic Street Night`,
+  `PS1 Storm Night` and `SoF PC2000` could not be loaded by name at all.
+
+### SECTION 41, BISECTED: THE DENSITY MODEL IS THE BUDGET
+
+The cost was traced by removing each film term in turn at the failing cell
+(3840x2160, hdr_2d=true, RTX 2060). Every variant is the shipped configuration
+with ONE term changed, so `full - variant` is that term and nothing else:
+
+| configuration | gpu ms | vs full |
+|---|---|---|
+| baseline shader (no film) | 0.4203 | -- |
+| **film, shipped defaults** | **0.6807** | |
+| film block branched over | 0.4272 | -0.2534 |
+| without the resolution lock | 0.6765 | -0.0041 |
+| without the chroma dye term | 0.6689 | -0.0118 |
+| 2 crystal octaves | 0.7002 | +0.0196 |
+| 3 crystal octaves | 0.8840 | +0.2034 |
+
+**The second shader is free: +0.0069 ms over the baseline with its whole block
+branched over.** Every previous theory about the cost -- the octave loop, the
+shader swap, the resolution lock -- is now measured and none of them is it.
+The entire +0.2534 ms is the film arithmetic itself: the grain fetch, the
+dihedral tile coordinate, the exp2 transmission.
+
+**And it cannot be tuned away.** Removing BOTH removable terms saves 0.0159 ms,
+6.1% of the film cost. 4K needs to shed 0.0380 ms for 90 fps and 0.0880 for
+120. There is no combination of parameter changes that gets there -- the
+density model IS the budget, and that is the answer to a question that had been
+guessed at four times.
+
+### The shippable envelope, measured
+
+| resolution | film ms | 30 fps | 60 fps | 90 fps | 120 fps |
+|---|---|---|---|---|---|
+| 1280x720 | 0.0450 | ok | ok | ok | ok |
+| 1920x1080 | 0.0990 | ok | ok | ok | ok |
+| 2560x1440 | 0.1760 | ok | ok | ok | **OVER** |
+| 3840x2160 | 0.2580 | ok | ok | **OVER** | **OVER** |
+
+**Film Mode is inside §41 everywhere except 4K above 60 fps and 1440p at 120.**
+That is a scope, not a failure, and it is now documented rather than discovered
+by whoever ships a 4K120 build. Both figures are FLOORS on an empty scene, so
+treat the two ok cells nearest a boundary (1440p at 90, 4K at 60) as thin.
+
+**The unbuilt option, named rather than assumed:** running the film pass at
+half resolution and upsampling would cut the arithmetic roughly fourfold and is
+plausible for a treatment whose finest structure is a 1.42 px crystal. That is
+a redesign, it is unmeasured, and it is not in this release.
+
+### The old section 41 finding, superseded
+
+Measured on an RTX 2060, Godot 4.7 forward_plus, the engine's own viewport
+timer, at the shipped settings:
+
+| resolution | hdr_2d | no post | baseline | film | film - baseline |
+|---|---|---|---|---|---|
+| 1280x720 | false | 0.0540 | 0.0650 | 0.1080 | 0.0430 |
+| 1920x1080 | false | 0.0850 | 0.1290 | 0.2240 | 0.0950 |
+| 2560x1440 | false | 0.1390 | 0.2140 | 0.3830 | 0.1690 |
+| 3840x2160 | false | 0.1980 | 0.3080 | 0.5620 | **0.2540** |
+| 3840x2160 | true | 0.2790 | 0.4180 | 0.6790 | 0.2580 |
+
+Against §41's ~2% of frame, graded at the worst cell:
+
+| frame rate | budget | film uses | |
+|---|---|---|---|
+| 30 fps | 0.67 ms | 0.78% | ok |
+| 60 fps | 0.33 ms | 1.57% | ok |
+| 90 fps | 0.22 ms | **2.32%** | **OVER** |
+| 120 fps | 0.17 ms | **3.10%** | **OVER** |
+
+**0.28.0 met every cell in this matrix.** It measured 0.0240 ms at 720p and
+0.1340 ms at 4K; this release measures 0.0430 and 0.2540. The cost roughly
+DOUBLED, and the only structural change in the hot path large enough to explain
+it is the octave loop -- a `for` bounded by a UNIFORM cannot be unrolled, so it
+becomes a real per-fragment branch on a full-screen pass.
+
+**THE LOOP WAS NOT THE COST, AND THAT ATTRIBUTION IS WITHDRAWN.** A
+single-octave fast path was added on the reasoning above and measured on the
+same hardware: film at 4K went 0.2610 -> **0.2580 ms**, and §41 went from 2.35%
+/ 3.13% of frame at 90/120 fps to 2.32% / 3.10%. **Three microseconds.** The
+fast path is kept because it is free and arithmetically identical at the
+default, but it fixes nothing and the explanation it was based on was a guess
+that measurement rejected.
+
+**AND THE REGRESSION ITSELF IS NOT ESTABLISHED.** The comparison was 0.28.0's
+0.1340 ms against today's 0.2540, with no control: 0.28.0's `no post` column is
+not recorded, so a machine that is simply slower today -- thermals, driver,
+background load -- produces the same apparent doubling. Today's `no post` at 4K
+is 0.1980 ms and there is nothing to compare it to. **What is actually known is
+the absolute figure and its verdict**, which do not depend on any of that:
+
+- film costs 0.2580 ms at 4K on an RTX 2060, and that is OVER §41's budget at
+  90 and 120 fps
+- it is a FLOOR on an empty scene, so a real level can only be worse
+
+Finding what costs it needs a bisect -- disable each film term in turn and time
+each -- not another hypothesis.
+
+### §45 at 8 bits: inside the hard bar, outside the preferred one
+`film_manage_hdr_2d` now defaults false, so the shipped path is 8-bit -- and
+that is where §45's chroma-to-luma ratio reads **0.3365** (hard bar 0.40,
+preferred 0.20). At float it reads 0.1914 and clears both.
+
+The probe's own noise-floor control says most of that is the FORMAT, not the
+grain: the baseline grain is chroma-free by construction, and it still measures
+chroma noise of 0.000412 (orange) and 0.000618 (shadow) at 8 bits against
+0.000091 and 0.000009 at float. So this is the 8-bit target's quantization
+showing up in a chroma metric, not the film's dye term -- and it is NOT fixed
+by lowering `film_chroma_ratio`, which the probe says explicitly.
+
+### And the rainbow claim, on a flat patch, exactly
+Saturation spread from quantization alone, grain off, so nothing else can vary:
+per-channel **0.082397**, shared **0.000000**. Not "smaller" -- zero. One
+multiplier applied to three channels leaves hue and saturation untouched by
+construction. The coherent quantizer also costs almost nothing: 0.0010 to
+0.0120 ms across the whole resolution matrix.
+
+### Added
+- **`LuxRoot.film_mode` -- Lux Film Mode, the whole treatment as one switch.**
+  `set_film_mode(true)` / `false`, or the exported flag, so a Level Factory
+  export can turn the look on or off per level without touching a preset.
+
+  It works because the shipped presets store **no `film_*` fields at all** (only
+  the legacy `grain_strength`), so every film value comes from the LuxPreset
+  script defaults -- which are now the settled ones. That leaves two flags to
+  flip: the master on LuxRoot, and `film_emulsion_enabled` + `grain_mode` on
+  whatever preset is being applied, via `make_override` so the shipped resource
+  is never mutated.
+
+  **It is an override, not nine edited .tres files.** Film is a treatment OF a
+  look, not a look. Baking it into the shipped presets would make it
+  unavailable to any preset a project authors itself, and impossible to switch
+  off per-export.
+
+  All four `_post.apply` call sites now route through one `_post_apply` choke
+  point, so the mode cannot be bypassed by whichever path happens to run. With
+  film mode off, `_film_view` returns the preset object itself -- no copy, no
+  allocation, and a pure pass-through to the previous behaviour.
+
+  Measured, driven by `set_film_mode()` alone with the preset untouched:
+  `active` false -> true, pure black 55.6% -> 87.1%.
+
+  **A TESTING CONSTRAINT WORTH RECORDING.** "Film mode off is byte-identical to
+  the build before it existed" could not be measured, and not because it is
+  false. The baseline's legacy grain scales its noise FREQUENCY with `time_seed`
+  (§3c), so two runs that reach the same frame at different elapsed timesdiffer by
+  far more than any code change: same build twice, same selftest length, 0.0071
+  mean absolute difference; the same frame against a build whose selftest was
+  longer, 0.0304. Cross-build pixel comparison is only valid with the legacy
+  grain at zero. The equivalence claim here rests on the pass-through being
+  three readable lines, not on a pixel diff.
+
+### Changed (breaking, and it is the point)
+- **`film_grain_strength` range 0.0-0.10 -> 0.0-0.30, default 0.025 -> 0.20.**
+  At 0.025 the density modulation is about +/-0.75% of transmission --
+  invisible. Anyone who enabled film saw nothing and would reasonably conclude
+  it was broken; a default nobody can see is not conservative, it is broken.
+  0.20 is where the first person to walk a level and look at it put the knob.
+  One judgement, one night scene, and the only look judgement this feature has
+  ever had, so it is the default -- a daylight preset may want less.
+
+  **`film_grain_scale` stays at 1.0, also by eye.** The tooling advice was to
+  raise it for clumps -- coarsening to 3.0 measurably removes 55% of the fine
+  high-frequency energy while keeping 93% of the grain body. The same operator
+  tried it and went back to 1.0. Both results stand: that fizz measurement was
+  taken when the density was 8x too low to see, so it described the texture of
+  something nobody could make out. At a visible density the fine grain reads as
+  silver rather than sparkle and the clumps are not wanted.
+
+  The old ceiling also made that value unauthorable: `@export_range(0.0, 0.10)`
+  meant the inspector clamped at half of it.
+
+  **§45 is unaffected at any amplitude.** It measures chroma-to-luma noise, and
+  `film_chroma_ratio` is a fraction OF the neutral signal, so both scale
+  together: ratio 0.1881 at 0.025, 0.1882 at 0.200, 0.1884 at 0.300 -- inside
+  the hard 0.40 bar and the preferred 0.20 bar throughout.
+
+- **`LuxRoot.film_manage_hdr_2d` now defaults to FALSE.** Turning film on used
+  to switch the viewport to a floating-point 2D target, and that is a tone
+  change, not a film one -- larger than the grain it was meant to serve and
+  different on every rasteriser. llvmpipe takes a pixel at [0,0,0] to
+  [0.0118, 0.0118, 0.0118] on the raise with film still OFF; an RTX 2060 turns
+  the whole frame into its linear form (exponent 2.265, mean luminance halved).
+
+  With the target held identical and film the only variable: mean 0.0301 ->
+  0.0253, pure black **55.6% -> 87.1%**, 99.7% of black pixels staying black.
+  **Film deepens the blacks; it never lifted them.** Every figure in 0.28.1 and
+  earlier that showed film raising black levels was comparing film-off at 8-bit
+  against film-on at float.
+
+  Precision (§20) is still available by setting it true deliberately, on a look
+  you have checked on your own hardware.
+
+### Optionality is now proven by EXACT EQUALITY, and a false positive is gone
+The probe used to compare against a "floor" -- how far two runs of the SAME
+build move each other -- because the baseline's legacy grain is driven by
+`time_seed`, which accumulates wall clock. That floor produced a real false
+alarm on an RTX 2060: **`Heavy Rain` was reported as moving 0.013314 against a
+same-build floor of 0.000000, flagged as a genuine optionality violation.** It
+was the clock. The film-DELETED mirror has fewer assets to import, so it always
+reaches the same frame at a different elapsed time and renders different noise.
+
+The tell was in the table the whole time: the two presets that ship with
+`grain_strength 0` came back `0.000000 identical` in every run.
+
+So the probe now silences the legacy grain for the comparison. The render is
+deterministic and the bar is exact equality -- **all nine shipped presets,
+A1 vs A2 and A1 vs B both 0.000000, bit-identical.** The floor column is kept
+as evidence that the determinism holds: a non-zero entry means the render is
+moving on its own and no verdict below it can be trusted.
+
+That is a stronger statement than the floor ever made, and it came from
+chasing a failure that turned out not to be one.
+
+### Confirmed against an independent implementation
+Cross-checked against the filmify photochemical profile, which models the same
+physics from measured film data. Two agreements worth recording because they
+were arrived at separately:
+
+- **Exposure weighting.** Lux's mask runs 1.000 / 0.866 / 0.664 / 0.454 /
+  0.280 across the range; filmify's `density_amplitude_curve` runs 1.00 / 0.95
+  / 0.70 / 0.45 / 0.28. Same endpoints, same shape, one independent derivation
+  each. Lux falls off slightly faster in the deepest shadow (0.866 against 0.95
+  at 15%), which is the only place they differ meaningfully.
+- **Chroma restraint.** filmify's `chroma_weight` is 0.12, exactly the TDD
+  §31 default Lux diverged from; Lux ships 0.10 because 0.12 missed §45's
+  preferred bar. The two land either side of the same number.
+
+Not modelled in Lux, and now known to be modelled elsewhere: **per-layer grain
+amplitude.** filmify carries RMS granularity [9.0, 10.0, 13.0] for R/G/B --
+blue is grainiest because its crystals are the largest. Lux's chroma term is
+symmetric on two opponent axes and has no per-channel amplitude at all.
+
+### Unresolved, and it gates §8b
+On an RTX 2060 the raised render target is **not tonally neutral**: `film_off`
+and `hdr_only` differ only in `use_hdr_2d`, film OFF in both, and mean
+luminance halves (0.2046 -> 0.1004) with 45% of pixels moving more than 0.15.
+Best-fit exponent 2.265 -- the frame is the LINEAR form of the unraised one.
+Whether that is only the readback path or the presented image is what the
+walk's gamma null test asks; if it is the presented image, the post stack's
+0.5-keyed thresholds all land wrong whenever film is on and
+`film_manage_hdr_2d = true` is wrong as a shipped default.
+
+Also unmeasured: the extra texture fetch per octave against §41's budget, and
+every figure in this release is llvmpipe's except where it says otherwise.
+
+### §50's other columns, and the one that changed a decision
+
+`tools/film_render_probe.py --perf --power` closes three of the five columns
+§50 asks for. Full detail in the audit's §9.
+
+**Power was not one of the four things being looked for and is the most useful
+number in the release.** Film costs **+7.6 W at 720p to +12.1 W at 4K**, from
+`nvidia-smi` attributed to each configuration's OWN timed window -- warmup
+excluded, because shader compilation and the clock ramp both move watts and
+neither is the feature. On a desktop that is inside the noise. A Steam Deck's
+entire budget is 15 W, so the handheld class is now the row §51 should fill
+first, and no frame-time column could have said so.
+
+Power also independently supports §41's `hdr_2d` reading: the film delta gets
+SMALLER with the float target on (7.0 vs 10.3 W at 1440p, 8.8 vs 12.1 W at 4K),
+the same direction the frame times went. Two instruments, one hypothesis, still
+not a profile. `hdr_2d` itself: +35.9% on the baseline pass at 4K, and ~6-7 W.
+
+**VRAM reads +0.000M at every resolution and that is a flaw in the
+measurement, not a finding.** All five materials including the grain texture
+are built before any timing runs, so the texture is resident in the baseline
+row too and the delta cancels. What the row does prove is that nothing about
+film's VRAM scales with resolution. The absolute -- one 128x128 RGBA8 texture,
+**64 KiB, once** -- comes from the asset, not the instrument. RAM +0.006M.
+
+Bandwidth and shader stalls are left EMPTY rather than estimated: no engine
+counter reports either, deriving bandwidth from resolution x format x taps is
+arithmetic dressed as a measurement, and stalls need Nsight, RGP or PIX.
+
+### §51's sweep is now a file rather than a plan
+
+`tools/film_hw_sweep.py` appends one record per machine to
+`docs/data/film_hw_sweep.jsonl`. The section stayed untouched for as long as it
+did because a sweep written as a single invocation cannot be started until the
+last card arrives. Records are never overwritten -- re-measuring appends and
+the report prints the movement, which is most of what a sweep is for -- and
+sample counts are a constant rather than a flag, because two rows measured
+differently cannot be compared. First row: RTX 2060, worst cell 0.2590 ms at
+4K/`hdr_2d` true, reproducing 0.2580 across a separate harness. **Six of seven
+classes open, and the report names them.**
+
+### The half-resolution pass: priced, and deliberately not built
+
+`tools/film_halfres_probe.py`. It closes every failing §41 cell -- a half-res
+pass at 4K renders the same fragments as a full-res pass at 1080p, so its cost
+is a cell already measured -- leaving 0.1232, 0.0677 and 0.1217 ms for the
+upscale blit at 4K@90, 4K@120 and 1440p@120.
+
+What it costs is the grain, and **two predictions were wrong before the
+measurement stood up**: a Nyquist argument said the fine band would alias at
+1440p-half (it does not), and the first probe box-downsampled a full-res render
+-- a fair low-pass -- and reported 0.0% aliasing everywhere, which should have
+been the tell. A half-res pass point-samples once per half-res fragment.
+
+| case | amplitude retained | fine band | aliased down |
+|---|---|---|---|
+| 4K half-res | 74.3% | 31.5% -> 13.5% | 0.0% |
+| 1440p half-res | 65.6% | 23.4% -> 12.6% | 0.0% |
+| 1080p half-res | 64.1% | 25.9% -> 22.6% | 10.2% |
+
+It **softens** rather than aliases, and what it softens is the fine band -- 68%
+of the blend, placed near Nyquist on purpose so the grain reads as crystals
+rather than blobs. So half-res is not a quality setting, it is a **second
+stock**. That is a look decision and this release does not make it.
+
+### §54's film-mode edge case, closed -- and it was never the feature
+
+**RETRACTED: "the film-mode test segfaults llvmpipe at
+`is_film_emulsion_active()`."** It was the probe. The viewport-cleanup test
+above it frees the LuxRoot by design, and the film-mode test then called into a
+freed node; the free landed during an `await`, so there was no catchable error
+and the blamed line drifted onto a two-term getter that cannot abort anything.
+A freed Node still answers `!= null` in GDScript, which is what kept it hidden.
+
+**The fix then broke the test below it** -- `set_film_mode()` moves the film
+master, so the reordered cleanup test inherited it off. Same defect one pair
+along. Fixed from both sides and asserted, because either alone would fix the
+symptom and leave the coupling. It was caught only because the cleanup test
+refuses to pass itself when it did not observe what it was measuring; that is
+luck, not coverage.
+
+Green on both builds: film present ON->active, OFF->inactive; film DELETED
+ON->inactive, OFF->inactive; shipped preset unmutated in both; viewport raised
+and restored on both paths.
+
+## [0.28.1] - the optional feature was not optional, and the demo found it
+
+0.28.0 claimed film emulsion was "opt-in by construction" and listed the
+reasons. One of them was false, and the first real run of `tools/film_demo.gd`
+on a machine other than the one that wrote it found the false one in about
+thirty seconds. The lesson is in the fix: **optionality that has not been
+tested by REMOVING the thing is a claim, not a property.** It is now tested
+that way -- delete `grain_balanced.png` and Lux renders normally with one
+warning -- and that test is the reason to believe the rest of the list.
+
+### Fixed
+- **A `preload` of the film assets made an optional feature a hard dependency
+  of the entire post stack.** `LuxPostFX` held
+  `const FILM_GRAIN_TEX := preload(...)`; a preload resolves when the SCRIPT
+  loads, so on a project whose `.godot/` predated the grain texture the script
+  itself failed to load, `LuxPostFX.new()` returned null, and `_post` was null
+  -- no post processing at all, and
+  `Nonexistent function 'apply' in base 'Nil'` from `LuxRoot._process` every
+  frame. Found on the first real run of the demo, which is exactly what it was
+  for. The assets are now loaded on demand behind `ResourceLoader.exists`, film
+  reports itself unavailable once, and `_film_active` requires the material to
+  exist. Verified by deleting `grain_balanced.png` outright: one warning, the
+  post stack unaffected, frames render, film inactive. That is TDD section 54,
+  which a class-scope preload cannot honour because it fails before any Lux
+  code gets a say.
+- `LuxRoot._process` and `_apply_immediate` guard each module before calling
+  `apply()`. The blend branch called all three bare, so a null module threw
+  BEFORE `_blending = false` and the blend never finished -- turning one error
+  into an unbounded per-frame loop. `process()` two lines above already guarded
+  for the same case.
+- `tools/film_demo.py` always runs the import pass instead of only when
+  `.godot/` is absent. An already-imported project plus a newly added asset is
+  precisely the state that produced the above, and skipping an idempotent
+  import saved nothing worth having.
+
+- `tools/film_demo.gd`: the HUD panel was anchored to the window BOTTOM with a
+  hand-guessed offset smaller than its own content, so every line below
+  `strength` -- including `[N]`, the chroma-coherence switch that is the whole
+  point of the feature -- rendered off-screen. An operator could not see that
+  the control existed. Anchored top-left below the sample scene's own HUD, it
+  grows downward into empty space and cannot clip itself.
+- `tools/film_demo.gd` says WHY film is not running rather than only that it is
+  not: master off, grain mode, preset, quality tier, or assets unavailable. The
+  old readout said "no grain" and left five causes indistinguishable -- and one
+  of those causes was the preload bug above, whose only visible evidence was
+  that line saying nothing useful.
+
+### Added
+- `tools/film_optional_probe.py` + `.gd`: **proves optionality by deleting the
+  feature.** Mirrors the project twice, removes the film shader and grain asset
+  from the second copy, renders every shipped preset in both, and compares. It
+  also reports each preset's `asks_for_film` and `film_active`, because a
+  preset whose flag drifted would not crash -- it would quietly render
+  differently from what its author approved.
+
+  **It runs the same build twice as a control, and that is the whole reason it
+  can be believed.** The baseline Simple grain is driven by `time_seed`, which
+  accumulates wall-clock inside the process, so two launches of the SAME build
+  do not produce identical frames. The first version of this probe had no
+  control and reported all seven shipped presets as "not optional" -- a test
+  without a control is a claim too.
+
+  Result on an RTX 2060, all nine shipped presets, mean absolute pixel
+  difference:
+
+  | preset | same build, twice (the floor) | film DELETED |
+  |---|---|---|
+  | Blue Hour | 0.009988 | 0.009992 |
+  | Delco Arcade | 0.008323 | 0.008301 |
+  | Delco Summer Afternoon | 0.008332 | 0.008348 |
+  | Gas Station Fluorescent | 0.009856 | 0.009845 |
+  | Gothic Street Night | 0.010768 | 0.010755 |
+  | Heavy Rain | 0.013320 | 0.013320 |
+  | Mission Goes Hot | 0.010431 | 0.010445 |
+  | **PS1 Storm Night** | **0.000000** | **0.000000** |
+  | **SoF PC2000** | **0.000000** | **0.000000** |
+
+  None asks for film, none activated it, and removing the feature moves none of
+  them further than the build's own nondeterminism already does. **0.28.0's
+  optionality claim is now a measured property.**
+
+  The probe checks the other two 0.28.0 claims as well, which were also
+  assertions until now:
+
+  - **Does the feature put the viewport back?** `film_manage_hdr_2d` raising
+    the 2D target is the easy half; restoring it is the half worth testing.
+    Measured: `use_hdr_2d` False before, **True while film runs** (so the raise
+    is actually exercised and the restore is not vacuous), False again on
+    disable, and False again after the LuxRoot leaves the tree with film still
+    ON -- the path a level unload takes, where nothing calls anything.
+  - **Does anything else reference it?** No code file outside the feature's own
+    six mentions any of its eighteen symbols. Docs and tools are excluded on
+    purpose: describing or exercising a feature is not a dangling reference to
+    it.
+
+  **The last two rows are the control validating itself.** They are BIT-identical
+  in both columns, and the reason is in their `.tres`: `ps1_storm_night` and
+  `sof_pc2000` both set `grain_strength = 0.0`. The floor is non-zero exactly
+  where the legacy grain runs and exactly zero where it does not -- so the
+  control is measuring grain nondeterminism and nothing else, which is what
+  makes "within floor" mean something on the other seven.
+
+### Measured
+The rainbow, on the rings around a light pool, which is where it is most
+visible on real geometry. Counting neighbouring pixels whose hue jumps more
+than 15 degrees along one horizontal scanline through the pool:
+
+| scanline | as shipped | film, per-channel | film, **shared** |
+|---|---|---|---|
+| y=300 | 149 | 171 | **4** |
+| y=340 | 116 | 126 | **5** |
+| y=380 | 114 | 114 | **7** |
+
+About 97% of the hue edges gone. Note the middle column: film grain WITH
+per-channel quantization is slightly WORSE than the baseline, because film
+removes the luma noise that was camouflaging the hue steps. Turning film on by
+itself makes the rainbow easier to see; it is the shared quantization decision
+that removes it.
+
+### Added
+- `tools/film_walk_probe.py` + `.gd`: **the walk** -- item 61's closing
+  condition. Film emulsion on the staged night strip as `walk_night_strip.gd`
+  composes it: three Patina store shells with dressing, the fixtures GLB, 59
+  site light rigs baked, 147 fixtures spawned, `Gothic Street Night`. Four
+  cameras, four states. Everything measured before this ran on a blockout of
+  untextured boxes, which can only show that the arithmetic is right -- which
+  was already known.
+
+  **`hdr_only` is a control and it is not optional.** The film states raise
+  `use_hdr_2d`, so every three-state comparison measured film or the render
+  target and could not say which. `hdr_only` is film OFF at the film states'
+  target: `film_off -> hdr_only` is the target alone, `hdr_only -> film_shared`
+  is the film alone. Same shape of correction the optionality probe needed, in
+  the same week.
+
+  On an RTX 2060, hue edges per lit scanline, and the two ratios the control
+  exists to separate:
+
+  | shot | film_off | hdr_only | film per-chan | film SHARED | target | quantizer |
+  |---|---|---|---|---|---|---|
+  | 01_strip | 32.9 | 16.3 | 15.4 | **8.7** | 2.02x | 1.87x |
+  | 02_pawn_front | 33.5 | 11.4 | 9.6 | **5.7** | 2.94x | 2.00x |
+  | 03_facade_raking | 28.8 | 7.0 | 8.0 | **6.6** | 4.11x | 1.06x |
+  | 04_pool | 10.9 | 5.3 | 4.9 | **3.0** | 2.06x | 1.77x |
+
+  Both changes matter and on three of four shots the render target matters
+  more. Grain alone still does nothing (16.3 -> 15.4 with film fully on and
+  per-channel quantization) -- two rasterisers agree on that. The shared
+  quantizer is worth 1.06x to 2.00x on top of the target.
+
+  The probe **asserts each state rendered in the configuration its column
+  claims** and aborts otherwise. That check earned itself on its first run:
+  `film_shared` silently rendered at `hdr_2d = false`, because the control's
+  own reset cleared a raise that `_sync_film_precision` triggers on an edge and
+  therefore never restored.
+
+- `film_walk_probe.py` reports a **detection rate** -- the fraction of lit rows
+  carrying a real interior autocorrelation bump -- alongside prominence.
+  `argmax` always returns something, so a shot with no module reports the
+  search floor and that number then gets compared across states as though it
+  meant something. Prominence is only readable where detection is high.
+
+### Measured (hardware)
+**`film_manage_hdr_2d` is not tonally neutral on real hardware, and nothing
+before this had looked.** `film_off` and `hdr_only` differ only in
+`use_hdr_2d`, with film OFF in both. On an RTX 2060, `04_pool`: mean luminance
+**0.2046 -> 0.1004**, half, with 45% of pixels differing by more than 0.15.
+Not a readback encoding artifact -- applying the sRGB transfer function to
+`hdr_only` does not recover `film_off` (0.114 raw, 0.086 encoded, and the
+encoded mean overshoots). The `hdr_2d` decision rests on a patch-level
+measurement that the raised target lands on the same values only more
+precisely; end to end through the post stack that does not hold. Since
+`film_manage_hdr_2d` defaults to true, **turning film on halves the brightness
+of this scene before any film arithmetic runs.** Hypothesis, untested: the
+float target no longer clamps at 1.0 before post, so the grade pivot, palette
+zones and quantizer all see a different input range. This is the most
+consequential open question in the feature.
+
+### Fixed
+- `LuxRoot._load_default_library()` scans the presets directory instead of
+  carrying a hardcoded list of six while **nine** ship. `Gothic Street Night`,
+  `PS1 Storm Night` and `SoF PC2000` could not be loaded by name from the
+  default library -- including by the walk, which needs the first of them.
+
+### Retracted
+- **Every "repetition" figure this project printed before 2026-09-03 is void.**
+  `repetition_peak` reported `max(autocorrelation[8 : w/3])` and called it
+  periodicity. Autocorrelation of any low-pass signal falls monotonically from
+  lag 0, so that maximum is almost always the value at lag 8 -- a smoothness
+  measure wearing a periodicity label, and it ranks backwards: on a synthetic
+  blob with NO periodicity it reads 0.976, and adding a real 40 px module DROPS
+  it to 0.916. Replaced by the prominence of the strongest local bump above the
+  autocorrelation's own decay envelope. **The tool now proves the metric on
+  signals with known answers before it measures anything** and refuses to print
+  the column if that fails -- because nothing caught the first metric, having
+  never asked it to measure something whose answer was known.
+
+- **The llvmpipe attribution published earlier the same day is also retracted**,
+  on two counts, both corrected by the first hardware run:
+
+  - "The render target is not the fix (47.9 -> 42.7, not even consistent in
+    sign)." On an RTX 2060 it is 2.0x to 4.1x, and does MORE than the quantizer
+    on three of four shots. §2b already said the 8-bit figures do not agree
+    across rasterisers; `film_off` is the 8-bit column, so every ratio taken
+    against it was exposed to that.
+  - "Film emulsion is not a treatment for item 57 and mildly works against it
+    on raking facades", claiming +12% on the raking shot. On hardware that shot
+    goes the other way: -14% by prominence, 85% -> 71% by detection rate. That
+    conclusion rested on prominence figures from shots with no module to
+    measure.
+
+  **A control tells you THAT two causes are separable. It does not tell you
+  their sizes on hardware you did not run, and it does not make a wrong
+  statistic right.**
+
+### Item 57, re-walked on hardware
+Detection rate, fraction of lit rows with a real interior bump (`p8` is the
+search floor -- nothing found):
+
+| shot | film_off | hdr_only | film per-chan | film SHARED |
+|---|---|---|---|---|
+| 01_strip | 31% p8 | 44% p8 | 47% p8 | 47% p8 |
+| 02_pawn_front | 72% p128 | 78% p26 | 77% p27 | 79% p26 |
+| 03_facade_raking | 82% p50 | 85% p94 | 71% p49 | **71% p50** |
+| 04_pool | 25% p8 | 81% p53 | 8% p8 | **3% p8** |
+
+`03_facade_raking` is the real item-57 shot -- a raking facade at 50 px pitch --
+and film loosens it modestly: 85% -> 71% detection, prominence 0.1171 -> 0.1008.
+`02_pawn_front` does not move. `04_pool` collapses 81% -> 3%, but what is
+periodic in a light pool at pitch 53 is the concentric banding of the falloff,
+not a wall module -- that is the rainbow finding appearing in a second
+statistic, which is a good consistency check and a bad item-57 datum.
+`01_strip` has no module in any state and cannot answer the question.
+
+**A modest real loosening on the one genuine facade shot.** The original
+hypothesis survives weakly, having been wrongly declared dead a few hours
+earlier off llvmpipe.
+
+- Walk statistics were being averaged over black sky: two shots framed 5-8% lit
+  pixels and the per-row guard was `std > 1e-4`, which a black row passes on
+  noise alone. Rows now need mean luminance >= 0.02, sample size is printed per
+  shot, a thin sample is labelled, and the two worst cameras were tightened --
+  on hardware they measure 20% and 14% lit.
+
 ## [0.28.0] - film emulsion, and the problem it was written to solve is not the one Lux had
 
 Roadmap item 61. TDD phases 1, 3, 4 and 5-7 of `docs/film_emulsion_tdd.md`;
@@ -18,6 +683,11 @@ render path is unchanged.
 Nothing in this release changes any existing scene. That is not a claim about
 intent, it is a property with receipts:
 
+- **The one place this was NOT true has been fixed**: a `preload` of the film
+  assets in `LuxPostFX` took out the whole post stack when the grain texture
+  was not imported. Optionality that has not been tested by REMOVING the thing
+  is a claim, not a property -- so it now is tested that way, and the list
+  below is what holds after it.
 - `lux_ordered_dither.gdshader` is **byte-identical** to the shipped version
   (md5 `ab1ee8c5f476b65ef9fb07448e972b7e`, verified both before and after).
   The film variant is a SEPARATE file, so the disabled path runs code that did

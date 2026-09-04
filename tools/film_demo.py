@@ -38,6 +38,9 @@ def main(argv=None):
     ap.add_argument("--capture", default=None, metavar="DIR",
                     help="run headfully but non-interactively: capture the "
                          "four comparison states into DIR and exit")
+    ap.add_argument("--no-import", action="store_true",
+                    help="skip the import pass (it is idempotent; skip only if "
+                         "you know the project is current)")
     ap.add_argument("--preset", default=None,
                     help="preset to capture on (default Blue Hour -- a look "
                          "with shadows, which the default preset has none of)")
@@ -51,9 +54,14 @@ def main(argv=None):
     print("godot:   " + godot)
     print("project: " + a.project)
 
-    if not os.path.isdir(os.path.join(a.project, ".godot")):
-        print("first run -- importing (the film shader preloads the grain "
-              "texture, which an unimported project cannot supply)")
+    # ALWAYS import, not "only when .godot is missing". A project imported
+    # before the grain texture existed has a .godot directory AND no grain --
+    # which is exactly the state that produced a null post stack on the first
+    # real run of this demo. The import pass is idempotent and cheap on an
+    # already-imported project, and skipping it saved nothing worth having.
+    if not a.no_import:
+        print("importing (idempotent; skipping it is how a new asset gets "
+              "missed on an already-imported project)")
         subprocess.run([godot, "--headless", "--path", a.project, "--import"],
                        check=False)
 
