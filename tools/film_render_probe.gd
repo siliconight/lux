@@ -282,6 +282,14 @@ func _time_material(mat: ShaderMaterial, visible: bool, warmup: int,
 	RenderingServer.viewport_set_measure_render_time(rid, true)
 	for i in range(warmup):
 		await RenderingServer.frame_post_draw
+	# WALL-CLOCK WINDOW FOR THE TIMED FRAMES ONLY, so an external power
+	# sampler can attribute watts to THIS configuration. Polling nvidia-smi
+	# around the whole process would average import, scene build, warmup and
+	# five configurations together and call the result "film" -- which is how
+	# a power column gets published without measuring anything. Warmup is
+	# outside the window on purpose: it contains shader compilation and an
+	# idle clock ramp, and both move watts.
+	var t0: float = Time.get_unix_time_from_system()
 	var samples: Array[float] = []
 	for i in range(frames):
 		await RenderingServer.frame_post_draw
@@ -291,6 +299,33 @@ func _time_material(mat: ShaderMaterial, visible: bool, warmup: int,
 	var total := 0.0
 	for v in samples:
 		total += v
+
+	# SECTION 50'S OTHER COLUMNS, READ AT THE SAME INSTANT AS THE TIME.
+	#
+	# Sampled AFTER the timed frames, with this material still bound and its
+	# textures still resident, because that is the only moment the figure means
+	# "what this configuration costs". Read before the loop it would name the
+	# previous material; read after the rect is restored it would name none.
+	#
+	# VIDEO_MEM_USED is the engine's own texture + buffer total, which is what
+	# a project can actually control -- it is NOT the process's total VRAM
+	# footprint, which includes the driver's own allocations and the swapchain
+	# and is not visible from in here. The DIFFERENCE between configurations is
+	# the honest figure and the absolute number is not; that is the same
+	# discipline the frame-time columns already use.
+	#
+	# Static memory is Godot's own heap accounting, not RSS. Same rule: the
+	# delta is the claim.
+	var vram_tex: int = int(RenderingServer.get_rendering_info(
+		RenderingServer.RENDERING_INFO_TEXTURE_MEM_USED))
+	var vram_buf: int = int(RenderingServer.get_rendering_info(
+		RenderingServer.RENDERING_INFO_BUFFER_MEM_USED))
+	var vram_all: int = int(RenderingServer.get_rendering_info(
+		RenderingServer.RENDERING_INFO_VIDEO_MEM_USED))
+	var draws: int = int(RenderingServer.get_rendering_info(
+		RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME))
+	var t1: float = Time.get_unix_time_from_system()
+
 	return {
 		"frames": n,
 		"mean_ms": total / float(n),
@@ -299,6 +334,14 @@ func _time_material(mat: ShaderMaterial, visible: bool, warmup: int,
 		"p99_ms": samples[int(float(n) * 0.99)],
 		"min_ms": samples[0],
 		"max_ms": samples[n - 1],
+		"vram_texture_bytes": vram_tex,
+		"vram_buffer_bytes": vram_buf,
+		"vram_total_bytes": vram_all,
+		"draw_calls": draws,
+		"static_mem_bytes": int(OS.get_static_memory_usage()),
+		"static_mem_peak_bytes": int(OS.get_static_memory_peak_usage()),
+		"t_start_unix": t0,
+		"t_end_unix": t1,
 	}
 
 
@@ -356,14 +399,83 @@ func _measure_cost(warmup: int, frames: int) -> Dictionary:
 	q_shared.set_shader_parameter(&"dither_luma_scale", 3.0)
 	q_shared.set_shader_parameter(&"dither_chroma_coherence", 1.0)
 
+	# --- THE BISECT ---------------------------------------------------------
+	# Section 41 is OVER budget at 90 and 120 fps and NOBODY KNOWS WHY. The one
+	# hypothesis offered -- the octave loop -- was built, measured, and bought
+	# three microseconds. Guessing again is not a method, so this prices each
+	# film term by REMOVING it from the shipped configuration one at a time.
+	#
+	# Every variant carries the shipped defaults except the single term named,
+	# so `film_full - variant` is that term's cost and nothing else. Dither is
+	# off in all of them, as it is in `baseline`, so the delta is the film block
+	# alone rather than the whole pass.
+	var bisect: Dictionary = {}
+	if bool(ProjectSettings.get_setting("film_probe/bisect", false)):
+		# The shipped configuration, so the ladder has a top.
+		var full := _film_variant({})
+		# The film block branched over entirely: strength 0 AND fog 0 is the
+		# only way the guard is false. Whatever this costs above `baseline` is
+		# the price of binding a second shader and deferring the grade's clamp,
+		# before any film arithmetic runs at all.
+		var off := _film_variant({&"film_grain_strength": 0.0,
+			&"film_base_fog": 0.0})
+		# Resolution lock: a textureSize plus a divide, per fragment.
+		var nolock := _film_variant({&"film_grain_ref_width": 0.0})
+		# The opponent-axis dye term.
+		var nochroma := _film_variant({&"film_chroma_ratio": 0.0})
+		# Base fog is 0.0 by default, so this prices what a preset that ASKS
+		# for it pays -- the gate plus one luma and a smoothstep.
+		var fog := _film_variant({&"film_base_fog": 0.006})
+		# And what each additional crystal scale costs, now that the
+		# single-octave case is a fast path around the loop.
+		var oct2 := _film_variant({&"film_grain_octaves": 2})
+		var oct3 := _film_variant({&"film_grain_octaves": 3})
+		bisect = {
+			"full": await _time_material(full, true, warmup, frames),
+			"block_off": await _time_material(off, true, warmup, frames),
+			"no_reslock": await _time_material(nolock, true, warmup, frames),
+			"no_chroma": await _time_material(nochroma, true, warmup, frames),
+			"with_fog": await _time_material(fog, true, warmup, frames),
+			"octaves_2": await _time_material(oct2, true, warmup, frames),
+			"octaves_3": await _time_material(oct3, true, warmup, frames),
+		}
+
 	var none: Dictionary = await _time_material(null, false, warmup, frames)
 	var base: Dictionary = await _time_material(base_mat, true, warmup, frames)
 	var film: Dictionary = await _time_material(film_mat, true, warmup, frames)
 	var qp: Dictionary = await _time_material(q_per, true, warmup, frames)
 	var qs: Dictionary = await _time_material(q_shared, true, warmup, frames)
 	_post_rect.visible = true
-	return {"no_post": none, "baseline": base, "film": film,
+	var out: Dictionary = {"no_post": none, "baseline": base, "film": film,
 		"quant_perchannel": qp, "quant_shared": qs}
+	if not bisect.is_empty():
+		out["bisect"] = bisect
+	return out
+
+
+## One film material at the SHIPPED defaults, with the named overrides applied.
+## Written as one function so a variant cannot accidentally differ from the
+## others in some parameter nobody was looking at -- which is how a bisect
+## turns into a set of unrelated measurements.
+func _film_variant(overrides: Dictionary) -> ShaderMaterial:
+	var m := ShaderMaterial.new()
+	m.shader = load(FILM)
+	m.set_shader_parameter(&"film_grain_tex", load(GRAIN))
+	_neutral(m)
+	var shipped: Dictionary = {
+		&"film_grain_strength": 0.20,
+		&"film_chroma_ratio": 0.10,
+		&"film_grain_scale": 1.0,
+		&"film_base_fog": 0.0,
+		&"film_grain_ref_width": 2048.0,
+		&"film_grain_octaves": 1,
+		&"film_grain_lacunarity": 2.1,
+		&"film_grain_persistence": 0.55,
+		&"film_frame": 0,
+	}
+	for k: StringName in shipped:
+		m.set_shader_parameter(k, overrides.get(k, shipped[k]))
+	return m
 
 
 ## Named from the engine's own constants, never from a table in the driver.

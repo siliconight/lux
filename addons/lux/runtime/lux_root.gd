@@ -102,7 +102,30 @@ signal blend_finished(preset_name: StringName)
 ## the default grain spans three codes, and the TDD's own section 45
 ## acceptance metric moves 70% between one GPU and another because what
 ## it measures there is per-channel rounding.
-@export var film_manage_hdr_2d: bool = true
+## Raise the viewport to a floating-point 2D target while film runs.
+##
+## DEFAULTS TO FALSE, AND IT USED TO DEFAULT TO TRUE. The argument for raising
+## it is precision: TDD section 20 wants the post pass to see more than 8 bits.
+## The argument against it is everything an operator actually saw. Raising the
+## target is NOT tonally neutral, it moves differently on different rasterisers,
+## and the move is far larger than the grain it was supposed to serve:
+##
+##   * llvmpipe: a pixel at [0, 0, 0] reads [0.0118, 0.0118, 0.0118] with film
+##     still OFF and only the target raised. Pure black falls from 55.6% of the
+##     frame to 34.3% before any film arithmetic runs.
+##   * RTX 2060: the captured frame becomes the LINEAR form of the unraised one
+##     (best-fit exponent 2.265 over 746k mid-tone pixels), mean luminance
+##     halving from 0.2046 to 0.1004, 45% of pixels moving more than 0.15.
+##
+## Two rasterisers, two large and opposite tonal shifts, neither of them film.
+## With this true, turning film on changed the gamma and the contrast and put
+## the grain underneath that -- which is what it looked like, and an operator
+## said so in exactly those words. With it false, film changes the grain and
+## nothing else, which is the only honest form of an optional treatment.
+##
+## Set it true deliberately if you want the precision and have checked what it
+## does to your look on your hardware. It is not free and it is not invisible.
+@export var film_manage_hdr_2d: bool = false
 
 # Modules
 var _env: LuxEnvironment
@@ -275,22 +298,37 @@ func _build_modules() -> void:
 	_post.set_film_emulsion_master_enabled(film_emulsion_enabled)
 
 
+## Register the shipped presets so blend_to_preset() / set_mission_phase()
+## can resolve them by name.
+##
+## SCANS THE DIRECTORY. It used to carry a hardcoded list of six
+## filenames, and the repo ships nine -- so `gothic_street_night`,
+## `ps1_storm_night` and `sof_pc2000` could not be resolved by name at
+## all. The entire gothic look family was unreachable through
+## blend_to_preset and set_mission_phase; it worked only when assigned
+## directly as a scene's active_preset. Found by walking a real level,
+## which is the first thing that ever asked for one of the three by name.
+##
+## A list of files in a directory, kept by hand, next to that directory,
+## drifts the moment someone adds a file. The scan cannot.
 func _load_default_library() -> void:
-	# Register the shipped presets so blend_to_preset() / set_mission_phase()
-	# can resolve them by name. Missing files are skipped silently.
 	var dir := "res://addons/lux/presets/"
-	var files := [
-		"delco_summer_afternoon.tres",
-		"delco_arcade.tres",
-		"gas_station_fluorescent.tres",
-		"blue_hour.tres",
-		"heavy_rain.tres",
-		"mission_goes_hot.tres",
-	]
-	for f in files:
-		var res := ResourceLoader.load(dir + f)
-		if res is LuxPreset:
-			_preset_library[String(res.preset_name)] = res
+	var da := DirAccess.open(dir)
+	if da == null:
+		push_warning("Lux: cannot open " + dir + " -- no shipped presets "
+			+ "are resolvable by name.")
+	else:
+		for f in da.get_files():
+			var fn: String = f
+			# An exported project lists `.tres.remap`; ResourceLoader still
+			# wants the `.tres` path, so the suffix comes off first.
+			if fn.ends_with(".remap"):
+				fn = fn.substr(0, fn.length() - 6)
+			if not fn.ends_with(".tres"):
+				continue
+			var res := ResourceLoader.load(dir + fn)
+			if res is LuxPreset:
+				_preset_library[String(res.preset_name)] = res
 	if active_preset != null:
 		_preset_library[String(active_preset.preset_name)] = active_preset
 	if local_override != null:
@@ -384,7 +422,7 @@ func set_player_damage_intensity(value: float) -> void:
 	override.warmth = lerpf(_current.warmth, 0.5, v)
 	override.vignette_strength = lerpf(_current.vignette_strength, 0.55, v)
 	_current = override
-	_post.apply(override, _quality)
+	_post_apply(override)
 
 
 ## TDD section 14/15. Changing this must not reload the scene, the
@@ -437,8 +475,74 @@ func _push_film_master() -> void:
 	if not _post.set_film_emulsion_master_enabled(film_emulsion_enabled):
 		return  # unchanged, so there is nothing to re-apply
 	if _current != null:
-		_post.apply(_current, _quality)
+		_post_apply(_current)
 		_sync_film_precision()
+
+
+## LUX FILM MODE -- the whole treatment as one switch.
+##
+## Everything the film path needs is already a default on LuxPreset, and the
+## shipped presets store no `film_*` fields at all (only the legacy
+## `grain_strength`), so a preset picks up the settled film values by simply
+## not overriding them. That leaves exactly two flags to flip, which is what
+## this does: the master here, and `film_emulsion_enabled` + `grain_mode` on
+## whatever preset is being applied.
+##
+## WHY IT IS AN OVERRIDE AND NOT NINE EDITED .tres FILES. Film is a treatment
+## OF a look, not a look -- it has to compose with any preset, including ones a
+## project authors itself. Baking it into the shipped presets would make it
+## unavailable to everyone else's and impossible to switch off per-export.
+##
+## Off by default. With it off, not one byte of any preset changes and the
+## baseline render path is what it always was.
+@export var film_mode: bool = false:
+	set(value):
+		film_mode = value
+		# The master gates the whole film path (TDD section 10's three-key AND),
+		# so the switch has to move both or turning it on does nothing.
+		film_emulsion_enabled = value
+		if _initialized and _current != null:
+			_post_apply(_current)
+			_sync_film_precision()
+
+
+## Sugar for callers that would rather not assign a property -- Level Factory
+## exports, a brief, a debug key.
+func set_film_mode(enabled: bool) -> void:
+	film_mode = enabled
+
+
+## THE ONE PLACE A PRESET REACHES THE POST STACK. Every apply goes through
+## here so film mode cannot be bypassed by whichever path happens to run --
+## there are four, and an earlier version of this feature was applied at only
+## some of them.
+func _post_apply(preset: LuxPreset) -> void:
+	if _post == null or preset == null:
+		return
+	_post.apply(_film_view(preset), _quality)
+
+
+## The preset as the post stack should see it under the current mode. Returns
+## the preset ITSELF when film mode is off -- no copy, no allocation, and no
+## behavioural difference from before this existed.
+func _film_view(preset: LuxPreset) -> LuxPreset:
+	if not film_mode:
+		return preset
+	if preset.film_emulsion_enabled and preset.grain_mode == 2:
+		return preset  # already asking for film; nothing to override
+	if _film_view_src != preset or _film_view_cache == null:
+		# make_override copies, so the caller's preset -- often a shipped
+		# resource shared across scenes -- is never mutated.
+		var o: LuxPreset = preset.make_override(preset.preset_name)
+		o.film_emulsion_enabled = true
+		o.grain_mode = 2
+		_film_view_cache = o
+		_film_view_src = preset
+	return _film_view_cache
+
+
+var _film_view_cache: LuxPreset = null
+var _film_view_src: LuxPreset = null
 
 
 func is_film_emulsion_active() -> bool:
@@ -514,10 +618,13 @@ func bind_fixture_emissives(search_root: Node = null) -> Dictionary:
 
 func _apply_immediate(preset: LuxPreset) -> void:
 	_current = preset
-	_env.apply(preset, _quality)
-	_lighting.apply(preset, _quality)
-	_post.apply(preset, _quality)
-	_sync_film_precision()
+	if _env != null:
+		_env.apply(preset, _quality)
+	if _lighting != null:
+		_lighting.apply(preset, _quality)
+	if _post != null:
+		_post_apply(preset)
+		_sync_film_precision()
 	_apply_retro_scaling(preset)
 	_push_material_state(preset)
 	_sync_camera_planes()
@@ -591,10 +698,19 @@ func _process(delta: float) -> void:
 		var k := clampf(_blend_t, 0.0, 1.0)
 		var mid := _lerp_preset(_blend_from, _blend_to, k)
 		_current = mid
-		_env.apply(mid, _quality)
-		_lighting.apply(mid, _quality)
-		_post.apply(mid, _quality)
-		_sync_film_precision()
+		# GUARDED, and the reason is worth keeping. These three were bare calls;
+		# when `_post` came back null the error aborted this function BEFORE
+		# `_blending = false` below, so the blend never finished and the same
+		# error printed every frame forever. A missing module should cost its
+		# own module and let the blend complete -- `process()` above already
+		# guards for exactly this and the blend branch did not.
+		if _env != null:
+			_env.apply(mid, _quality)
+		if _lighting != null:
+			_lighting.apply(mid, _quality)
+		if _post != null:
+			_post_apply(mid)
+			_sync_film_precision()
 		_apply_retro_scaling(mid)
 		if k >= 1.0:
 			_blending = false
@@ -695,6 +811,11 @@ func _lerp_preset(a: LuxPreset, b: LuxPreset, k: float) -> LuxPreset:
 	p.film_emulsion_enabled = b.film_emulsion_enabled if k >= 0.5 else a.film_emulsion_enabled
 	p.grain_mode = b.grain_mode if k >= 0.5 else a.grain_mode
 	p.film_grain_strength = lerpf(a.film_grain_strength, b.film_grain_strength, k)
+	p.film_base_fog = lerpf(a.film_base_fog, b.film_base_fog, k)
+	p.film_grain_ref_width = lerpf(a.film_grain_ref_width, b.film_grain_ref_width, k)
+	p.film_grain_octaves = a.film_grain_octaves if k < 0.5 else b.film_grain_octaves
+	p.film_grain_lacunarity = lerpf(a.film_grain_lacunarity, b.film_grain_lacunarity, k)
+	p.film_grain_persistence = lerpf(a.film_grain_persistence, b.film_grain_persistence, k)
 	p.film_chroma_ratio = lerpf(a.film_chroma_ratio, b.film_chroma_ratio, k)
 	p.film_grain_fps = lerpf(a.film_grain_fps, b.film_grain_fps, k)
 	p.film_grain_scale = lerpf(a.film_grain_scale, b.film_grain_scale, k)

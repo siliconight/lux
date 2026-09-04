@@ -4,6 +4,30 @@ Gameplay code drives Lux visuals through **LuxRoot** (TDD §11) or the static
 **LuxRuntimeAPI** facade. Both blend smoothly so transitions read as intentional
 lighting changes, not hard cuts.
 
+## Lux Film Mode
+
+One switch for the whole film treatment, so an export can carry the look or not.
+
+```gdscript
+lux.set_film_mode(true)    # or the exported `film_mode` flag
+```
+
+That is the entire API. It composes with any preset -- film is a treatment OF a
+look, not a look -- and it never mutates the preset you pass it.
+
+- **Off by default.** With it off the render path is what it always was.
+- **It does not touch the render target.** `film_manage_hdr_2d` defaults false
+  because raising it is a tone change larger than the grain it serves, and it
+  moves differently on different hardware. Set it true deliberately if you want
+  the extra precision and have checked what it costs your look.
+- **The values it applies are the LuxPreset defaults**, so a preset that does
+  not override any `film_*` field gets the settled look automatically, and one
+  that does keeps its own tuning.
+
+The settled defaults, chosen by walking a level and looking at it rather than
+by calculation: density 0.20, grain size 1.0, chroma coherence 1.0, luma scale
+3.0, one octave, base fog 0.004.
+
 ## Direct (hold a LuxRoot reference)
 
 ```gdscript

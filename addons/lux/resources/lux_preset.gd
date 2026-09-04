@@ -110,7 +110,75 @@ extends Resource
 @export_enum("Off", "Simple", "Film Emulsion") var grain_mode: int = 1
 ## Density amplitude, in stops of transmission (TDD section 27). Much smaller
 ## than `grain_strength` because it multiplies rather than adds.
-@export_range(0.0, 0.10, 0.001) var film_grain_strength: float = 0.025
+##
+## RANGE AND DEFAULT BOTH RAISED ~8x. At 0.025 the modulation is about +/-0.75%
+## of transmission -- invisible, so anyone enabling film saw nothing. 0.20 is
+## where the first person to walk a level and look at it put the knob; one
+## judgement, one night scene, and the only look judgement this feature has
+## had. A daylight preset may want less.
+##
+## Section 45 holds throughout: it measures chroma-to-luma noise, and
+## `film_chroma_ratio` is a fraction OF the neutral signal, so both scale
+## together. Measured 0.1881 at 0.025, 0.1882 at 0.200, 0.1884 at 0.300 --
+## inside the hard 0.40 bar and the preferred 0.20 bar at every value.
+@export_range(0.0, 0.30, 0.005) var film_grain_strength: float = 0.20
+## The emulsion's base-plus-fog floor: how far above pure black the film sits.
+##
+## THIS IS A LIFT, NOT A NOISE AMPLITUDE, and the first version had it wrong.
+## It added noise symmetric about zero AFTER the transmission multiply, onto a
+## channel that was already zero -- so the negative half clipped at black and
+## only the positive half survived. That is half-wave rectified white noise:
+## bright specks on pure black, salt noise, and it reads as digital because no
+## emulsion can emit light.
+##
+## What film does is never be perfectly clear. Unexposed halide still develops
+## to a minimum density, so print black is a very dark GREY, and the grain
+## modulates that the same way it modulates everything else. So this is added
+## BEFORE the density multiply and there is no additive term after it anywhere.
+##
+## Consequences worth knowing when dialling it:
+##  * shadow grain and lifted blacks arrive TOGETHER, which is the coupling
+##    real film has -- there is no shadow grain without base fog
+##  * how much the lifted black BREATHES is `film_grain_strength`, not this.
+##    This sets the level; the density sets the modulation depth. A lift with
+##    the density near zero is just milky blacks.
+##  * nothing downstream can brighten a pixel out of black, because every
+##    operation after this point is a multiply
+##  * THE RANGE IS TENTHS OF A PERCENT, NOT PERCENT. The filmify photochemical
+##    profile puts projection flare at 0.004 and the black floor at 0.002. A
+##    0.03 lift is not a film black, it is a washed one. The first version of
+##    this shipped a 0.0-0.10 range and a walk default of 0.06, and it looked
+##    exactly as wrong as those numbers are.
+##  * the visible grain is NOT this. It is `film_grain_strength` acting on
+##    everything that has light in it. This term only stops the void being a
+##    dead flat hole in the middle of a grained picture.
+@export_range(0.0, 0.02, 0.0005) var film_base_fog: float = 0.0
+## How many grain scales are summed. Real emulsion is a DISTRIBUTION of
+## crystal sizes -- many fine, fewer large -- and one scale gives every grain
+## the same footprint, which is what reads as electronic fizz rather than
+## silver. 1 is the original single-scale behaviour, bit for bit.
+##
+## 2 or 3 is where the field starts to look like crystals moving against each
+## other, because each octave carries its own per-frame transform and they do
+## not shuffle in lockstep.
+## Frame width the grain size is defined against. A crystal is a physical
+## object; how many pixels it covers depends on how finely the strip was
+## scanned, so grain sized in PIXELS changes character with output resolution
+## -- the shipped asset's fine band is 1.42 px across at every resolution,
+## which is about 2x too coarse at 720p and 1.45x too fine at 4K against grain
+## sized as a fraction of the frame. Too fine is the one that hurts: it lands
+## near Nyquist and fizzes.
+##
+## 2048 matches where the asset already sits (its 1.42 px fine band against a
+## real fine crystal's 1.38 px at 2.5K), so it preserves the authored look at
+## ~1440p and corrects everywhere else. 0.0 restores pixel-locked grain.
+@export var film_grain_ref_width: float = 2048.0
+@export_range(1, 3) var film_grain_octaves: int = 1
+## Scale step between octaves. 2.1 rather than 2.0 so the octaves do not land
+## on a common multiple and beat into a visible lattice.
+@export_range(1.5, 4.0, 0.1) var film_grain_lacunarity: float = 2.1
+## How much each successive (coarser) octave contributes.
+@export_range(0.1, 1.0, 0.05) var film_grain_persistence: float = 0.55
 ## Chromatic dye variation as a fraction of the neutral signal. Restrained on
 ## purpose: section 45 requires chroma noise under 0.4x luma noise and prefers
 ## under 0.2x.
@@ -128,6 +196,21 @@ extends Resource
 ## (TDD section 24); the grain must not reseed every rendered frame.
 @export_range(1.0, 60.0, 1.0) var film_grain_fps: float = 24.0
 ## Grain tile scale. 1.0 samples the 128px tile at one screen pixel per texel.
+## Crystal footprint multiplier, on top of the frame-width scaling.
+##
+## 1.0 IS NOT A PLACEHOLDER DEFAULT -- IT WAS CHOSEN BY EYE. The tooling
+## advice used to be "raise this for clumps, it is usually the fizz knob",
+## because coarsening measurably cuts fine high-frequency energy (55% less
+## fizz at 3.0 while keeping 93% of the grain body). The one person to walk a
+## level and judge it went back to 1.0 and preferred it, alongside a density
+## of 0.20.
+##
+## Both can be true: the fizz measurement was taken when the density was 8x
+## too low to see, so it was measuring the texture of something nobody could
+## make out. With a visible density the fine grain reads as silver rather than
+## sparkle, and the clumps are not needed. Treat the coarsening figures as
+## real but as an answer to a question that no longer applies at the shipped
+## amplitude.
 @export_range(0.5, 3.0, 0.05) var film_grain_scale: float = 1.0
 ## How much of the quantization decision is SHARED across channels, on the film
 ## path only (the baseline shader is untouched). Ordered dithering quantizes R,

@@ -48,6 +48,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 _FACTORY_TOOLS = os.path.normpath(os.path.join(
@@ -103,7 +105,7 @@ SECTION_41 = [(30, 33.33, 0.67), (60, 16.67, 0.33),
 PERF_RESOLUTIONS = [(1280, 720), (1920, 1080), (2560, 1440), (3840, 2160)]
 
 
-def build_project(dest, hdr_2d, size=(512, 512), cost=None):
+def build_project(dest, hdr_2d, size=(512, 512), cost=None, bisect=False):
     for rel in ASSETS:
         src = os.path.join(LUX, rel)
         if not os.path.isfile(src):
@@ -125,21 +127,124 @@ def build_project(dest, hdr_2d, size=(512, 512), cost=None):
         warmup, frames = cost
         text += ("\n[film_probe]\n\nmeasure_cost=true\n"
                  "warmup_frames=%d\ntimed_frames=%d\n" % (warmup, frames))
+        if bisect:
+            text += "bisect=true\n"
     with open(os.path.join(dest, "project.godot"), "w", encoding="utf-8") as f:
         f.write(text)
 
 
-def run(godot, hdr_2d, timeout, verbose, size=(512, 512), cost=None):
+class PowerSampler:
+    """nvidia-smi in the background, timestamped, so watts can be attributed.
+
+    SECTION 50 ASKS FOR POWER AND NO ENGINE COUNTER REPORTS IT. The only real
+    source is the driver, and the only honest way to use it is to sample
+    continuously with wall-clock stamps and intersect afterwards with the
+    window each configuration actually rendered in -- which the probe now
+    reports as t_start_unix/t_end_unix per configuration.
+
+    Polling around the whole process instead would average import, scene
+    build, shader compilation, warmup and five configurations together and
+    publish the mean as "film". That is how a power column gets written
+    without measuring anything, and it is worse than leaving the column empty.
+
+    Absent nvidia-smi this does nothing and says so. It is NVIDIA-only by
+    construction; AMD and Intel need their own tools and section 51's sweep
+    is where that belongs.
+    """
+
+    INTERVAL_MS = 100
+
+    def __init__(self, enabled):
+        self.samples = []
+        self.proc = None
+        self.thread = None
+        self.reason = ""
+        if not enabled:
+            self.reason = "not requested"
+            return
+        if shutil.which("nvidia-smi") is None:
+            self.reason = "nvidia-smi not on PATH"
+            return
+
+    def start(self):
+        if self.reason:
+            return
+        try:
+            self.proc = subprocess.Popen(
+                ["nvidia-smi",
+                 "--query-gpu=power.draw,utilization.gpu",
+                 "--format=csv,noheader,nounits",
+                 "-lms", str(self.INTERVAL_MS)],
+                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+        except OSError as exc:
+            self.reason = "nvidia-smi would not start: %s" % exc
+            return
+        self.thread = threading.Thread(target=self._pump, daemon=True)
+        self.thread.start()
+
+    def _pump(self):
+        # STAMPED HERE, NOT BY nvidia-smi. Its own timestamp column is the
+        # driver's clock; time.time() here is the same clock the probe's
+        # t_start_unix came from, and only same-clock stamps can be
+        # intersected. The read latency this adds is under the 100 ms
+        # interval and is a constant offset on every sample either way.
+        for line in self.proc.stdout:
+            t = time.time()
+            parts = [p.strip() for p in line.split(",")]
+            if len(parts) < 2:
+                continue
+            try:
+                self.samples.append((t, float(parts[0]), float(parts[1])))
+            except ValueError:
+                continue
+
+    def stop(self):
+        if self.proc is not None:
+            self.proc.terminate()
+            try:
+                self.proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                self.proc.kill()
+        if self.thread is not None:
+            self.thread.join(timeout=5)
+
+    def window(self, t0, t1):
+        """Mean watts and GPU utilisation strictly inside [t0, t1], or None.
+
+        Returns None rather than a number when fewer than three samples land
+        in the window: at a 100 ms interval a 600-frame configuration is
+        seconds long and should hold dozens, so one or two means the clocks
+        disagree or the sampler died, and averaging two samples would dress
+        that up as a reading.
+        """
+        got = [(w, u) for (t, w, u) in self.samples if t0 <= t <= t1]
+        if len(got) < 3:
+            return None
+        return {
+            "watts": sum(w for w, _ in got) / len(got),
+            "gpu_util": sum(u for _, u in got) / len(got),
+            "samples": len(got),
+        }
+
+
+def run(godot, hdr_2d, timeout, verbose, size=(512, 512), cost=None,
+        bisect=False, power=False):
     dest = tempfile.mkdtemp(prefix="film_render_")
     try:
-        build_project(dest, hdr_2d, size, cost)
+        build_project(dest, hdr_2d, size, cost, bisect)
         subprocess.run([godot, "--headless", "--path", dest, "--import"],
                        capture_output=True, text=True, timeout=timeout)
         cmd = _display_wrapper() + [
             godot, "--path", dest, "-s", "res://film_render_probe.gd"]
         if verbose:
             print("  [probe] " + " ".join(cmd))
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        sampler = PowerSampler(power)
+        sampler.start()
+        try:
+            r = subprocess.run(cmd, capture_output=True, text=True,
+                               timeout=timeout)
+        finally:
+            sampler.stop()
         out = (r.stdout or "") + (r.stderr or "")
         m = re.search(re.escape(MARK_BEGIN) + r"\s*(.*?)\s*" + re.escape(MARK_END),
                       out, re.S)
@@ -149,7 +254,20 @@ def run(godot, hdr_2d, timeout, verbose, size=(512, 512), cost=None):
                 "the probe never printed its result fence, so nothing was "
                 "measured. Godot exited " + str(r.returncode) + ".\n"
                 "  Last of its output:\n" + tail)
-        return json.loads(m.group(1)), out
+        rep = json.loads(m.group(1))
+        # ATTRIBUTED HERE, WHILE THE SAMPLES ARE STILL IN HAND, and only to
+        # configurations whose own reported window actually contains enough
+        # of them. A configuration with no key got no reading; that is the
+        # correct outcome and not a zero.
+        cfgs = rep.get("cost") or {}
+        for name, d in list(cfgs.items()):
+            if not isinstance(d, dict) or "t_start_unix" not in d:
+                continue
+            w = sampler.window(d["t_start_unix"], d["t_end_unix"])
+            if w:
+                d["power"] = w
+        rep["power_source"] = sampler.reason or "nvidia-smi"
+        return rep, out
     finally:
         shutil.rmtree(dest, ignore_errors=True)
 
@@ -299,6 +417,89 @@ def is_software(adapter):
     return any(k in a for k in SOFTWARE_ADAPTERS)
 
 
+def report_bisect(rep):
+    """What each film term costs, by removing it one at a time.
+
+    Section 41 is over budget and the only hypothesis anyone offered -- the
+    octave loop -- was built, measured, and bought three microseconds. This
+    prices the terms instead of guessing at them. Every variant carries the
+    shipped defaults except the one named, so `full - variant` is that term's
+    cost and nothing else.
+    """
+    b = (rep or {}).get("cost", {}).get("bisect")
+    if not b:
+        print("")
+        print("  BISECT -- no data (did the run set film_probe/bisect?)")
+        return 1
+    full = b["full"]["mean_ms"]
+    base = rep["cost"]["baseline"]["mean_ms"]
+    print("")
+    print("  BISECT -- 3840x2160, hdr_2d=true, the cell that fails section 41")
+    print("  Every variant is the shipped configuration with ONE term changed,")
+    print("  so the delta is that term and nothing else. `block off` is the")
+    print("  film shader BOUND but its whole block branched over, so its cost")
+    print("  above the baseline is the price of the second shader itself.")
+    print("")
+    print("    %-34s %9s %10s" % ("configuration", "gpu ms", "vs full"))
+    print("    %-34s %9.4f %10s" % ("baseline shader (no film)", base, "--"))
+    rows = [
+        ("film, shipped defaults", "full"),
+        ("  film block branched over", "block_off"),
+        ("  without the resolution lock", "no_reslock"),
+        ("  without the chroma dye term", "no_chroma"),
+        ("  WITH base fog 0.006 (opt-in)", "with_fog"),
+        ("  2 crystal octaves", "octaves_2"),
+        ("  3 crystal octaves", "octaves_3"),
+    ]
+    # A term whose REMOVAL makes the pass slower, or whose ADDITION makes it
+    # faster, is not a measurement -- it is noise larger than the effect. The
+    # sign is known in advance for every row here, so the report says which
+    # rows it cannot support rather than letting the reader treat a negative
+    # cost as a finding.
+    expect_cheaper = {"block_off", "no_reslock", "no_chroma"}
+    noisy = []
+    for label, key in rows:
+        if key not in b:
+            continue
+        ms = b[key]["mean_ms"]
+        d = ms - full
+        delta = "" if key == "full" else "%+.4f" % d
+        flag = ""
+        if key != "full":
+            wrong = (d > 0 if key in expect_cheaper else d < 0)
+            if wrong:
+                flag = "  <- WRONG SIGN, noise"
+                noisy.append(label.strip())
+        print("    %-34s %9.4f %10s%s" % (label, ms, delta, flag))
+    if noisy:
+        print("")
+        print("  %d row(s) came back with the wrong sign: %s."
+              % (len(noisy), ", ".join(noisy)))
+        print("  Removing work cannot make a pass slower and adding it cannot")
+        print("  make it faster, so the run-to-run noise is larger than those")
+        print("  effects. Raise --perf-frames until they settle, or read only")
+        print("  the rows whose sign is right.")
+    print("")
+    print("  READ IT AS: a large NEGATIVE delta means removing that term saved")
+    print("  that much, so the term is where the cost is. A delta near zero")
+    print("  means the term is free and is not what put section 41 over.")
+    shader_cost = b["block_off"]["mean_ms"] - base
+    print("")
+    print("    the second shader, before ANY film arithmetic: %+.4f ms"
+          % shader_cost)
+    print("    all film arithmetic on top of that:            %+.4f ms"
+          % (full - b["block_off"]["mean_ms"]))
+    if shader_cost > (full - base) * 0.5:
+        print("")
+        print("  MOST OF THE COST IS THE SHADER, NOT THE FILM. The film block")
+        print("  branched over already costs more than half of the total, so")
+        print("  tuning film terms cannot recover the budget -- the pass is")
+        print("  paying for the second shader's other differences from the")
+        print("  baseline (the deferred clamp, the coherent quantizer branch)")
+        print("  whether or not any film runs.")
+    return 0
+
+
 def report_cost(perf, adapter):
     """perf: {(w, h, hdr): payload}. Prints the section 41 comparison."""
     soft = is_software(adapter)
@@ -341,6 +542,88 @@ def report_cost(perf, adapter):
             print("    %-11s %-7s %10.4f %10.4f %10.4f"
                   % ("%dx%d" % (w, h), str(hdr).lower(), qp, qs, qs - qp))
         print("")
+
+    # SECTION 50'S MEMORY COLUMNS. Read from the engine's own counters at the
+    # instant each configuration finished its timed frames, so the row names
+    # that configuration and not the one before it.
+    #
+    # THE DELTA IS THE CLAIM, THE ABSOLUTE IS NOT. VIDEO_MEM_USED counts what
+    # the engine allocated -- textures and buffers -- and not the driver's own
+    # allocations or the swapchain, which are not visible from inside the
+    # process. Same for static memory, which is Godot's heap accounting rather
+    # than RSS. Both are honest as differences between two runs of the same
+    # binary and dishonest as a footprint.
+    have_mem = any("vram_total_bytes" in ((d.get("cost") or {}).get("film") or {})
+                   for d in perf.values())
+    if have_mem:
+        print("  MEMORY -- section 50's VRAM and RAM columns, engine counters")
+        print("    %-11s %-7s %11s %11s   %11s %11s"
+              % ("resolution", "hdr_2d", "VRAM base", "VRAM film",
+                 "film-base", "RAM film-base"))
+        for (w, h, hdr), d in sorted(perf.items()):
+            c = d.get("cost") or {}
+            f, b = c.get("film") or {}, c.get("baseline") or {}
+            if "vram_total_bytes" not in f or "vram_total_bytes" not in b:
+                continue
+            vb, vf = b["vram_total_bytes"], f["vram_total_bytes"]
+            rb = b.get("static_mem_bytes", 0)
+            rf = f.get("static_mem_bytes", 0)
+            print("    %-11s %-7s %10.2fM %10.2fM   %+10.3fM %+12.3fM"
+                  % ("%dx%d" % (w, h), str(hdr).lower(),
+                     vb / 1048576.0, vf / 1048576.0,
+                     (vf - vb) / 1048576.0, (rf - rb) / 1048576.0))
+        print("")
+        print("    The film grain texture is the whole VRAM story and it does")
+        print("    NOT scale with resolution -- it is one asset, sampled at a")
+        print("    locked reference width. A VRAM delta that grows with the")
+        print("    row is the render target, not the feature.")
+        print("")
+        print("  NOT MEASURED, AND NOT MEASURABLE FROM IN HERE:")
+        print("    bandwidth      -- no engine counter exists. Derivable from")
+        print("                      resolution x format x taps, but that is")
+        print("                      arithmetic, not a measurement, and the")
+        print("                      cache is what decides it.")
+        print("    power          -- needs nvidia-smi / RAPL alongside the run,")
+        print("                      polled by the caller, not by the probe.")
+        print("    shader stalls  -- needs Nsight, RGP or PIX. No substitute.")
+        print("")
+
+    # POWER, IF THE CALLER ASKED FOR IT AND THE DRIVER ANSWERED.
+    have_pw = any("power" in ((d.get("cost") or {}).get("film") or {})
+                  for d in perf.values())
+    if have_pw:
+        print("  POWER -- nvidia-smi, attributed to each configuration's own")
+        print("  timed window. Warmup is outside it: shader compilation and the")
+        print("  clock ramp both move watts and neither is the feature.")
+        print("    %-11s %-7s %9s %9s %9s   %8s"
+              % ("resolution", "hdr_2d", "no post", "baseline", "film", "f-b"))
+        for (w, h, hdr), d in sorted(perf.items()):
+            c = d.get("cost") or {}
+            row = []
+            for k in ("no_post", "baseline", "film"):
+                pw = (c.get(k) or {}).get("power")
+                row.append(pw["watts"] if pw else None)
+            if row[1] is None or row[2] is None:
+                continue
+            print("    %-11s %-7s %8s %8.1fW %8.1fW   %+7.1fW"
+                  % ("%dx%d" % (w, h), str(hdr).lower(),
+                     ("%.1fW" % row[0]) if row[0] is not None else "--",
+                     row[1], row[2], row[2] - row[1]))
+        print("")
+        print("    READ THIS AS A DIFFERENCE AND AT ITS OWN PRECISION. Board")
+        print("    power on an idle desktop wanders by several watts on its")
+        print("    own, and these are means over a few seconds; a delta")
+        print("    smaller than that wander is not a finding. What the column")
+        print("    can honestly settle is whether film moves power by tens of")
+        print("    watts, not whether it moves it by one.")
+        print("")
+    else:
+        src = next((d.get("power_source") for d in perf.values()
+                    if d.get("power_source")), None)
+        if src and src != "nvidia-smi":
+            print("  POWER -- not sampled: %s" % src)
+            print("")
+
 
     # The hdr_2d question, priced in time as well as in memory.
     print("  THE COST OF hdr_2d ITSELF, which is a separate question from film")
@@ -415,6 +698,18 @@ def main(argv=None):
     ap.add_argument("--godot", default=None)
     ap.add_argument("--timeout", type=int, default=900)
     ap.add_argument("--json", default=None)
+    ap.add_argument("--power", action="store_true",
+                    help="sample GPU power with nvidia-smi alongside --perf and\n"
+                         "attribute it to each configuration's own timed window.\n"
+                         "NVIDIA only; does nothing and says so without it.")
+    ap.add_argument("--bisect", action="store_true",
+                    help="price each film term by removing it, at the cell "
+                         "that fails section 41. Answers WHAT costs, which "
+                         "--perf only shows the total of.")
+    ap.add_argument("--bisect-at", default="3840x2160",
+                    help="resolution for --bisect. The default is the cell "
+                         "that fails section 41; a smaller one is for checking "
+                         "the harness, not for grading the budget.")
     ap.add_argument("--perf", action="store_true",
                     help="also measure GPU cost across section 50's resolutions")
     ap.add_argument("--perf-frames", type=int, default=600,
@@ -439,6 +734,16 @@ def main(argv=None):
                     if "ERROR" in line or "error" in line:
                         print("  | " + line)
         perf = {}
+        bisect = None
+        if a.bisect:
+            # ONE resolution and ONE target: the cell that actually fails.
+            # A bisect run at every cell would take four times as long to say
+            # the same thing about the one that matters.
+            bw, bh = (int(v) for v in a.bisect_at.lower().split("x"))
+            print("  BISECT at %dx%d hdr_2d=true -- the failing cell ..."
+                  % (bw, bh))
+            bisect, _ = run(godot, True, a.timeout, a.verbose, (bw, bh),
+                            (a.perf_warmup, a.perf_frames), bisect=True)
         if a.perf:
             cost = (a.perf_warmup, a.perf_frames)
             res = PERF_RESOLUTIONS
@@ -450,7 +755,8 @@ def main(argv=None):
                     print("  timing %dx%d hdr_2d=%s ..."
                           % (w, h, str(hdr).lower()))
                     perf[(w, h, hdr)], _ = run(godot, hdr, a.timeout,
-                                               a.verbose, (w, h), cost)
+                                               a.verbose, (w, h), cost,
+                                               power=a.power)
     except ProbeFailed as e:
         print("")
         print("  NOTHING MEASURED: " + str(e))
@@ -460,6 +766,8 @@ def main(argv=None):
     n = report(runs)
     if perf:
         n += report_cost(perf, runs[False].get("adapter"))
+    if bisect:
+        n += report_bisect(bisect)
     if a.json:
         out = {str(k).lower(): v for k, v in runs.items()}
         if perf:

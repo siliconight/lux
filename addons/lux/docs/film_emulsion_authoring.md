@@ -8,6 +8,100 @@ For what it is and how it works, see `docs/film_emulsion_tdd.md` (the
 specification) and `docs/film_emulsion_phase1_audit.md` (what was measured, and
 one thing the audit got wrong first). For the API, see `runtime_api.md`.
 
+## What it costs, and where it fits
+
+Measured on an RTX 2060, Godot 4.7 forward_plus, the engine's own viewport
+timer, at the shipped settings. §41 budgets the treatment at about 2% of the
+frame:
+
+| resolution | film ms | film watts | 30 fps | 60 fps | 90 fps | 120 fps |
+|---|---|---|---|---|---|---|
+| 1280x720 | 0.0450 | +7.6 W | ok | ok | ok | ok |
+| 1920x1080 | 0.0990 | +11.0 W | ok | ok | ok | ok |
+| 2560x1440 | 0.1760 | +7.0 W | ok | ok | ok | **over** |
+| 3840x2160 | 0.2580 | +8.8 W | ok | ok | **over** | **over** |
+
+**Film Mode fits everywhere except 4K above 60 fps and 1440p at 120.** If your
+target is one of those two cells, do not ship it on -- the cost is the density
+model itself and no parameter recovers it. A bisect at the failing cell showed
+the removable terms (the resolution lock, the chroma dye term) are together
+6.1% of the film cost, against the 15% to 34% that would be needed.
+
+Two honest qualifications. These are FLOORS taken on an empty scene, so a real
+level can only be worse -- treat 1440p at 90 and 4K at 60 as thin rather than
+comfortable. And they are one GPU: §51's hardware sweep has one machine in it,
+and two rasterisers have already disagreed about this shader in opposite
+directions.
+
+**The watts column matters more than the milliseconds on a handheld.** Film
+costs 7 to 12 W, sampled with `nvidia-smi` and attributed to each
+configuration's own timed window. On a desktop that is inside the noise you
+should care about. A Steam Deck's entire power budget is 15 W, so on that class
+of machine this is not a rounding error and nobody has measured it there --
+`tools/film_hw_sweep.py` is where that row goes when somebody does.
+
+Two other columns §50 asks for are deliberately absent rather than estimated.
+Bandwidth has no engine counter and deriving it from resolution x format x taps
+would be arithmetic wearing a measurement's clothes; shader stalls need Nsight,
+RGP or PIX. VRAM is flat -- the grain texture is one 128x128 RGBA8 asset, 64
+KiB, sampled at a locked reference width, so nothing about it scales with
+resolution.
+
+### If you need 4K above 60, or 1440p at 120
+
+A half-resolution film pass closes every failing cell -- its cost is just the
+row above it in this table, since it renders that many fragments of the same
+shader. It is priced in `tools/film_halfres_probe.py` and **not built**,
+because what it costs is not time:
+
+| | grain retained | fine band | aliasing |
+|---|---|---|---|
+| 4K half-res | 74.3% | 31.5% -> 13.5% | 0.0% |
+| 1440p half-res | 65.6% | 23.4% -> 12.6% | 0.0% |
+
+It softens rather than aliases, and what it softens is the fine band -- 68% of
+the blend, and the band deliberately placed near Nyquist so the grain reads as
+crystals rather than blobs. **Half-res is not a quality slider. It is a second
+stock:** the same emulsion, coarser, because half the pixels is half the
+pixels. Whether that is the look you want is not a decision this page can make
+for you.
+
+Worth saying next to all of it: 4K at 120 fps is chasing motion clarity, and
+film emulsion is a 24 fps aesthetic -- the grain advances at 24 fps no matter
+how fast the renderer runs. Half-res makes the cell fit. It does not make it a
+thing anyone wants.
+
+## What it is imitating, and why that shapes the parameters
+
+Analog motion picture film is coated with an emulsion of light-sensitive silver
+halide crystals. Exposure and development turn those microscopic crystals into
+metallic silver, and that physical deposit IS the grain -- it is not an overlay
+on the image, it is the substance the image is made of. Projected at the
+industry standard 24 frames per second, the result is the organic, flickering,
+immersive quality people mean by "the cinematic look".
+
+Three things in this feature follow directly from that description, and they
+are worth knowing because they explain parameters that otherwise look arbitrary:
+
+- **`film_grain_fps` defaults to 24, not to the frame rate.** Grain is a
+  property of each exposed FRAME of film, so it changes 24 times a second no
+  matter how fast the projector -- or the renderer -- runs. TDD §24: at 120 fps
+  the grain uniform is written every fifth frame, not every frame. Grain that
+  advances per rendered frame is video noise, not film.
+- **The density is MULTIPLICATIVE, not additive.** `col *= exp2(-neutral_density)`
+  models silver blocking light rather than noise being added on top, which is
+  why it preserves hue and saturation where an additive grain modulates them
+  (audit §3a). It is also why the effect is loud in shadow and quiet in
+  highlight without any mask -- the table below is that physics, measured.
+- **One shared density, not three.** Silver is not red, green and blue crystals
+  independently; one deposit attenuates all wavelengths together. That is the
+  same reasoning that produced the shared quantization decision, which turned
+  out to be the thing that removes the RGB breakup (audit §8b).
+
+An observation from the walk that this predicts: **the effect is easiest to see
+against blacks.** That is the exposure weighting below, seen rather than
+measured, and the two agree.
+
 ## It is already area-selective, and that is the whole design
 
 Two selectivities are built into the effect. Neither is a mask, and both are
