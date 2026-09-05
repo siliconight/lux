@@ -23,3 +23,6 @@ walk/headless/
 # editor backups from patch_*.py -- copies of tracked files, not history.
 # A RULE, not a list: each patch invents its own suffix.
 *.pre_*
+
+# Python bytecode from the tools/ probes
+__pycache__/
