@@ -126,6 +126,13 @@ func _build_quad(col: Color) -> void:
 	mat.emission = col
 	mat.emission_energy_multiplier = 1.5
 	mat.albedo_color = col
+	# DOUBLE-SIDED. A window's panel faces the room (that is where the light
+	# goes), and a single-sided quad is back-face culled from the street --
+	# so the first person to walk a level with lit windows (2026-09-11, cold
+	# run 9005) saw white panes from the ward and black rectangles from the
+	# road, the wrong way round for the viewer who judges a facade at night
+	# (roadmap 138). An emissive, unshaded panel has no wrong side.
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	if panel_texture != null:
 		mat.albedo_texture = panel_texture
 		mat.emission_texture = panel_texture

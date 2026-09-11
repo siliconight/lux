@@ -7,6 +7,15 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.32.2] - the window panel has no wrong side
+
+### Fixed
+- `LuxAreaLightRig`'s emissive quad is double-sided. It faces the room, and a
+  single-sided quad is back-face culled from outside, so the first person to
+  walk a level with lit windows saw white panes from inside and black
+  rectangles from the street (roadmap 138). Unshaded and emissive, the panel
+  reads the same from either side, which is what a lit window at night is.
+
 ## [0.32.1] - the shadow budgets are priced
 
 ### Changed
