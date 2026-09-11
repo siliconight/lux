@@ -7,6 +7,23 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.31.0] - a window's range is derived, not four times its size
+
+Roadmap 137. The first level to light its windows (0.30.0) went from 2 to
+12 meshes over GL Compatibility's per-mesh budget of 8 positional lights,
+every one an interior plate two rooms in: `LuxAreaLightRig`'s omni
+approximation used `4 x panel` (6.4-9.6 m) and a window anchor is the wall
+centreline, so half of every sphere is indoors.
+
+### Changed
+- `LuxAreaLightRig.omni_range` (export, 0 = the old panel rule). The loader
+  sets it for windows: twice the panel's longer side, clamped to 3.0-4.0 m
+  -- the floor under the sill and a few metres of room, capped where item 54
+  capped the fluorescent rows on the same tiles. 1.6 m windows -> 3.2, 2.4
+  -> 4.0. Signs and hand-placed rigs keep the panel rule. Deliberately NOT
+  `rig.light_range`: that resource defaults to 12.0 and this rig had never
+  read it.
+
 ## [0.30.1] - the window panels face the room
 
 ### Fixed

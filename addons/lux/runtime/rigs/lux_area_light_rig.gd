@@ -21,6 +21,11 @@ extends Node3D
 @export var panel_texture: Texture2D
 ## Keep energy independent of panel size (AreaLight3D.normalize_energy).
 @export var normalize_energy: bool = true
+## Range of the Compatibility-tier omni approximation, metres. 0 = derive
+## from the panel (4 x its longer side). The light loader sets it for
+## windows (roadmap 137); see _build for why the rig resource's own
+## light_range is deliberately not read here.
+@export var omni_range: float = 0.0
 
 @export_group("Preview Surface")
 ## Spawn a matching emissive quad so the panel reads visually, not just as light.
@@ -70,7 +75,21 @@ func _build() -> void:
 		omni.name = &"AreaPanel_Omni"
 		omni.light_color = col
 		omni.light_energy = energy
-		omni.omni_range = maxf(panel_size.x, panel_size.y) * 4.0
+		# RANGE: `omni_range` when the placer set one, else `4 x panel` --
+		# this rig's own guess, 6.4 m for a 1.6 m window, 9.6 for a 2.4. A
+		# window sits ON the envelope, so half that sphere is inside the
+		# building: the first level to light its windows (roadmap 96) went
+		# from 2 to 12 meshes over the per-mesh light budget, every one an
+		# interior plate two rooms in (roadmap 137). The loader derives a
+		# window's range the way it derives every other type's; the
+		# panel-size rule stays for signs and for hand-placed rigs. NOT
+		# `rig.light_range`: that resource defaults to 12.0, which this rig
+		# has never read, and honouring it would have made every window a
+		# 12 m sphere the day it started being consulted.
+		if omni_range > 0.0:
+			omni.omni_range = omni_range
+		else:
+			omni.omni_range = maxf(panel_size.x, panel_size.y) * 4.0
 		omni.shadow_enabled = shadows
 		_light = omni
 	else:

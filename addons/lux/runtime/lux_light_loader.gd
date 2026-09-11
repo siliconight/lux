@@ -280,6 +280,21 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			if typeof(a.get("size")) == TYPE_ARRAY and (a.get("size") as Array).size() >= 2:
 				size = a.get("size")
 			ar.panel_size = Vector2(float(size[0]), float(size[1]))
+			if t == "window":
+				# A WINDOW'S RANGE, DERIVED LIKE EVERY OTHER TYPE'S. The rig's
+				# own fallback is 4 x the panel's longer side -- 6.4 m for the
+				# 1.6 m windows Deli Counter emits most, 9.6 for a 2.4 -- and
+				# the anchor is the wall centreline (item 85 measured it at
+				# -0.150 m by design), so half the sphere is indoors and
+				# reaches two rooms of plates: cold run 9005 went from 2 to 12
+				# meshes over the per-mesh budget of 8 the day its windows lit
+				# (roadmap 137). What a window lights is the floor under its
+				# sill and a few metres of room: twice the longer side, held
+				# between 3.0 (a small window still reaches the floor from a
+				# 1.6 m centre) and 4.0 (the fluorescent row's cap, item 54,
+				# the same tiles). 1.6 -> 3.2, 2.4 -> 4.0.
+				var longer := maxf(float(size[0]), float(size[1]))
+				ar.omni_range = clampf(longer * 2.0, 3.0, 4.0)
 			var ra := LuxLightRig.new()
 			ra.rig_name = &"Window (baked)"
 			ra.light_color = LuxColorTemp.kelvin(LuxColorTemp.DAYLIGHT)
