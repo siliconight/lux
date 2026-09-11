@@ -15,7 +15,10 @@ extends RefCounted
 ## Division of labor is unchanged: Zoo owns WHERE (geometry + markers), Lux
 ## owns HOW BRIGHT (rig tuning per type via LuxLightLoader.rig_for_anchor).
 ## Daylight (window/sun) has no hardware, no markers, and stays on the
-## manifest bake path — which also means spawned lights are exactly the set
+## manifest bake path — `LuxLightLoader.bake_daylight`, which Level Factory's
+## driver calls with the merged site manifest since 0.30.0 (roadmap 96; until
+## then that path had no caller outside the dock and no window ever lit).
+## Which also means spawned lights are exactly the set
 ## `set_fixtures_powered(false)` SHOULD kill: interior/exterior building
 ## power, never light coming in through glass.
 ##

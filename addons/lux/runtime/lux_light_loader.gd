@@ -15,8 +15,63 @@ extends RefCounted
 ##   sun -> handled by the preset. Zoo's fixture pass (--fixtures) bakes the
 ##   matching HARDWARE at the same anchors; LuxEmissiveBinder ties its lit
 ##   faces to set_fixtures_powered.
+##
+## TWO CALLERS, TWO CONTAINERS. `bake` is the editor's: everything in the
+## manifest under `LuxLights`. `bake_daylight` is the pipeline's (0.30.0,
+## roadmap 96): only the anchors that have NO hardware and therefore no
+## `LuxEmit_*` marker for LuxFixtureSpawner to find -- `window` today --
+## under `LuxDaylight`, beside the spawner's `LuxFixtureLights`. Before it,
+## Deli Counter derived a window anchor per opening, Lot merged them, the
+## manifest shipped them, and no built level ever turned one into light: the
+## only caller of `bake` was the dock button.
 
 const CONTAINER := "LuxLights"
+const DAYLIGHT_CONTAINER := "LuxDaylight"
+
+## The anchor types daylight owns. `sun` is the preset's and is never baked
+## here; `window` is the one with no hardware and no marker.
+const DAYLIGHT_TYPES: Array[String] = ["window"]
+
+
+## Bake ONLY the daylight anchors of `path` under a `LuxDaylight` container,
+## leaving whatever the marker path spawned alone. Returns {ok, msg, count,
+## in_manifest} -- `in_manifest` is how many daylight anchors the file
+## carried, so a caller can tell "none asked for" from "none made".
+static func bake_daylight(path: String, scene_root: Node) -> Dictionary:
+	if scene_root == null:
+		return {"ok": false, "msg": "no scene root", "count": 0, "in_manifest": 0}
+	if not FileAccess.file_exists(path):
+		return {"ok": false, "msg": "File not found: %s" % path, "count": 0,
+			"in_manifest": 0}
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(data) != TYPE_DICTIONARY or not data.has("anchors"):
+		return {"ok": false, "msg": "Not a .lights.json (no 'anchors').",
+			"count": 0, "in_manifest": 0}
+	var old := scene_root.get_node_or_null(NodePath(DAYLIGHT_CONTAINER))
+	if old != null:
+		old.free()
+	var container := Node3D.new()
+	container.name = DAYLIGHT_CONTAINER
+	scene_root.add_child(container)
+	container.owner = scene_root
+	var made := 0
+	var in_manifest := 0
+	for a in data["anchors"]:
+		if typeof(a) != TYPE_DICTIONARY:
+			continue
+		if not DAYLIGHT_TYPES.has(String(a.get("type", ""))):
+			continue
+		in_manifest += 1
+		var node := _rig_for(a)
+		if node == null:
+			continue
+		container.add_child(node)
+		node.owner = scene_root
+		_reown(node, scene_root)
+		_place(node, a)
+		made += 1
+	return {"ok": true, "count": made, "in_manifest": in_manifest,
+		"msg": "Baked %d daylight rig(s) from %d window anchor(s)" % [made, in_manifest]}
 
 
 ## Read `path`, replace any previous bake, and spawn a rig per anchor under a

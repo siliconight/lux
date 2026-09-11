@@ -7,6 +7,23 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.30.0] - the windows light
+
+Roadmap 96, decided: window anchors become area lights. Deli Counter derived
+one per opening, Lot merged them into the site manifest, the manifest shipped
+them, and nothing in a built level ever turned one into light -- `bake`'s only
+caller was the dock button, and the marker path skips daylight by design
+because Zoo bakes no hardware for it.
+
+### Added
+- **`LuxLightLoader.bake_daylight(path, scene_root)`** -- the pipeline's
+  entry: only the anchors with no hardware and no marker (`window`) under a
+  `LuxDaylight` container, beside `LuxFixtureLights`, through the same
+  `_rig_for` tuning table (the shadowed `LuxAreaLightRig`, roadmap 60's
+  first tier). Returns `count` and `in_manifest` separately so a caller can
+  tell "none asked for" from "none made". Level Factory 0.70.0's driver
+  calls it with `--lights <site.site.lights.json>`.
+
 ## [0.29.0] - grain with a crystal size, and the walk walked
 
 The goal was never "add grain". It is the organic movement of different
