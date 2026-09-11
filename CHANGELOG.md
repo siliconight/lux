@@ -7,6 +7,27 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.32.1] - the shadow budgets are priced
+
+### Changed
+- `max_shadow_casters`: High 12 (was 24). Measured on cold run 9005's export
+  (58 lights) on an RTX 2060 under GL Compatibility at 1600x900, GPU ms per
+  frame from the engine's own timestamps: 0 casters 2.7-5.5 ms on the
+  elevations, 4 casters 3.9-7.7, 24 casters 8.4-13.3 -- about 0.3 ms per
+  shadowed omni, ~0.5 for the first few. 24 puts an exterior view at half to
+  three quarters of a 60 fps frame, so "High shadows everything" was never a
+  tier. 12 costs about +3.9 ms, under a quarter of the frame; Medium 8,
+  +2.6; Low and Compatibility 4, +1.3. The table is in the profile beside
+  the numbers it sets.
+- The ranking is by RANGE ACROSS AN ENVELOPE THE LIGHT IS OUTSIDE OF, which
+  0.32.0 had upside down: signs (8 m, the original sighting), wall packs
+  (5.5 m) and streetlights (14 m) first; windows second, now that they are
+  3.2-4.0 m and light on both sides of glass is the point of them; bulbs;
+  fluorescent rows. On cold run 9005 the old order spent all 24 casters on
+  19 windows and 5 bulbs and none on the three packs and the sign that put
+  half a sphere through the walls. The class is read off the rig NODE's
+  name, because signs and windows share a resource name.
+
 ## [0.32.0] - the tier decides which lights cast shadows
 
 Roadmap 60, the decision: shadows are a BUDGET the quality tier spends, on

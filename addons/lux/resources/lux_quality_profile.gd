@@ -30,7 +30,21 @@ extends Resource
 ## packs and streetlights, then the fluorescent rows) and enables shadows on
 ## the first `max_shadow_casters`, disabling the rest. Low and Compatibility
 ## keep 4: the area rigs, the class item 60 measured as affordable first.
-@export var max_shadow_casters: int = 24
+##
+## PRICED, 2026-09-11, RTX 2060, GL Compatibility, 1600x900, cold run 9005's
+## export (58 lights), GPU ms per frame from the engine's own timestamps:
+##
+##     casters   elev_N   elev_S   elev_E   elev_W   interior x3
+##           0     5.5      3.1      2.8      2.7    2.0  2.7  3.3
+##           4     7.7      4.2      3.9      4.2    3.1  3.3  3.4
+##          24    13.3      9.1      8.4      8.7    7.8  4.1  4.6
+##
+## About 0.3 ms per shadowed omni on an exterior view, ~0.5 for the first
+## few. 24 casters put an exterior at 8-13 ms -- half to three quarters of a
+## 60 fps frame at a modest resolution -- so "High shadows everything" is not
+## a tier, it is a slideshow. High spends 12 (+3.9 ms, under a quarter of the
+## 60 fps frame), Medium 8 (+2.6), Low and Compatibility 4 (+1.3).
+@export var max_shadow_casters: int = 12
 @export var shadow_max_distance: float = 100.0
 
 
@@ -39,7 +53,7 @@ static func make_tier(t: int) -> LuxQualityProfile:
 	q.tier = t
 	match t:
 		0:  # High
-			pass
+			q.max_shadow_casters = 12
 		1:  # Medium
 			q.shadow_max_distance = 45.0
 			q.max_dynamic_lights = 16

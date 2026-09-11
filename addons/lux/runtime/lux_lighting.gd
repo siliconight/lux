@@ -74,13 +74,22 @@ func unregister_light(light: Node3D) -> void:
 # shadowed light, so the question is never "shadows or not" but WHICH of a
 # level's ~60 lights get the maps the tier can afford.
 #
-# RANKED BY HOW MUCH THE THROUGH-WALL WASH IS WORTH STOPPING. Area rigs
-# (windows, signs) hang ON the envelope, so half their sphere is always inside
-# the building they are mounted to -- the class item 60 saw first, and the
-# only one shadowed since Lux 0.25.0. Bare bulbs are the objective rooms.
-# Wall packs and streetlights face exterior walls from outside. Fluorescent
-# rows are inside the rooms they light, so their spill through a partition is
-# the least visible of the four. Within a class, stable by name.
+# RANKED BY HOW MUCH THE THROUGH-WALL WASH IS WORTH STOPPING, which is the
+# light's RANGE across an envelope it is mounted outside of. Signs (8 m,
+# the original sighting: arena_a03's interior ceiling carried the wash of
+# the sign outside its south wall), wall packs (5.5 m, proud of the face
+# above a door) and streetlights (14 m) all sit outside the building and
+# put half a sphere through its walls -- first. Windows are ON the envelope
+# but at 3.2-4.0 m since Lux 0.31.0, and the light on both sides of glass
+# is the point of them -- second. Bare bulbs are inside their objective
+# rooms -- third. Fluorescent rows are inside the rooms they light, so their
+# spill through a partition is the least visible of the four -- last. Within
+# a class, stable by path.
+#
+# THE CLASS IS READ OFF THE RIG NODE'S NAME, not the resource's rig_name:
+# the loader gives signs and windows the same "Window (baked)" resource,
+# and the marker path names its rigs `Spawned_<type>_<n>`, so the node name
+# is the one place both paths spell the type.
 #
 # THE RIG'S OWN `shadows_enabled` IS A REQUEST, NOT A DECISION: it is what a
 # rig does with no LuxRoot in the scene. Under a LuxRoot the tier decides,
@@ -107,19 +116,31 @@ func _run_scheduled_policy() -> void:
 
 ## Which shadow-priority class a registered light belongs to; lower first.
 static func shadow_rank(light: Node3D) -> int:
+	return shadow_rank_of_name(_rig_type_name(light))
+
+
+## The rig node's name lower-cased -- `b0_ext_0_S_sign`, `ext_0_E_pack_1`,
+## `Spawned_streetlight_3`, `lobby_ceiling`, `vault_bulbs` -- with the rig
+## resource's name appended as a fallback for hand-built rigs.
+static func _rig_type_name(light: Node3D) -> String:
 	var rig_node := light.get_parent()
-	var name := ""
-	if rig_node != null:
-		var r: Variant = rig_node.get(&"rig")
-		if r is LuxLightRig:
-			name = String((r as LuxLightRig).rig_name)
-	if name.begins_with("Window") or name.begins_with("Sign"):
+	if rig_node == null:
+		return ""
+	var name := String(rig_node.name).to_lower()
+	var r: Variant = rig_node.get(&"rig")
+	if r is LuxLightRig:
+		name += " " + String((r as LuxLightRig).rig_name).to_lower()
+	return name
+
+
+static func shadow_rank_of_name(name: String) -> int:
+	if name.contains("sign") or name.contains("pack") or name.contains("street"):
 		return 0
-	if name.begins_with("Bare Bulb") or name.begins_with("Pendant"):
+	if name.contains("window"):
 		return 1
-	if name.begins_with("Wall Pack") or name.begins_with("Streetlight"):
+	if name.contains("bulb") or name.contains("pendant"):
 		return 2
-	if name.begins_with("Fluorescent"):
+	if name.contains("fluorescent") or name.contains("ceiling"):
 		return 3
 	return 4
 
