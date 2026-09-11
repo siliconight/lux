@@ -7,6 +7,26 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.30.1] - the window panels face the room
+
+### Fixed
+- `LuxLightLoader._place` mapped Deli Counter's `rot_y` ("0 == +X") straight
+  onto `rotation.y`, which is right for a rig that lays lamps along local +X
+  (the fluorescent row) and a quarter turn wrong for one that faces local +Z
+  (`LuxAreaLightRig`'s quad): under the axis swap the panel's forward needs
+  `rot_y + 90`. Every baked window panel stood perpendicular to its wall.
+  Seen the first time the pipeline called the path -- white quads out of
+  cold run 9005's west facade in the S elevation -- because until 0.30.0
+  nothing but the dock button ever baked one. The omni light beneath the
+  panel is orientation-free and was never wrong; the quad was.
+
+### Seen, not touched
+- Zoo writes its `LuxEmit_*` markers with a translation only, so a rig
+  spawned on the marker path inherits an identity basis; for the sign rig
+  that means its quad faces +Z whatever the wall. The sign's own hardware
+  carries the visible face there, which is why nobody has noticed. Item 55's
+  territory.
+
 ## [0.30.0] - the windows light
 
 Roadmap 96, decided: window anchors become area lights. Deli Counter derived

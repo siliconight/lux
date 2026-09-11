@@ -324,7 +324,21 @@ static func _place(node: Node3D, a: Dictionary) -> void:
 	# If a bake looks mirrored or rotated wrong, THIS line and the yaw below are
 	# the two things to flip.
 	node.position = Vector3(float(p[0]), float(p[2]), -float(p[1]))
-	node.rotation = Vector3(0.0, deg_to_rad(float(a.get("rot_y", 0.0))), 0.0)
+	# YAW, and which way a rig FACES. Deli Counter's rot_y is measured from
+	# +X toward +Y (its docs: "rot_y 0 == +X"); under the axis swap, DC
+	# (cos t, sin t) lands on Godot (cos t, 0, -sin t), and a rig that lays
+	# its lamps along local +X (the fluorescent row) reaches that with
+	# rotation.y = t exactly -- which is what this always did. An AREA rig
+	# faces local +Z (QuadMesh's normal), and rotation.y = f turns +Z onto
+	# (sin f, 0, cos f); equating gives f = t + 90. Without the quarter turn
+	# every baked window panel stood PERPENDICULAR to its wall -- first seen
+	# 2026-09-11, the day the pipeline first called this path (roadmap 96),
+	# as white quads sticking out of cold run 9005's west facade in the S
+	# elevation. The omni beneath it never cared; only the quad did.
+	var yaw := float(a.get("rot_y", 0.0))
+	if node is LuxAreaLightRig:
+		yaw += 90.0
+	node.rotation = Vector3(0.0, deg_to_rad(yaw), 0.0)
 
 
 static func _reown(node: Node, root: Node) -> void:
