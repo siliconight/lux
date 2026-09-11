@@ -7,6 +7,17 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.32.3] - a window's light stands inside the room
+
+### Changed
+- `LuxAreaLightRig.light_offset`: the source can stand off the panel while
+  the panel stays in the wall plane. The loader sets a window's to 0.35 m
+  along the panel's forward -- half a wall plus the panel standoff -- so the
+  omni sits inside the room and pools on the floor in front of the glass. On
+  the centreline it pooled on the ceiling and the floor symmetrically at the
+  wall, which a person walking cold run 9005 read as "light coming out of
+  this wall" (roadmap 145).
+
 ## [0.32.2] - the window panel has no wrong side
 
 ### Fixed

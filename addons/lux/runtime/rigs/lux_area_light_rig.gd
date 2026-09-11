@@ -26,6 +26,10 @@ extends Node3D
 ## windows (roadmap 137); see _build for why the rig resource's own
 ## light_range is deliberately not read here.
 @export var omni_range: float = 0.0
+## Where the light source sits relative to the panel, in the rig's own
+## frame (+Z = the panel's forward). Zero keeps it in the panel plane; the
+## loader sets a window's to stand inside the room (roadmap 145).
+@export var light_offset: Vector3 = Vector3.ZERO
 
 @export_group("Preview Surface")
 ## Spawn a matching emissive quad so the panel reads visually, not just as light.
@@ -107,6 +111,15 @@ func _build() -> void:
 	if rig != null:
 		rig.apply_bake_mode(_light)
 	add_child(_light)
+	# The LIGHT can stand off the panel while the panel stays in the wall
+	# plane. A window's anchor is the wall centreline, so an omni placed
+	# exactly there pools on the ceiling and the floor symmetrically at the
+	# wall -- walked 2026-09-11 as "light coming out of this wall" (roadmap
+	# 145). Local +Z is the panel's forward (the room, for a window), so a
+	# positive z puts the source inside the room and the pool on the floor in
+	# front of the glass, which is where a window's light lands.
+	if light_offset != Vector3.ZERO:
+		_light.position = light_offset
 	if Engine.is_editor_hint() and get_tree() != null:
 		_light.owner = get_tree().edited_scene_root
 

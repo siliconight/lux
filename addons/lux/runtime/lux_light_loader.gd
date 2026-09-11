@@ -295,6 +295,11 @@ static func _rig_for(a: Dictionary) -> Node3D:
 				# the same tiles). 1.6 -> 3.2, 2.4 -> 4.0.
 				var longer := maxf(float(size[0]), float(size[1]))
 				ar.omni_range = clampf(longer * 2.0, 3.0, 4.0)
+				# The source inside the room, not on the centreline: half a
+				# wall (0.15) plus the panel's own standoff (0.20), so the pool
+				# lands on the floor in front of the glass rather than on the
+				# ceiling and floor symmetrically at the wall (roadmap 145).
+				ar.light_offset = Vector3(0.0, 0.0, 0.35)
 			var ra := LuxLightRig.new()
 			ra.rig_name = &"Window (baked)"
 			ra.light_color = LuxColorTemp.kelvin(LuxColorTemp.DAYLIGHT)
