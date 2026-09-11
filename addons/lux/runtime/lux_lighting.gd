@@ -48,15 +48,107 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 	sun.shadow_enabled = preset.sun_shadows and quality.allow_sun_shadows
 	sun.directional_shadow_max_distance = quality.shadow_max_distance
 	_alarm_color = preset.alarm_color
+	apply_shadow_policy(quality)
 
 
 func register_light(light: Node3D) -> void:
 	if light != null and not _registered.has(light):
 		_registered.append(light)
+		# A rig registers from its own _ready, which can come AFTER the
+		# preset was applied (LuxRoot is an earlier sibling in a packed
+		# scene), so the policy is re-run once the frame settles.
+		_schedule_shadow_policy()
 
 
 func unregister_light(light: Node3D) -> void:
 	_registered.erase(light)
+
+
+# ---------------------------------------------------------------------------
+# Shadow policy (roadmap 60).
+#
+# An unshadowed light illuminates everything in range with walls never
+# consulted: a fixture in the next room lights this one's ceiling, and a sign
+# on the envelope washes the room behind the wall it hangs on. Collision never
+# blocks light; only a shadow map does, and GL Compatibility pays per
+# shadowed light, so the question is never "shadows or not" but WHICH of a
+# level's ~60 lights get the maps the tier can afford.
+#
+# RANKED BY HOW MUCH THE THROUGH-WALL WASH IS WORTH STOPPING. Area rigs
+# (windows, signs) hang ON the envelope, so half their sphere is always inside
+# the building they are mounted to -- the class item 60 saw first, and the
+# only one shadowed since Lux 0.25.0. Bare bulbs are the objective rooms.
+# Wall packs and streetlights face exterior walls from outside. Fluorescent
+# rows are inside the rooms they light, so their spill through a partition is
+# the least visible of the four. Within a class, stable by name.
+#
+# THE RIG'S OWN `shadows_enabled` IS A REQUEST, NOT A DECISION: it is what a
+# rig does with no LuxRoot in the scene. Under a LuxRoot the tier decides,
+# so that changing `quality_tier` moves the whole level at once and nothing
+# has to be re-baked.
+# ---------------------------------------------------------------------------
+
+var _policy_pending: bool = false
+var _quality_for_policy: LuxQualityProfile
+
+
+func _schedule_shadow_policy() -> void:
+	if _policy_pending:
+		return
+	_policy_pending = true
+	call_deferred(&"_run_scheduled_policy")
+
+
+func _run_scheduled_policy() -> void:
+	_policy_pending = false
+	if _quality_for_policy != null:
+		apply_shadow_policy(_quality_for_policy)
+
+
+## Which shadow-priority class a registered light belongs to; lower first.
+static func shadow_rank(light: Node3D) -> int:
+	var rig_node := light.get_parent()
+	var name := ""
+	if rig_node != null:
+		var r: Variant = rig_node.get(&"rig")
+		if r is LuxLightRig:
+			name = String((r as LuxLightRig).rig_name)
+	if name.begins_with("Window") or name.begins_with("Sign"):
+		return 0
+	if name.begins_with("Bare Bulb") or name.begins_with("Pendant"):
+		return 1
+	if name.begins_with("Wall Pack") or name.begins_with("Streetlight"):
+		return 2
+	if name.begins_with("Fluorescent"):
+		return 3
+	return 4
+
+
+## Enable shadows on the `quality.max_shadow_casters` highest-ranked registered
+## lights and disable them on the rest. Returns {enabled, disabled, budget}.
+func apply_shadow_policy(quality: LuxQualityProfile) -> Dictionary:
+	_quality_for_policy = quality
+	var budget: int = quality.max_shadow_casters if quality != null else 0
+	var lights: Array = []
+	for n in _registered:
+		if is_instance_valid(n) and n is Light3D and not (n is DirectionalLight3D):
+			lights.append(n)
+	lights.sort_custom(func(a: Node3D, b: Node3D) -> bool:
+		var ra := shadow_rank(a)
+		var rb := shadow_rank(b)
+		if ra != rb:
+			return ra < rb
+		return String(a.get_path()) < String(b.get_path()))
+	var enabled := 0
+	var disabled := 0
+	for i in range(lights.size()):
+		var on: bool = i < budget
+		(lights[i] as Light3D).shadow_enabled = on
+		if on:
+			enabled += 1
+		else:
+			disabled += 1
+	return {"enabled": enabled, "disabled": disabled, "budget": budget}
 
 
 func register_emissive(mat: BaseMaterial3D) -> void:

@@ -30,8 +30,24 @@ signal blend_finished(preset_name: StringName)
 	set(value):
 		quality_tier = value
 		_quality = LuxQualityProfile.make_tier(value)
+		_apply_shadow_override()
 		if _initialized and _current != null:
 			apply_preset(_current)
+## Fixture shadow maps this level may spend, overriding the tier's budget
+## when >= 0 (roadmap 60). -1 keeps the tier's figure. Exists so a level
+## can be priced -- the same package at 0, 4 and 24 casters -- without
+## changing the tier, which moves post-fx, glow and dither with it.
+@export var shadow_caster_budget: int = -1:
+	set(value):
+		shadow_caster_budget = value
+		_apply_shadow_override()
+		if _initialized and _current != null:
+			apply_preset(_current)
+
+
+func _apply_shadow_override() -> void:
+	if _quality != null and shadow_caster_budget >= 0:
+		_quality.max_shadow_casters = shadow_caster_budget
 
 @export_group("Startup")
 @export var apply_on_ready: bool = true
@@ -165,6 +181,7 @@ var _preset_library := {}
 func _ready() -> void:
 	add_to_group(&"lux_root")
 	_quality = LuxQualityProfile.make_tier(quality_tier)
+	_apply_shadow_override()
 	# Resolve the sun link BEFORE building modules. _build_modules() decides
 	# whether to manufacture a sun, and it cannot honour a link that has not
 	# been worked out yet.

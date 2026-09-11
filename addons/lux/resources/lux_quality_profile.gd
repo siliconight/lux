@@ -21,7 +21,16 @@ extends Resource
 
 @export_group("Budgets")
 @export var max_dynamic_lights: int = 24
-@export var max_shadow_casters: int = 8
+## FIXTURE SHADOW MAPS THE TIER MAY SPEND (roadmap 60). An unshadowed light
+## illuminates everything in range with walls never consulted -- collision
+## never blocks light, only a shadow map does -- and GL Compatibility pays
+## per shadowed light, so a level cannot shadow all of its ~60. LuxLighting
+## ranks every rig light by how much its through-wall wash is worth
+## stopping (area rigs on the envelope first, then bare bulbs, then wall
+## packs and streetlights, then the fluorescent rows) and enables shadows on
+## the first `max_shadow_casters`, disabling the rest. Low and Compatibility
+## keep 4: the area rigs, the class item 60 measured as affordable first.
+@export var max_shadow_casters: int = 24
 @export var shadow_max_distance: float = 100.0
 
 
@@ -34,6 +43,7 @@ static func make_tier(t: int) -> LuxQualityProfile:
 		1:  # Medium
 			q.shadow_max_distance = 45.0
 			q.max_dynamic_lights = 16
+			q.max_shadow_casters = 8
 			q.allow_volumetric_fog = false
 		2:  # Low
 			q.allow_post_fx = false
@@ -41,7 +51,7 @@ static func make_tier(t: int) -> LuxQualityProfile:
 			q.allow_sun_shadows = false
 			q.allow_volumetric_fog = false
 			q.max_dynamic_lights = 8
-			q.max_shadow_casters = 0
+			q.max_shadow_casters = 4
 			q.allow_film_emulsion = false
 			q.dither_note()
 		3:  # Compatibility
@@ -51,7 +61,7 @@ static func make_tier(t: int) -> LuxQualityProfile:
 			q.allow_sun_shadows = false
 			q.allow_volumetric_fog = false
 			q.max_dynamic_lights = 6
-			q.max_shadow_casters = 0
+			q.max_shadow_casters = 4
 			q.allow_film_emulsion = false
 	return q
 

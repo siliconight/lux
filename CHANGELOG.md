@@ -7,6 +7,33 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.32.0] - the tier decides which lights cast shadows
+
+Roadmap 60, the decision: shadows are a BUDGET the quality tier spends, on
+the lights whose through-wall wash is worth stopping first. An unshadowed
+light illuminates everything in range with walls never consulted; collision
+never blocks light, only a shadow map does, and GL Compatibility pays per
+shadowed light, so a level cannot shadow all of its ~60.
+
+### Added
+- `LuxLighting.apply_shadow_policy(quality)`: ranks every registered rig
+  light -- area rigs on the envelope (windows, signs) first, then bare
+  bulbs, then wall packs and streetlights, then the fluorescent rows; stable
+  by path within a class -- enables `shadow_enabled` on the first
+  `max_shadow_casters`, disables the rest. Runs on every preset apply and,
+  deferred, after every rig registration, so a rig that readies after the
+  LuxRoot is not missed. The rig's own `shadows_enabled` is now what it does
+  with NO LuxRoot in the scene; under one, the tier decides.
+- `LuxRoot.shadow_caster_budget` (-1 = the tier's): a level can be priced at
+  0, 4 and 24 casters without changing the tier, which moves post-fx, glow
+  and dither with it.
+
+### Changed
+- `LuxQualityProfile.max_shadow_casters`: High 24 (was 8), Medium 8, Low
+  and Compatibility 4 (were 0 -- the area rigs are the class item 60
+  measured as affordable first, and 0 would have switched the shipped
+  window shadows off).
+
 ## [0.31.0] - a window's range is derived, not four times its size
 
 Roadmap 137. The first level to light its windows (0.30.0) went from 2 to
