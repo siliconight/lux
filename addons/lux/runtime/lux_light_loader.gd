@@ -300,6 +300,20 @@ static func _rig_for(a: Dictionary) -> Node3D:
 				# lands on the floor in front of the glass rather than on the
 				# ceiling and floor symmetrically at the wall (roadmap 145).
 				ar.light_offset = Vector3(0.0, 0.0, 0.35)
+			else:
+				# A SIGN'S SOURCE STANDS IN FRONT OF ITS CABINET. The anchor
+				# is the sign's FACE plane (Deli Counter, 0.20 m proud of the
+				# wall) and Zoo mounts `sign_box` CENTRED on it, 0.18 m deep
+				# by its genome default -- so an omni at the anchor is inside
+				# the cabinet, 0.09 m from every face of a 0.28-grey box at
+				# energy 3.0. That is the "white box" walked on cold run 9005
+				# (roadmap 139). Half the cabinet plus the same 0.20 standoff
+				# the face itself keeps from the wall puts the source 0.29 m
+				# ahead of the face: the cabinet is lit from outside like the
+				# facade around it, and the pool lands on the pavement below.
+				# The range is deliberately untouched here (4 x the panel's
+				# longer side); a sign's reach is its own derivation.
+				ar.light_offset = Vector3(0.0, 0.0, 0.18 * 0.5 + 0.20)
 			var ra := LuxLightRig.new()
 			ra.rig_name = &"Window (baked)"
 			ra.light_color = LuxColorTemp.kelvin(LuxColorTemp.DAYLIGHT)

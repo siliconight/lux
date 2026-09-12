@@ -82,10 +82,26 @@ static func spawn(scene_root: Node, parent: Node = null) -> Dictionary:
 			skipped.append({"marker": String(mk.name),
 				"reason": "no rig for type '%s'" % t})
 			continue
+		if rig is LuxAreaLightRig:
+			# The hardware IS the panel. Zoo's sign cabinet carries its own
+			# emissive face (`M_SignBox_Face`); the rig's preview quad on top
+			# of it is the "white square standing off the sign" walked on
+			# cold run 9005 (roadmap 139). Set before add_child: _build runs
+			# in _ready.
+			rig.show_emissive_quad = false
 		container.add_child(rig)
 		if edited_root != null:
 			rig.owner = edited_root
 		rig.global_transform = mk.global_transform
+		if rig is LuxAreaLightRig:
+			# The marker's basis IS the anchor's facing (Zoo stamps rot_z;
+			# roadmap 139 first said "translation only" and was wrong -- the
+			# rotation was always there). But an area rig faces local +Z and
+			# the marker's facing is its local +X, so the rig takes the same
+			# quarter turn `LuxLightLoader._place` derives (f = t + 90).
+			# Without it the sign's panel and its offset source stand
+			# perpendicular to the facade.
+			rig.rotate_object_local(Vector3.UP, deg_to_rad(90.0))
 		made += 1
 
 	var msg := "Spawned %d fixture light(s) from %d marker(s)" % [made, markers.size()]

@@ -169,6 +169,38 @@ func _main() -> void:
 	_check("only the two markers with nothing on them are dark",
 		(" | ".join(mixed)).contains("2 fixture marker"), true)
 
+	print("case E -- a sign faces the way its marker points (roadmap 139)")
+	# Zoo stamps the anchor's facing on the marker as a yaw; under the glTF
+	# axis swap that facing is the marker's local +X. An area rig faces
+	# local +Z, so the spawner owes it the loader's quarter turn -- without
+	# it the panel stands perpendicular to the facade, as walked on cold
+	# run 9005. And the hardware is the panel: no preview quad under it.
+	var stage2 := Node3D.new()
+	stage2.name = "SignStage"
+	root.add_child(stage2)
+	var sign := Node3D.new()
+	sign.name = "LuxEmit_sign"
+	stage2.add_child(sign)
+	sign.global_position = Vector3(2.0, 3.0, 1.0)
+	sign.rotation = Vector3(0.0, deg_to_rad(30.0), 0.0)
+	await process_frame
+	var spawn2: Dictionary = Spawner.spawn(stage2)
+	await process_frame
+	_check("one rig spawned", int(spawn2.get("count", 0)), 1)
+	var c2: Node = stage2.get_node_or_null(NodePath("LuxFixtureLights"))
+	var srig: Node3D = (c2.get_child(0) as Node3D) if c2 != null and c2.get_child_count() > 0 else null
+	if srig == null:
+		_check("sign rig exists", false, true)
+	else:
+		var facing: Vector3 = sign.global_transform.basis.x.normalized()
+		var normal: Vector3 = srig.global_transform.basis.z.normalized()
+		_check("panel normal is the marker's facing (dot)",
+			snappedf(normal.dot(facing), 0.001), 1.0)
+		_check("rig root sits ON its marker",
+			snappedf((srig.global_position - sign.global_position).length(), 0.001), 0.0)
+		_check("no preview quad under spawned hardware",
+			srig.get_node_or_null(NodePath("AreaPanel_Surface")) == null, true)
+
 	print("")
 	if _fails == 0:
 		print("  colocation selftest ok: the drop is real, a hung fixture passes,")

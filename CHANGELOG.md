@@ -7,6 +7,30 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.33.0] - the sign faces the street and lights it from outside
+
+### Changed
+- `LuxFixtureSpawner` gives an area rig the same quarter turn
+  `LuxLightLoader._place` derives (f = t + 90): the marker's basis is the
+  anchor's facing along local +X, an area rig faces local +Z. Roadmap 139
+  first said Zoo wrote its `LuxEmit_*` markers "with a translation only";
+  that was wrong -- `build.py` has stamped `rot_z` since the markers
+  existed and the spawner copies the whole transform. What was missing was
+  the turn, so the sign's panel stood perpendicular to the facade: the
+  "white square standing off the sign" walked on cold run 9005.
+- The spawner turns the area rig's preview quad OFF: the hardware is the
+  panel (Zoo's sign cabinet carries `M_SignBox_Face`), and a second
+  emissive quad through it is the same white square from another angle.
+  The manifest bake path (windows) keeps its quad; no hardware stands there.
+- `rig_for_anchor("sign")` sets `light_offset` 0.29 m ahead of the face:
+  the anchor is the face plane, Zoo mounts `sign_box` centred on it, 0.18 m
+  deep, so the omni sat inside the cabinet 0.09 m from a 0.28-grey box at
+  energy 3.0 -- the "white box". Half the cabinet + the face's own 0.20 m
+  standoff from the wall. The sign's range (4 x its longer side, 12 m for
+  a 3 m sign) is untouched and named as its own derivation.
+- `tools/colocation_selftest.gd` case C: a sign marker facing +X spawns a
+  rig whose panel normal is that facing, and no preview quad under it.
+
 ## [0.32.3] - a window's light stands inside the room
 
 ### Changed
