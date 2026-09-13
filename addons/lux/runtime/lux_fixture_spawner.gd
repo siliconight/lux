@@ -89,6 +89,7 @@ static func spawn(scene_root: Node, parent: Node = null) -> Dictionary:
 			# cold run 9005 (roadmap 139). Set before add_child: _build runs
 			# in _ready.
 			rig.show_emissive_quad = false
+		rig.name = unique_child_name(container, String(rig.name))
 		container.add_child(rig)
 		if edited_root != null:
 			rig.owner = edited_root
@@ -108,6 +109,24 @@ static func spawn(scene_root: Node, parent: Node = null) -> Dictionary:
 	if not skipped.is_empty():
 		msg += " (%d skipped)" % skipped.size()
 	return {"ok": true, "msg": msg, "count": made, "skipped": skipped}
+
+
+## `base`, or `base_dup<k>` for the first k from 2 that no child of
+## `parent` already carries. A level instances one site per building, every
+## site's fixture GLB names its markers the same way (`LuxEmit_sign`,
+## `LuxEmit_fluorescent_001`), and they all spawn into ONE container -- so
+## `add_child` renamed every rig after the first building's to `@Node3D@<n>`.
+## That erased the type word LuxLighting ranks shadows by: on cold run
+## 9048's walk copy the second building's sign ranked as a WINDOW, went
+## unshadowed while the first building's sign cast, and measured the largest
+## through-wall leak of any fixture light (LuxLeakMeter, 36 of 128 rays).
+static func unique_child_name(parent: Node, base: String) -> String:
+	if not parent.has_node(NodePath(base)):
+		return base
+	var k := 2
+	while parent.has_node(NodePath("%s_dup%d" % [base, k])):
+		k += 1
+	return "%s_dup%d" % [base, k]
 
 
 ## Remove a previous spawn (the whole LuxFixtureLights container).

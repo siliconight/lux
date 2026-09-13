@@ -7,6 +7,110 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.34.0] - a ceiling lamp lights its own room, not the storey above
+
+A person walking cold run 9048 saw "light coming from a basement fixture
+through the wall". It was: a basement pendant hangs 0.70 m under its slab with
+a 3.6 m range, and as an unshadowed omni it lit the lobby's south wall from
+0.18 to 0.99 m above the lobby floor. Collision never blocks light; only a
+shadow map does, and nothing counted how often a range crossed one.
+
+### Added
+- **`LuxLeakMeter`** (`runtime/lux_leak_meter.gd`, no class dependencies, so
+  it loads from a vendored package too): from each positional light, rays on
+  a Fibonacci sphere against the PHYSICS space out to the light's range; the
+  first front face behind the first collider is a leak sample, weighted by the
+  engine's falloff and a spot's rim. Split by the occluder's normal into slab
+  (another storey) and wall (another room, or outdoors); shadowed lights
+  counted apart. Numbers only.
+- `LuxValidator.check_light_leak` -- the meter's summary as an INFO finding
+  in `validate()`, never a WARN: a window lighting the pavement through its
+  own pane counts too, and the meter cannot tell design from defect.
+- `tools/light_leak_probe.gd` -- the meter over a scene's RUNNING tree
+  (rigs rebuild their lamps in `_ready`, and the shadow policy re-decides a
+  frame later), printing `LUX_LEAK` lines and writing the per-light table as
+  JSON. `--meter` for a package that vendors Lux elsewhere.
+- `tools/light_leak_selftest.gd` -- the downlight stops a slab leak that the
+  omni it replaced registers; a box resting flush on the slab is a contact and
+  the same box lifted 10 cm is a leak; the validator carries the count; a
+  shadowed light is counted apart; duplicate marker names keep their type.
+- `LuxLightRig.downlight_angle_deg` / `downlight_rim`: 0 keeps the omni.
+
+### Changed
+- **Fluorescent rows and pendants are downward spots**: 89 degrees,
+  `spot_angle_attenuation` 0.125 (`LuxLightLoader._make_downlight`). Measured
+  on 9048's walk copy, 76 unshadowed ceiling rigs, 512 rays each: 66 lit a
+  surface behind a collider, 56 of them in the storey ABOVE. The candidates,
+  priced on the same rays:
+  - **clamping range to the room** fails: for 57 of the 66 the largest range
+    that leaks nothing halves or zeroes the light straight under the lamp. A
+    lamp hangs 0.25-0.70 m under one slab and 2.6-3.2 m over the other.
+  - **shadows** do not fit: 66 more casters at 0.32.1's ~0.3 ms is ~20 ms,
+    and High's 12 are spent on signs, packs and windows.
+  - **per-storey cull layers** would re-layer geometry Lux does not own and
+    do nothing for the lamp beside a wall.
+  - **a downward cone** takes the storey-above leak to zero at any rim
+    (weighted leak 125.1 -> 6.5-7.6); the rim sets how much of the room's
+    own light below the lamp survives: 56% at 1.0, 69% at 0.5, 80% at 0.25,
+    87% at 0.125.
+
+  Re-spawning that level's fixtures through the old loader and this one, same
+  meter: unshadowed lights leaking 78 -> 38 (through a slab 63 -> 24, through a
+  wall 28 -> 19); fluorescent-row leak energy 14.12 -> 0.13, pendants 15.49 ->
+  1.84; own light below the lamp 87.2% (rows) and 87.3% (pendants) of before.
+  The old loader's rebuild reproduced the shipped scene's numbers to four
+  figures, so the difference is this change. Frames: the warm glow at the foot
+  of the lobby wall, on the manager's office furniture above the basement and
+  at the foot of the auto shop's upstairs wall is gone.
+
+  **Cost.** No shadow maps and no extra lights. GPU ms, RTX 2060, GL
+  Compatibility, 1600x900, two look_shots runs per build: elev_S 4.46/4.05
+  before, 4.22/3.90 with the downlights alone; elev_E 4.45/4.34 before,
+  3.78/3.56. **The look cost is the ceiling**: a fixture no longer lights the
+  ceiling it hangs from, so the halo round a troffer and the warm wash a bare
+  basement bulb threw overhead are both gone; the ceiling reads from ambient.
+  Not yet walked.
+
+### Fixed
+- `LuxFixtureSpawner` names a rig `<name>_dup<k>` when the container already
+  holds its name. A level instances one site per building, every site names its
+  markers alike, and `add_child` renamed every rig after the first building's
+  to `@Node3D@<n>` -- erasing the type word the shadow policy ranks by. On 9048
+  the second building's sign ranked as a window and went unshadowed while the
+  first building's sign cast; it had the largest through-wall leak of any
+  fixture light. It now casts, which is the +1 ms on elev_S/elev_E measured
+  with both changes (5.09/5.83, 5.45/5.36): that sign's shadow map, inside the
+  12 High budget. Shadowed lights 12 of 12 before and after.
+- `LuxFluorescentRig` sweeps saved lamps by `Light3D`, not `OmniLight3D`, or a
+  loaded downlight rig would build a second set beside the first.
+
+### Measured, not assumed
+- **Godot 4.7's spot rim exponent is the RECIPROCAL of
+  `spot_angle_attenuation`** under GL Compatibility: a downward spot against
+  an identical omni on a white floor matched `1 - rim^(1/a)` within 0.02 at a
+  = 0.125, 0.25, 1, 4, 8, and missed `1 - rim^a` (0.499 against 1.000 at 20
+  degrees, a = 4). The streetlight's 1.2 is therefore a slightly SHARPER
+  falloff than Lambertian, not a softer one.
+- **A spot's culling box is `range * sin(angle)` wide up to 89.x degrees and
+  the omni's full cube at 90 and above** (`get_aabb()`), which is why the cone
+  is 89, not 90. RETRACTED before it shipped: the first reasoning here said
+  `tan(angle)`, which would have made any wide cone pair with the whole storey.
+- **The first meter counted hidden faces.** 45 of basement pendant_012's 46
+  slab samples were the underside of the sidewalk collider resting flush on
+  the slab; chairs standing on the slab above and the faces between touching
+  stair blocks filled the rest. A sample now needs 3 cm of free space in front
+  of it from any other body, tested from 5 mm behind the face so a coplanar
+  trimesh neighbour is crossed.
+
+### Unresolved
+- What still leaks (38 unshadowed lights at 128 rays) is windows through their
+  own panes -- by design since 0.31.0 -- plus ceiling lamps through the floor
+  below them and walls beside them.
+- Whether dropping the ceiling hemisphere from each lamp's culling box frees
+  per-mesh light slots on ceiling plates (roadmap 54) is the engine's pairing
+  rule as understood, not measured with `mesh_light_census`, which treats
+  spots as spheres.
+
 ## [0.33.0] - the sign faces the street and lights it from outside
 
 ### Changed

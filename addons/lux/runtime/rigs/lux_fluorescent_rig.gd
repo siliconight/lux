@@ -11,7 +11,7 @@ extends Node3D
 		if is_inside_tree():
 			_rebuild()
 
-var _lights: Array[OmniLight3D] = []
+var _lights: Array[Light3D] = []
 var _flicker_phase: float = 0.0
 
 
@@ -37,20 +37,34 @@ func _rebuild() -> void:
 	# queue_free(): a deferred corpse still holds its name for the rest of the
 	# frame, so the replacement would be renamed @OmniLight3D@N and become
 	# unaddressable (item 55 documents what @-names cost downstream).
+	# By Light3D, not OmniLight3D: a downlight rig (0.34.0) saves SpotLight3D
+	# lamps, and sweeping only omnis would double those exactly the way the
+	# census above describes.
 	for c in get_children():
-		if c is OmniLight3D:
+		if c is Light3D:
 			remove_child(c)
 			c.free()
 	_lights.clear()
 	var r := rig if rig != null else _default_rig()
 	var start := -(r.count - 1) * 0.5 * r.spacing
 	for i in r.count:
-		var lamp := OmniLight3D.new()
+		var lamp: Light3D
+		if r.downlight_angle_deg > 0.0:
+			var spot := SpotLight3D.new()
+			spot.spot_range = r.light_range
+			spot.spot_attenuation = r.attenuation
+			spot.spot_angle = minf(r.downlight_angle_deg, 89.0)
+			spot.spot_angle_attenuation = r.downlight_rim
+			spot.rotation_degrees = Vector3(-90.0, 0.0, 0.0)  # straight down
+			lamp = spot
+		else:
+			var omni := OmniLight3D.new()
+			omni.omni_range = r.light_range
+			omni.omni_attenuation = r.attenuation
+			lamp = omni
 		lamp.name = &"Fluoro_%d" % i
 		lamp.light_color = r.light_color
 		lamp.light_energy = r.energy
-		lamp.omni_range = r.light_range
-		lamp.omni_attenuation = r.attenuation
 		lamp.shadow_enabled = r.shadows_enabled
 		lamp.position = Vector3(start + i * r.spacing, r.mount_height, 0.0)
 		r.apply_bake_mode(lamp)

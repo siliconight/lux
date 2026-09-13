@@ -29,6 +29,25 @@ extends Resource
 @export var spacing: float = 6.0
 @export var mount_height: float = 4.0
 
+@export_group("Downlight")
+## Ceiling rigs only (LuxFluorescentRig). 0 = each lamp is an OmniLight3D,
+## every rig before Lux 0.34.0. > 0 = each lamp is a SpotLight3D pointing
+## straight down with this half-angle, so nothing ABOVE the lamp's own plane
+## is lit -- in particular nothing in the storey above, through the slab,
+## which no unshadowed omni can avoid (see LuxLightLoader's fluorescent
+## branch for the measurement). Held below 90: Godot 4.7 sizes a spot's
+## culling box as a half-box of `range * sin(angle)` up to 89.x degrees and
+## returns the omni's FULL box at 90 and above, so 90 would keep pairing
+## the light with every mesh above it.
+@export_range(0.0, 89.0) var downlight_angle_deg: float = 0.0
+## The cone's rim softness, written straight to `spot_angle_attenuation`.
+## MEASURED, GL Compatibility, Godot 4.7: the engine's rim factor is
+## `1 - rim^(1 / value)` with rim = (1 - cos t) / (1 - cos angle) -- the
+## RECIPROCAL of the property is the exponent. 1.0 is a cosine (Lambertian)
+## falloff from the axis; 0.125 holds the full omni value to 60 degrees off
+## axis and fades over the last ~20.
+@export_range(0.01, 4.0) var downlight_rim: float = 1.0
+
 @export_group("Flicker")
 ## Subtle instability for fluorescents / failing bulbs. 0 = steady.
 @export_range(0.0, 1.0) var flicker_amount: float = 0.0

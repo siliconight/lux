@@ -204,6 +204,7 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			r.mount_height = -0.25
 			r.flicker_amount = 0.12
 			r.flicker_speed = 9.0
+			_make_downlight(r)
 			f.rig = r
 			return f
 		"pendant":
@@ -229,6 +230,7 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			rb.mount_height = 0.0
 			rb.flicker_amount = 0.06
 			rb.flicker_speed = 2.5
+			_make_downlight(rb)
 			b.rig = rb
 			return b
 		"streetlight":
@@ -335,6 +337,62 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			return ar
 		_:
 			return null   # 'sun' is owned by the preset/SkyMint; others skipped
+
+
+## CEILING LAMPS LIGHT DOWNWARD, NOT THROUGH THE SLAB ABOVE (0.34.0). A person
+## walking cold run 9048 saw "light coming from a basement fixture through the
+## wall": a basement pendant hangs 0.70 m under its slab with a 3.6 m range,
+## so as an unshadowed omni it lit the ground floor's walls up to a metre
+## above that floor. Collision never blocks light; only a shadow map does.
+##
+## Measured with LuxLeakMeter on that walk copy, 512 rays per light, the 76
+## unshadowed ceiling rigs (55 fluorescent, 21 pendant):
+##
+##   * 66 of 76 lit an exposed surface behind a collider; 56 of those
+##     through the slab ABOVE them.
+##   * (a) CLAMPING RANGE TO THE ROOM DOES NOT WORK. For 57 of the 66, the
+##     largest range that leaks nothing halves or zeroes the light on the
+##     lamp's own floor directly below: a lamp hangs 0.25-0.70 m under the slab
+##     above and 2.6-3.2 m over its floor, and the pool has to reach the floor
+##     (the drop rule above).
+##   * (b) SHADOWS DO NOT FIT. 66 more casters at the ~0.3 ms each that 0.32.1
+##     priced is ~20 ms on the RTX 2060, against a High budget of 12 that the
+##     signs, packs and windows already spend.
+##   * (c) PER-STOREY CULL LAYERS would mean re-layering geometry Lux does not
+##     own, and do nothing for the lamp beside a wall.
+##   * A DOWNWARD CONE, per angle and rim (energy-weighted leak / own-room
+##     light below the lamp plane, omni = 125.1 / 692):
+##
+##         89 deg, rim 1.0     6.46 / 389  (56%)   Lambertian falloff
+##         89 deg, rim 0.5     7.24 / 479  (69%)
+##         89 deg, rim 0.25    7.53 / 551  (80%)
+##         89 deg, rim 0.125   7.63 / 604  (87%)
+##
+##     Leak falls 94% at every setting and the slab-above leak to zero; the
+##     rim decides how much of the room's own light survives. 0.125 keeps 87%
+##     and is what ships. The 13% lost is the band just under the ceiling at
+##     grazing angles. The ceiling itself is no longer lit by its own fixture
+##     and reads from the environment's ambient, like a recessed troffer --
+##     which for a BARE BULB is a visible change: the warm wash a basement
+##     bulb threw on its own ceiling is gone (look_shots, same walk copy).
+##
+##     Confirmed by re-spawning that level's fixtures through this loader and
+##     the one before it, same meter, 512 rays: own light below the lamp plane
+##     157.9 -> 137.8 on the fluorescent rows (87.2%), 553.1 -> 482.6 on the
+##     pendants (87.3%); lights leaking into the storey above 56 -> 0.
+##
+## Cost: no shadow maps; one positional light per lamp, as before. At 89
+## degrees a spot's culling box (printed from `get_aabb()`) is the lower HALF
+## of the omni's 2R cube, so a mesh wholly above the lamp plane -- the ceiling
+## plate it hangs under -- should no longer be paired with it. That last part
+## is the engine's pairing rule as understood, not yet measured against a
+## per-mesh census (roadmap 54).
+## What is left leaking (40 of 76 lights at 512 rays, 6% of the old energy)
+## goes through the floor below the lamp and walls beside it -- measured, not
+## fixed here.
+static func _make_downlight(r: LuxLightRig) -> void:
+	r.downlight_angle_deg = 89.0
+	r.downlight_rim = 0.125
 
 
 ## Flip a freshly-built rig's resource to bake-static BEFORE it enters the

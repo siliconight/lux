@@ -55,6 +55,11 @@ static func validate(root: LuxRoot) -> Array:
 		if Engine.is_editor_hint() and root.get_tree() else root)
 	for f in check_fixture_colocation(scan_root):
 		findings.append(f)
+	var space: PhysicsDirectSpaceState3D = null
+	if root.get_world_3d() != null:
+		space = root.get_world_3d().direct_space_state
+	for f in check_light_leak(scan_root, space, quality.max_shadow_casters):
+		findings.append(f)
 	var lights: Dictionary = _count_nodes_of_type(scan_root, "Light3D")
 	var omni_spot: int = lights.omni + lights.spot
 	if omni_spot > quality.max_dynamic_lights:
@@ -350,6 +355,30 @@ static func check_fixture_colocation(scene_root: Node, tolerance: float = 0.1) -
 		findings.append(Finding.new(Severity.OK,
 			"Fixture co-location: %d marker(s) lit, %d spawned rig(s) on hardware (tolerance %.2f m)."
 			% [markers.size(), spawned.size(), tolerance]))
+	return findings
+
+
+## Light-leak measurement (0.34.0): how many UNSHADOWED positional lights reach
+## an exposed surface behind a collider, split by what they cross -- a slab
+## (another storey) or a wall (another room, or outdoors). INFO, never WARN: a
+## window lighting the pavement through its own pane counts here too, and the
+## meter does not know which leaks are the design. The numbers are for
+## comparing one build with the next; `tools/light_leak_probe.gd` writes the
+## per-light table. Empty when there is no physics space to cast against.
+static func check_light_leak(scene_root: Node, space: PhysicsDirectSpaceState3D,
+		shadow_budget: int, samples: int = 64) -> Array:
+	var findings: Array = []
+	if scene_root == null or space == null:
+		return findings
+	var m: Dictionary = LuxLeakMeter.measure(scene_root, space, samples, shadow_budget)
+	var s: Dictionary = m.summary
+	if int(s.lights) == 0:
+		return findings
+	findings.append(Finding.new(Severity.INFO,
+		("Light leak (%d rays/light, colliders): %d of %d unshadowed light(s) reach a surface behind a collider -- %d through a slab, %d through a wall; leak share %.2f%% of their falloff-weighted light. Shadowed %d of budget %d."
+		% [samples, s.unshadowed_leaking, s.unshadowed, s.unshadowed_leaking_slab,
+			s.unshadowed_leaking_wall, float(s.unshadowed_leak_share) * 100.0,
+			s.shadowed, shadow_budget])))
 	return findings
 
 
