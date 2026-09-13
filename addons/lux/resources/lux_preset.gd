@@ -254,6 +254,14 @@ extends Resource
 ## Used by pulse_alarm_lights() and the "Mission Goes Hot" family.
 @export var alarm_color: Color = Color(1.0, 0.15, 0.22)
 
+@export_group("Weather")
+## Falling rain and the weather overrides that travel with this look. Null is
+## clear weather. A preset whose profile has `rain_enabled` gets a LuxRain
+## emitter over the active camera while it is applied. Appended as the last
+## group on purpose: a group inserted mid-list re-parents the property after
+## it in the inspector.
+@export var weather: LuxWeatherProfile
+
 
 func get_palette_or_neutral() -> LuxPalette:
 	if palette != null:

@@ -147,6 +147,8 @@ func _apply_shadow_override() -> void:
 var _env: LuxEnvironment
 var _lighting: LuxLighting
 var _post: LuxPostFX
+## Present only while the applied preset's weather has rain (0.35.0).
+var _rain: LuxRain
 
 var _quality: LuxQualityProfile
 var _current: LuxPreset
@@ -279,9 +281,11 @@ func _build_modules() -> void:
 	for child in get_children():
 		if child is DirectionalLight3D or child is CanvasLayer \
 				or child is WorldEnvironment or child is LuxEnvironment \
-				or child is LuxLighting or child is LuxPostFX:
+				or child is LuxLighting or child is LuxPostFX \
+				or child is LuxRain:
 			remove_child(child)
 			child.queue_free()
+	_rain = null
 
 	_env = LuxEnvironment.new()
 	_env.name = &"LuxEnvironment"
@@ -407,6 +411,9 @@ func set_weather(profile: LuxWeatherProfile, blend_time: float = 5.0) -> void:
 		target.saturation *= profile.saturation_scale
 		target.brightness *= profile.brightness_scale
 	target.default_wetness = profile.surface_wetness
+	# The profile rides along, so its rain starts with the blend (at the
+	# midpoint, where _lerp_preset snaps it) and a rainless profile stops it.
+	target.weather = profile
 	apply_preset(target, blend_time)
 
 
@@ -645,6 +652,7 @@ func _apply_immediate(preset: LuxPreset) -> void:
 	_apply_retro_scaling(preset)
 	_push_material_state(preset)
 	_sync_camera_planes()
+	_sync_rain(preset)
 	preset_applied.emit(preset.preset_name)
 
 
@@ -729,6 +737,7 @@ func _process(delta: float) -> void:
 			_post_apply(mid)
 			_sync_film_precision()
 		_apply_retro_scaling(mid)
+		_sync_rain(mid)
 		if k >= 1.0:
 			_blending = false
 			_current = _blend_to
@@ -861,6 +870,8 @@ func _lerp_preset(a: LuxPreset, b: LuxPreset, k: float) -> LuxPreset:
 	p.vertex_shading_mode = b.vertex_shading_mode if k >= 0.5 else a.vertex_shading_mode
 	p.ps2_lighting_global = (b.ps2_lighting_global if k >= 0.5 else a.ps2_lighting_global)
 	p.alarm_color = a.alarm_color.lerp(b.alarm_color, k)
+	# A resource, not a curve: it snaps at the midpoint like every switch.
+	p.weather = b.weather if k >= 0.5 else a.weather
 	return p
 
 
@@ -931,6 +942,36 @@ func _preset_key_dir(preset: LuxPreset) -> Vector3:
 	# A DirectionalLight3D emits along -Z of its basis; the direction TO the light
 	# is therefore +Z of that basis.
 	return basis.z.normalized()
+
+
+## Rain follows the applied preset's weather: created when it asks for drops on
+## this tier, reconfigured when the profile or the tier changes, freed when it
+## does not. Not in the editor -- LuxRain follows the running camera, and an
+## editor viewport's camera is not one. Every call after the first with the
+## same profile and tier is a string compare (`LuxRain.configure`).
+func _sync_rain(preset: LuxPreset) -> void:
+	var w: LuxWeatherProfile = preset.weather if preset != null else null
+	var want: bool = (not Engine.is_editor_hint()
+		and LuxRain.drops_for(w, _quality) > 0)
+	if not want:
+		if _rain != null and is_instance_valid(_rain):
+			remove_child(_rain)
+			_rain.queue_free()
+		_rain = null
+		return
+	if _rain == null or not is_instance_valid(_rain):
+		_rain = LuxRain.new()
+		_rain.name = &"LuxRain"
+		add_child(_rain)
+	_rain.configure(w, _quality)
+
+
+## Drops alive in the rain emitter, 0 when there is none. For probes and
+## pipeline records: a level that asked for rain and reports 0 is dry.
+func get_rain_drops() -> int:
+	if _rain == null or not is_instance_valid(_rain):
+		return 0
+	return _rain.get_drops()
 
 
 func _sync_camera_planes() -> void:

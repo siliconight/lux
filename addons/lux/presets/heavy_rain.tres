@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="LuxPreset" load_steps=3 format=3 uid="uid://lux_heavy_rain"]
+[gd_resource type="Resource" script_class="LuxPreset" load_steps=5 format=3 uid="uid://lux_heavy_rain"]
 
 [ext_resource type="Script" path="res://addons/lux/resources/lux_preset.gd" id="1_preset"]
 [ext_resource type="Script" path="res://addons/lux/resources/lux_palette.gd" id="2_palette"]
+[ext_resource type="Script" path="res://addons/lux/resources/lux_weather_profile.gd" id="3_weather"]
 
 [sub_resource type="Resource" id="pal"]
 script = ExtResource("2_palette")
@@ -11,6 +12,26 @@ midtone = Color(0.47, 0.48, 0.5, 1)
 shadow = Color(0.4, 0.43, 0.48, 1)
 fog = Color(0.52, 0.54, 0.56, 1)
 accent = Color(0.8, 0.85, 0.9, 1)
+
+[sub_resource type="Resource" id="rain"]
+script = ExtResource("3_weather")
+weather_name = &"Heavy Rain"
+override_fog = false
+override_grade = false
+surface_wetness = 0.85
+rain_enabled = true
+rain_amount = 9000
+rain_fall_speed = 9.0
+rain_speed_randomness = 0.1
+rain_spread_deg = 5.0
+rain_streak_length = 0.45
+rain_streak_width = 0.012
+rain_color = Color(0.72, 0.76, 0.82, 0.32)
+rain_near_fade_m = 2.0
+rain_emitter_radius = 16.0
+rain_emitter_height = 12.0
+rain_fall_below = 6.0
+rain_fixed_fps = 30
 
 [resource]
 script = ExtResource("1_preset")
@@ -56,3 +77,4 @@ palette_influence = 0.3
 palette = SubResource("pal")
 default_wetness = 0.85
 alarm_color = Color(1, 0.15, 0.22, 1)
+weather = SubResource("rain")

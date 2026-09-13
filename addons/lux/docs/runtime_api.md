@@ -51,7 +51,8 @@ func _on_player_hit(health01: float) -> void:
 | `apply_preset(preset, blend_time=0.0)` | Apply a LuxPreset, optionally blending. |
 | `blend_to_preset(name, blend_time)` | Blend to a preset resolved by name from the library. |
 | `set_mission_phase(phase, blend_time=1.0)` | Blend to the preset mapped for a phase (`calm`, `alert`, `combat`, `escape`). |
-| `set_weather(profile, blend_time=5.0)` | Layer a LuxWeatherProfile over the current look. |
+| `set_weather(profile, blend_time=5.0)` | Layer a LuxWeatherProfile over the current look. Its rain starts (or stops) at the blend's midpoint. |
+| `get_rain_drops()` | Drops alive in the rain emitter; 0 when the applied weather has no rain on this tier. |
 | `set_time_of_day(normalized_time)` | Nudge sun elevation/warmth across a 0–1 day arc. |
 | `pulse_alarm_lights(intensity, duration)` | Pulse lights in the `lux_alarm` group. |
 | `set_player_damage_intensity(value)` | Desaturate + red-shift + vignette for low health (0–1). |

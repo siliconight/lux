@@ -46,6 +46,25 @@ extends Resource
 ## 60 fps frame), Medium 8 (+2.6), Low and Compatibility 4 (+1.3).
 @export var max_shadow_casters: int = 12
 @export var shadow_max_distance: float = 100.0
+## RAIN DROPS THE TIER MAY KEEP ALIVE AT ONCE. The applied count is
+## min(weather.rain_amount, this); 0 turns rain off on the tier.
+## High 9000, Medium 6000, Low 3000, Compatibility 2000.
+##
+## NOT PRICED WHERE IT MATTERS. On an RTX 2060, GL Compatibility, 1600x900,
+## cold run 9048's walk copy, vsync off, median of 4 rounds x 400 frames
+## (lux/tools/rain_walk_probe.py), rain against no rain:
+##
+##     station          drops   frame ms   viewport GPU ms
+##     looking up        9000    +0.055       +0.016
+##     looking up       36000    +0.023       +0.060
+##     street, facade    2000    +0.67        +0.21
+##     street, facade    9000    +0.12        +0.07
+##     street, facade   36000    +0.46        +0.20
+##
+## The street rows are inside that station's own run-to-run spread (0.5 ms),
+## so this card cannot tell 2000 drops from 36000. The caps below High are
+## a guess for weaker GPUs, and no weaker GPU has measured them.
+@export var max_rain_drops: int = 9000
 
 
 static func make_tier(t: int) -> LuxQualityProfile:
@@ -59,6 +78,7 @@ static func make_tier(t: int) -> LuxQualityProfile:
 			q.max_dynamic_lights = 16
 			q.max_shadow_casters = 8
 			q.allow_volumetric_fog = false
+			q.max_rain_drops = 6000
 		2:  # Low
 			q.allow_post_fx = false
 			q.allow_glow = false
@@ -67,6 +87,7 @@ static func make_tier(t: int) -> LuxQualityProfile:
 			q.max_dynamic_lights = 8
 			q.max_shadow_casters = 4
 			q.allow_film_emulsion = false
+			q.max_rain_drops = 3000
 			q.dither_note()
 		3:  # Compatibility
 			q.allow_post_fx = false
@@ -77,6 +98,7 @@ static func make_tier(t: int) -> LuxQualityProfile:
 			q.max_dynamic_lights = 6
 			q.max_shadow_casters = 4
 			q.allow_film_emulsion = false
+			q.max_rain_drops = 2000
 	return q
 
 

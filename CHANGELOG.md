@@ -7,6 +7,182 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.35.0] - it rains, and not indoors
+
+The walker asked for "another layer" over the level: rain and wetness on top
+of the assets. This is the rain. Wet surfaces and puddles are later slices.
+
+### Measured first: what GL Compatibility does with the technique
+The technique the walker pointed at is Godot's standard one: GPUParticles3D,
+ribbon-trail streaks, particle colliders hiding drops on contact, fixed_fps
+chosen against collider thickness, sub-emitter ripples, volumetric fog. The
+shipped package renders with GL Compatibility, so every step was checked there
+before any of it was built on. `tools/rain_renderer_probe.gd`, Godot 4.7, RTX
+2060, a black stage with 3,000 white drops falling past a collider whose top is
+y = 0, bright pixels counted in a band 2-8 m above it and 2-8 m below:
+
+| case | Compatibility above / below | Forward+ above / below |
+| --- | --- | --- |
+| no collider | 12,732 / 13,065 | 13,272 / 13,039 |
+| box, hide on contact | 12,906 / **0** | 13,094 / 0 |
+| heightfield over a slab | 13,137 / **0** | 12,673 / 0 |
+| same heightfield, no slab under it | 13,028 / 12,877 | 13,073 / 13,252 |
+| sphere | 13,052 / 0 | 12,847 / 0 |
+| emitter born inside a box | **0 / 0** | 0 / 0 |
+| preprocess 2 s, read at 0.1 s | 12,904 / 12,927 | 13,050 / 12,785 |
+| no preprocess, read at 0.1 s | 136 / 0 | 261 / 0 |
+| preprocess + box, read at 0.1 s | 12,734 / 0 | 13,159 / 0 |
+| 30, 31, 32, 40 decoy boxes first, then the slab | 0 below each | 0 below each |
+| slab first, then 64 decoys | 0 below | 0 below |
+| ribbon trails | 7,109 / 7,115, engine warning | 5,922 / 6,084 |
+| volumetric fog on | frame unchanged, engine warning | frame white |
+
+- **Particle trails are not supported** ("The Compatibility renderer does not
+  support particle trails"); the ribbon draws as its static mesh. The streak
+  is a vertical billboard quad instead, on every renderer.
+- **Sub-emitters are not supported** (engine warning), so there are no splash
+  rings. The probe's ring emitter drew nothing under Forward+ either, so its
+  sub-emitter case proves nothing about Forward+.
+- **Volumetric fog is not supported**; the preset's depth fog thickens the air.
+- **Heightfield collision IS supported**, which the survey believed it was
+  not. The no-slab control is what makes that a measurement: the heightfield
+  hides drops under geometry and nothing where there is none. SDF collision
+  was not measured (it needs an editor bake).
+- **No collider cap showed** up to 65 boxes in either insertion order. A cap
+  that ranked colliders by size would not show in this test.
+- **Tunnelling is thickness / step**, 10 m/s: a 5 cm box let through 60-69%
+  of drops at fixed_fps 60 (four runs; step 0.167 m; 70% predicted, 58%
+  counting the 1 cm particle radius), 92% or more at fixed_fps 10 (step
+  1.0 m), and a 1.2 m box at fixed_fps 10 let through none under
+  Compatibility (2 and 42 pixels in two Forward+ runs).
+
+### Added
+- `LuxWeatherProfile` rain fields: `rain_enabled` (off by default, so every
+  existing profile stays dry), `rain_amount`, `rain_fall_speed` (terminal
+  velocity, no gravity), `rain_speed_randomness`, `rain_spread_deg`,
+  `rain_streak_length` / `_width`, `rain_color` (vertex colour, alpha is
+  opacity), `rain_near_fade_m`, `rain_emitter_radius` / `_height`,
+  `rain_fall_below`, `rain_fixed_fps`.
+- `LuxPreset.weather`, appended as the last export group. `heavy_rain.tres`
+  carries a rain profile: 9,000 drops at 9 m/s +/-10%, 5 degrees of spread,
+  0.45 x 0.012 m streaks at 32% opacity fading out within 2 m of the lens,
+  a 32 m square 12 m over the camera falling to 6 m under it, fixed_fps 30.
+- **`LuxRain`** (`runtime/lux_rain.gd`): a GPUParticles3D LuxRoot builds while
+  the applied preset's weather has rain and frees when it does not.
+  Unshaded, alpha-blended, cull disabled, vertex colour as albedo, upright
+  billboard, no shadows. World-space particles; the emitter follows
+  `get_viewport().get_camera_3d()` and restarts on a jump of more than half
+  its radius, with `preprocess` refilling the column. The visibility AABB is
+  the column plus spread drift plus a streak at each end -- it is also the
+  collider query. Runtime state: never owned, never packed. Rebuilds only
+  when a VALUE changes, so the deep copies `set_time_of_day` makes do not
+  refill the column.
+- `LuxRoot`: `_sync_rain` on every apply and every blend frame;
+  `get_rain_drops()`; `set_weather` carries its profile, so rain starts or
+  stops with the blend; `_lerp_preset` snaps `weather` at the midpoint like
+  every switch. No rain in the editor viewport.
+- `LuxQualityProfile.max_rain_drops`: High 9,000, Medium 6,000, Low 3,000,
+  Compatibility 2,000 -- see Cost for what that is and is not based on.
+- **`LuxRainCollision.build(scene, profile, name_pattern, ground_y)`**
+  (`runtime/lux_rain_collision.gd`): one GPUParticlesCollisionBox3D per
+  building child matching `name_pattern` (default `^b\d+$`, Level Factory's
+  site spec ids), from the bottom of its visual AABB to `roof_clearance_m`
+  above its roof, plus one ground box across the site, top at `ground_y`.
+  Plain engine nodes; the caller owns them.
+  - **Why the whole building.** The emitter hangs 12 m over the camera, so on
+    the ground floor of a taller building it is INSIDE, under the roof; a
+    roof slab cannot hide a drop born beneath it, a floor-to-roof box can
+    (probe: emitter inside a box, 0 / 0).
+  - **The arithmetic.** Fastest drop 9 x 1.1 = 9.9 m/s; at fixed_fps 30 it
+    moves `step_m` = 0.33 m between collision tests. Minimum thickness is two
+    steps, 0.66 m: the ground box is exactly that; a building box is its own
+    height plus the clearance, which alone is 0.885 m.
+  - **Why the box stands above the roof.** See Verified: a box topped at the
+    roof leaked streaks under a ceiling 0.37 m below it. A drop is hidden at
+    the first step that finds it inside, so it is drawn up to a step below
+    the top, with half a streak hanging under its centre: lowest drawn point
+    = top - step - length / 2. `roof_clearance_m` = 2 steps + length / 2 =
+    0.885 m, so that point stays a step above the roof. Drops therefore stop
+    0.885 m above a roof when seen from higher up.
+- `tools/rain_selftest.gd` (headless): rain exists exactly when a preset asks,
+  at each tier's count, with the configured material and AABB, follows the
+  camera, leaves with a dry preset and with `set_weather`, snaps at k = 0.5,
+  does not rebuild for a deep copy; boxes per building floor to roof +
+  clearance, ground exactly two steps, rebuild replaces, no match refuses.
+- `tools/rain_renderer_probe.gd` (windowed, either renderer): the table above.
+- `tools/rain_walk_probe.gd` + `.py` (windowed, through the factory's
+  `godot_probe.py` mirror): per station, pixels risen over a rain-hidden
+  baseline at sample times, per variant (fixed_fps, preprocess, a hidden node,
+  a collider raised or moved away), and frame / GPU ms against rain off at
+  given drop counts.
+
+### Verified on cold run 9048's walk copy
+A scratch copy, rebuilt the way the pipeline would: this Lux staged as
+`res://addons/lux`, Level Factory's `run_lux_apply.gd` (rain-slice1) on the
+themed `site.tscn` with `--preset "Heavy Rain"` (no `--lights`, so no daylight
+rigs), then Level Factory's `localize_export` into `runtime/lux` (it pulled
+`lux_rain.gd` by class name, 0 unresolved), then an import. The driver
+reported 9,000 drops and 4 boxes. look_shots, GL Compatibility, RTX 2060,
+1600x900, 90 frames per shot; pixels whose luma rose more than 30 codes
+against the same shot with `rain_enabled = false`:
+
+| shot | risen px |
+| --- | --- |
+| street, looking west down the road | 12,182 |
+| street, facing Goose Mart | 17,897 |
+| street, looking up | 3,014 |
+| extraction (outdoors, facing a wall) | 2,819 |
+| mansion master suite, under the roof | **0** |
+| auto shop upper office, under the roof | **0** |
+| bank upper offices, under the roof | **0** |
+| spawn, objective (indoors) | **0**, **0** |
+| mansion hall, facing an open doorway | 2 (rain outside, through the door) |
+
+- **The first build leaked, and it was not the ceiling.** With boxes topped
+  at the roof, the master suite read 115-503 pixels, all in the top third of
+  the frame and ending at the far wall's top edge. Suspected first: the
+  ceiling not writing depth -- REFUTED by reading its material (opaque, depth
+  draw on, cull disabled). Suspected second: preprocess ignoring colliders --
+  REFUTED on the probe stage (preprocess + box, 0 below at 0.1 s). Measured
+  with `rain_walk_probe`, 1.5 s and 5 s after a restart: fixed_fps 30 218 /
+  114, fixed_fps 60 15 / 0, the box raised to y = 60 0 / 0, the box moved
+  away 6,707 / 7,458 in every band, ceiling hidden 224 / 314. The leak
+  scaled with the step and vanished with a tall box: the drawn-streak
+  arithmetic above, 7.65 - 0.33 - 0.225 = 7.095 under a 7.28 ceiling. With
+  the clearance, 0 at every sample, fixed_fps 30 and 60.
+- **The near fade** took the extraction shot from 4,124 risen pixels to 820
+  (four bars a third of the screen tall, drops within a metre of the lens)
+  and the west street view from 22,429 to 14,798; it still reads as rain.
+
+### Cost
+RTX 2060, GL Compatibility, 1600x900, vsync off, `rain_walk_probe`, median of
+4 rounds x 400 frames, rain against rain stopped and hidden:
+
+| station | drops | frame ms | viewport GPU ms |
+| --- | --- | --- | --- |
+| street, looking up | 9,000 | +0.055 | +0.016 |
+| street, looking up | 36,000 | +0.023 | +0.060 |
+| mansion suite | 9,000 | -0.10 | +0.017 |
+| mansion suite | 36,000 | -0.11 | +0.041 |
+| street, facade | 2,000 | +0.67 | +0.21 |
+| street, facade | 9,000 | +0.12 | +0.07 |
+| street, facade | 36,000 | +0.46 | +0.20 |
+
+The quiet stations put 9,000 drops at a few hundredths of a millisecond; the
+facade station's own run-to-run spread is 0.5 ms, so it cannot tell 2,000
+drops from 36,000. **The tier caps below High are not priced**: this card
+cannot see the difference, and no weaker GPU has run the probe.
+
+### Not done, and known
+- Only buildings shelter. Trees, awnings and the bus shelter do not; the
+  heightfield collider (measured working above) is the general answer.
+- Rain colliders are built only when the applied preset asks for rain, so a
+  game that calls `set_weather` with rain on a level built dry rains indoors.
+- A camera far above the site sees no rain.
+- Wetness, puddles, splashes: later slices; splashes cannot be sub-emitters
+  under Compatibility.
+- Not yet walked by a person.
+
 ## [0.34.0] - a ceiling lamp lights its own room, not the storey above
 
 A person walking cold run 9048 saw "light coming from a basement fixture
