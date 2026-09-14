@@ -27,9 +27,64 @@ extends RefCounted
 ## Deli Counter derived a window anchor per opening, Lot merged them, the
 ## manifest shipped them, and no built level ever turned one into light: the
 ## only caller of `bake` was the dock button.
+##
+## A THIRD CONTAINER FOR THE ROOMS (0.38.0). `bake_room_ambient` derives one
+## interior ReflectionProbe per room from the ceiling anchors' `room` and
+## `room_box_local`, under `LuxRoomAmbient`. It is the pipeline's default,
+## beside the daylight bake, and `bake` runs it too. See ROOM_BOX_FIELD.
 
 const CONTAINER := "LuxLights"
 const DAYLIGHT_CONTAINER := "LuxDaylight"
+const ROOM_AMBIENT_CONTAINER := "LuxRoomAmbient"
+
+## THE FIELD A ROOM'S BOX ARRIVES IN, and why it is relative (0.38.0).
+## Deli Counter writes it on every ceiling anchor that names a `room`:
+##
+##     "room_box_local": [x0, y0, z0, x1, y1, z1]
+##
+## metres, RELATIVE TO THE ANCHOR'S `pos`, in the anchor's own frame -- x
+## along `rot_y` (the row), y across it, z up (Deli Counter's Z-up axes) --
+## z0 the room's floor and z1 the underside of the slab that caps it. So a
+## fluorescent row's box has z0 = -drop and z1 = +0.1 (the ceiling gap it
+## hangs by); a pendant's z1 is its cord plus the gap.
+##
+## Relative, not world, because of what Lot does to a building manifest:
+## `merge_lights` transforms `pos` and `rot_y` by the building's placement
+## and copies EVERY other field verbatim (`wa = dict(a)`). A world box would
+## ship in building-local coordinates on a site whose buildings are turned
+## 180 degrees, and a reader would place every probe in the wrong room with
+## no error. A box that rides on the anchor's frame is placed by the same
+## two numbers Lot already transforms, so it needs no Lot change and cannot
+## drift from the lamp it belongs to. (The 0.37.0 `stage_light` `target` has
+## exactly the world-frame problem this avoids; it is noted, not fixed here.)
+##
+## Absent on an anchor: that room gets no derived probe, and the bake counts
+## it (`without_box`) rather than guessing a box from the row -- a row's
+## count and spacing say how LONG a room is and nothing about how wide.
+const ROOM_BOX_FIELD := "room_box_local"
+
+## A DERIVED probe's ambient: neutral and low. The environment's ambient in
+## Heavy Rain is (0.5, 0.52, 0.55) at energy 1.0 -- roughly ten times what one
+## fluorescent lamp puts on the floor beneath it (office_floor_value, 0.057
+## at 3.2 m), which is why every interior read as lit by the sky and not by
+## its fixtures. Inside a probe, with the preset's `room_probes_replace_ambient`
+## on, this replaces that ambient entirely. MEASURED on the walk of cold run
+## 9054 (Heavy Rain, RTX 2060, 1600 x 900, GL Compatibility, sun shadowed,
+## fog on; tools/club_walk_probe.py, whole-frame luma of the 8-bit frame at
+## five interior stations, `ambient_color_energy` set on all 16 probes):
+##
+##     energy   spawn  vault  office  lobby  antechamber      p05 (lobby)
+##     0.00       4.8   20.1    17.6   21.1     18.2           0  (crushed)
+##     0.04      20.5   33.9    37.8   31.4     36.5           6
+##     0.08      32.3   44.9    52.0   39.3     49.3           8
+##     (sky, contribution 0.5, the 0.37.0 room)
+##               34.0   46.0    53.5   40.1     50.7           8
+##
+## 0.08 hands back what the sky was giving through the roof; 0.0 crushes
+## the far floor to black. 0.04 is a floor under the fixtures so an unlit
+## corner is dark grey rather than a hole, and no more.
+const ROOM_AMBIENT_DERIVED_COLOR := Color(1.0, 1.0, 1.0)
+const ROOM_AMBIENT_DERIVED_ENERGY := 0.04
 
 ## The anchor types daylight owns. `sun` is the preset's and is never baked
 ## here; `window` is the one with no hardware and no marker.
@@ -209,6 +264,155 @@ static func bake_club(path: String, scene_root: Node) -> Dictionary:
 		"refused": refused, "msg": msg}
 
 
+## ONE INTERIOR PROBE PER ROOM, DERIVED (0.38.0). Every room the manifest's
+## ceiling anchors name gets a ReflectionProbe the size of its
+## `room_box_local` plus ROOM_AMBIENT_MARGIN a side, under `LuxRoomAmbient`,
+## the shape of `bake_daylight`. Inside the box the probe's flat, low ambient
+## replaces the environment's -- ALL of it when the preset sets
+## `room_probes_replace_ambient` (which writes ambient_light_sky_contribution
+## 1.0; the share replaced IS the contribution, measured in 0.37.0), and the
+## sky's share otherwise. That, sun shadows and fog are what decide whether a
+## room reads dark: the probe owns exactly one of the three.
+##
+## A room whose anchors carry no box is SKIPPED AND COUNTED (`without_box`),
+## never guessed. A room that also has an explicit `room_ambient` anchor (the
+## club set) is left to `bake_club` (`explicit`). Two runs of one room's row
+## (`<room>_ceiling_0`, `_1`) are one room and one probe: the first anchor by
+## id supplies the box, and the two agree by construction because each is
+## relative to its own lamp. Returns {ok, count, rooms, without_box,
+## explicit, msg}; `rooms` is how many distinct rooms the anchors named, so a
+## caller can tell "none asked for" from "none made".
+static func bake_room_ambient(path: String, scene_root: Node) -> Dictionary:
+	if scene_root == null:
+		return {"ok": false, "msg": "no scene root", "count": 0, "rooms": 0,
+			"without_box": [], "explicit": []}
+	if not FileAccess.file_exists(path):
+		return {"ok": false, "msg": "File not found: %s" % path, "count": 0,
+			"rooms": 0, "without_box": [], "explicit": []}
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(data) != TYPE_DICTIONARY or not data.has("anchors"):
+		return {"ok": false, "msg": "Not a .lights.json (no 'anchors').",
+			"count": 0, "rooms": 0, "without_box": [], "explicit": []}
+	var plan: Dictionary = room_probe_plan(data["anchors"])
+	var old := scene_root.get_node_or_null(NodePath(ROOM_AMBIENT_CONTAINER))
+	if old != null:
+		old.free()
+	var container := Node3D.new()
+	container.name = ROOM_AMBIENT_CONTAINER
+	scene_root.add_child(container)
+	container.owner = scene_root
+	var made := 0
+	var boxed: Dictionary = plan["boxed"]
+	var ids: Array = boxed.keys()
+	ids.sort()
+	for room in ids:
+		var probe: ReflectionProbe = room_probe_for(boxed[room])
+		if probe == null:
+			continue
+		container.add_child(probe)
+		probe.owner = scene_root
+		made += 1
+	var without: Array = plan["without_box"]
+	var explicit: Array = plan["explicit"]
+	var msg := "Baked %d room probe(s) for %d room(s)" % [made, int(plan["rooms"])]
+	if not without.is_empty():
+		msg += "; %d without %s: %s" % [without.size(), ROOM_BOX_FIELD, ", ".join(without)]
+	if not explicit.is_empty():
+		msg += "; %d left to an explicit room_ambient: %s" % [explicit.size(), ", ".join(explicit)]
+	return {"ok": true, "count": made, "rooms": int(plan["rooms"]),
+		"without_box": without, "explicit": explicit, "msg": msg}
+
+
+## The rooms of an anchor list, sorted into what can be baked. Pure, so a
+## test can ask it about a dictionary rather than a file. Returns
+## {rooms: int, boxed: {room: anchor}, without_box: [room], explicit: [room]}.
+static func room_probe_plan(anchors: Array) -> Dictionary:
+	var explicit_rooms := {}
+	for a in anchors:
+		if typeof(a) == TYPE_DICTIONARY and String(a.get("type", "")) == "room_ambient" \
+				and typeof(a.get("room")) == TYPE_STRING:
+			explicit_rooms[String(a.get("room"))] = true
+	var boxed := {}
+	var seen := {}
+	var unboxed := {}
+	var sorted: Array = []
+	for a in anchors:
+		if typeof(a) == TYPE_DICTIONARY and typeof(a.get("room")) == TYPE_STRING \
+				and String(a.get("type", "")) != "room_ambient":
+			sorted.append(a)
+	# By id, so "the first anchor supplies the box" is the same anchor in
+	# every build rather than whichever the file listed first.
+	sorted.sort_custom(func(x: Dictionary, y: Dictionary) -> bool:
+		return String(x.get("id", "")) < String(y.get("id", "")))
+	for a in sorted:
+		var room := String(a.get("room"))
+		seen[room] = true
+		if explicit_rooms.has(room) or boxed.has(room):
+			continue
+		if _room_box_ok(a.get(ROOM_BOX_FIELD)):
+			boxed[room] = a
+		else:
+			unboxed[room] = true
+	var without: Array = []
+	for room in unboxed:
+		if not boxed.has(room) and not explicit_rooms.has(room):
+			without.append(room)
+	without.sort()
+	var explicit: Array = []
+	for room in seen:
+		if explicit_rooms.has(room):
+			explicit.append(room)
+	explicit.sort()
+	return {"rooms": seen.size(), "boxed": boxed, "without_box": without,
+		"explicit": explicit}
+
+
+static func _room_box_ok(b: Variant) -> bool:
+	if typeof(b) != TYPE_ARRAY or (b as Array).size() < 6:
+		return false
+	for v in b:
+		if typeof(v) != TYPE_FLOAT and typeof(v) != TYPE_INT:
+			return false
+	return float(b[3]) > float(b[0]) and float(b[4]) > float(b[1]) and float(b[5]) > float(b[2])
+
+
+## The probe for one boxed anchor, PLACED: its transform is the anchor's
+## (`pos`, `rot_y`, the same swap and yaw as _place) carried onto the box's
+## centre, so a box that is off-centre from its lamp -- a split run, a row
+## nudged off a partition -- still lands on the room. Named after the room,
+## with the "/" Lot's namespacing puts in a room id made a "_": a "/" in a
+## node name is a path separator and Godot renames the node.
+##
+## Frames: the box is Deli Counter Z-up in the anchor's frame, (x along the
+## row, y across, z up). Godot local is (x, z, -y) -- the swap `_godot_point`
+## applies to every anchor coordinate -- and rotation.y = rot_y turns local
+## +X onto the row's world direction, exactly as it does for the lamps the
+## row rig lays along local +X (see _place). The box's own x axis follows.
+static func room_probe_for(a: Dictionary) -> ReflectionProbe:
+	var b: Variant = a.get(ROOM_BOX_FIELD)
+	if not _room_box_ok(b):
+		return null
+	var lo := Vector3(float(b[0]), float(b[1]), float(b[2]))
+	var hi := Vector3(float(b[3]), float(b[4]), float(b[5]))
+	var centre_dc := (lo + hi) * 0.5
+	var size_dc := hi - lo
+	var yaw := deg_to_rad(float(a.get("rot_y", 0.0)))
+	var probe := ReflectionProbe.new()
+	probe.name = String(a.get("room", a.get("id", "room"))).replace("/", "_")
+	probe.size = Vector3(size_dc.x, size_dc.z, size_dc.y) + Vector3.ONE * 2.0 * ROOM_AMBIENT_MARGIN
+	probe.interior = true
+	probe.update_mode = ReflectionProbe.UPDATE_ONCE
+	probe.ambient_mode = ReflectionProbe.AMBIENT_COLOR
+	probe.ambient_color = ROOM_AMBIENT_DERIVED_COLOR
+	probe.ambient_color_energy = ROOM_AMBIENT_DERIVED_ENERGY
+	probe.blend_distance = 0.1
+	var anchor_pos := _godot_point(a.get("pos"))
+	var local_centre := Vector3(centre_dc.x, centre_dc.z, -centre_dc.y)
+	probe.position = anchor_pos + Basis(Vector3.UP, yaw) * local_centre
+	probe.rotation = Vector3(0.0, yaw, 0.0)
+	return probe
+
+
 ## Read `path`, replace any previous bake, and spawn a rig per anchor under a
 ## `LuxLights` container. Returns {ok, msg, count}.
 ##
@@ -249,6 +453,10 @@ static func bake(path: String, scene_root: Node, lightmap_static: bool = false) 
 		_place(node, a)
 		made += 1
 
+	# The rooms' probes ride with the editor bake too (0.38.0), in their own
+	# container, so the dock and the pipeline produce the same level.
+	var rooms: Dictionary = bake_room_ambient(path, scene_root)
+
 	var has_root := not scene_root.get_tree().get_nodes_in_group(
 		&"lux_root").is_empty()
 	var msg := "Baked %d light rig(s)" % made
@@ -256,9 +464,11 @@ static func bake(path: String, scene_root: Node, lightmap_static: bool = false) 
 		msg += " [lightmap static]"
 	if skipped > 0:
 		msg += " (%d unsupported skipped)" % skipped
+	msg += "; " + String(rooms.get("msg", ""))
 	if not has_root:
 		msg += ". No LuxRoot in the scene -- add one so presets drive these."
-	return {"ok": true, "msg": msg, "count": made}
+	return {"ok": true, "msg": msg, "count": made,
+		"room_probes": int(rooms.get("count", 0))}
 
 
 ## The rig for an anchor dict — the one tuning table for both paths: the
@@ -269,15 +479,18 @@ static func rig_for_anchor(a: Dictionary) -> Node3D:
 	return _rig_for(a)
 
 
-## Remove a previous bake (the whole LuxLights container). Returns how many.
+## Remove a previous bake (the LuxLights container and the room probes that
+## `bake` made beside it). Returns how many containers went.
 static func clear(scene_root: Node) -> int:
 	if scene_root == null:
 		return 0
-	var n := scene_root.get_node_or_null(NodePath(CONTAINER))
-	if n != null:
-		n.free()
-		return 1
-	return 0
+	var gone := 0
+	for cname in [CONTAINER, ROOM_AMBIENT_CONTAINER]:
+		var n := scene_root.get_node_or_null(NodePath(cname))
+		if n != null:
+			n.free()
+			gone += 1
+	return gone
 
 
 static func _rig_for(a: Dictionary) -> Node3D:

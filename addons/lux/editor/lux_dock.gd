@@ -465,4 +465,5 @@ func _on_clear_lights() -> void:
 		_set_status("[color=orange]Open a scene first.[/color]")
 		return
 	var n: int = LuxLightLoader.clear(scene_root)
-	_set_status("[color=gray]Cleared %d light bake(s).[/color]" % n)
+	# Two containers per bake since 0.38.0: the rigs and the room probes.
+	_set_status("[color=gray]Cleared %d bake container(s).[/color]" % n)

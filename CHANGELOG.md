@@ -7,6 +7,163 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.38.0] - interiors read dark by default, and the sun's shadow is priced and refused
+
+The walker's decision: interiors read dark, lit by their own fixtures, not by
+the sun, sky and fog leaking through the roof. 0.37.0 measured the three
+terms on one club and built a `room_ambient` probe that only `bake_club`
+could place, from a `size` only a club anchor carried. This release makes the
+probe every room's, by default, and prices the other two terms on a whole
+level.
+
+Measured on a scratch copy of cold run 9054's walk (bank_block_001: a bank, a
+museum, a credit union; Heavy Rain; RTX 2060, GL Compatibility, 1600 x 900;
+`tools/look_shots.py` for the frames, `tools/club_walk_probe.py` for the
+terms, whole-frame Rec.709 luma of the 8-bit frame), six cameras:
+
+    station          0.37.0 as shipped   0.38.0 as shipped   + sun shadow (refused)
+                     mean  p05 p50 p95   mean  p05 p50 p95   mean  p05 p50 p95
+    street           68.5   23  76 105   62.7   18  65  99   69.4   28  70 115
+    spawn (derived)  70.6   53  71  89   55.3   38  54  78   22.7   13  21  39
+    lobby (b0)       59.4   24  61  98   43.1   17  33  87   27.7    5  23  68
+    office (b2)      82.7   50  78 118   60.7   25  55 101   37.3   19  35  57
+    vault antechamb. 81.8   38  80 125   60.6   19  67 107   30.1   17  28  56
+    vault room       73.0   50  73  96   52.0   22  54  85   29.0   14  27  51
+
+### Added
+- **`LuxLightLoader.bake_room_ambient(path, scene_root)`**: one interior
+  ReflectionProbe per room the manifest's ceiling anchors name, under
+  `LuxRoomAmbient`, the shape of `bake_daylight`. `bake` runs it too, and
+  `clear` takes the container. Returns `{ok, count, rooms, without_box,
+  explicit, msg}`: a room with no box is counted, never guessed (a row's
+  count and spacing say how long a room is and nothing about how wide); a
+  room with an explicit `room_ambient` anchor is left to `bake_club`; a row
+  split into runs is one room and one probe, the first run by id supplying
+  the box. `room_probe_plan` is the pure half, for tests.
+- **The field Deli Counter is asked to write, `ROOM_BOX_FIELD`**:
+
+      "room_box_local": [x0, y0, z0, x1, y1, z1]
+
+  on every ceiling anchor that names a `room` -- metres, RELATIVE TO THE
+  ANCHOR'S `pos`, in its own frame (x along `rot_y`, y across, z up), z0 the
+  floor (`-drop`), z1 the capping slab's underside. Relative because Lot's
+  `merge_lights` transforms `pos` and `rot_y` and copies every other field
+  verbatim: a world box would ship building-local on a site whose buildings
+  are turned 180 degrees. A box on the anchor's frame is placed by the two
+  numbers Lot already transforms and needs no Lot change. (0.37.0's
+  `stage_light` `target` has exactly that world-frame problem; noted, not
+  fixed.) The walk above was measured on the 9054 manifest with the field
+  stamped from the merged rooms' bounds: 16 probes for 16 rooms.
+- **`room_probe_for(anchor)`** places the probe from the anchor's transform
+  carried onto the box's centre, so an off-centre box (a nudged row, a split
+  run) still lands on the room; named after the room with Lot's "/" made "_"
+  (a "/" in a node name is a path).
+- **`LuxPreset.room_probes_replace_ambient`** (the knob): LuxEnvironment
+  writes `ambient_light_sky_contribution` 1.0 regardless of the preset's own
+  value, for BOTH live ambient sources (the Flat Color branch never wrote the
+  field and left a re-applied Environment holding the previous preset's).
+  The share of ambient a probe replaces IS the contribution (0.37.0's
+  measurement), so with it on a probed room's ambient is the probe's alone.
+  On for Heavy Rain, Blue Hour, Delco Summer Afternoon and Gas Station
+  Fluorescent.
+- **`LuxPreset.sun_shadow_mode` / `sun_shadow_max_distance`**: how a preset
+  pays for its sun shadow -- Orthogonal / PSSM 2 / PSSM 4, and a reach of its
+  own (0 = the tier's). LuxLighting applies them; `_lerp_preset` carries all
+  three new fields. All four presets carry orthogonal, 60 m.
+- `tools/room_ambient_selftest.gd`: 70 checks -- a box lands on its room at
+  rot_y 0, 90 and 180, off-centre included; five shapes of bad box are no
+  box; the plan sorts one room to one probe, counts the unboxed, leaves the
+  explicit; the bake replaces itself and a missing file is not ok; the knob
+  writes 1.0 under Sky and under Flat Color and leaves the source alone; the
+  sun takes the preset's mode and reach and 0 means the tier's; a blend
+  snaps the switches and interpolates the reach; the four presets ask for
+  dark interiors and price their sun. Exits 2 against the 0.37.0 loader
+  ("no bake_room_ambient"). club_light (74), window_glass, colocation,
+  light_leak and rain selftests pass.
+
+### The derived probe's ambient, and why 0.04
+`ROOM_AMBIENT_DERIVED_ENERGY` is 0.04 on white. `ambient_color_energy` set on
+all 16 probes, sun shadowed, fog on, five interior stations:
+
+    energy   spawn  vault  office  lobby  antechamber   lobby p05
+    0.00       4.8   20.1    17.6   21.1     18.2          0   crushed
+    0.04      20.5   33.9    37.8   31.4     36.5          6
+    0.08      32.3   44.9    52.0   39.3     49.3          8
+    sky at contribution 0.5 (the 0.37.0 room)
+              34.0   46.0    53.5   40.1     50.7          8
+
+0.08 hands back what the sky was giving; 0.0 crushes the far floor. 0.04 is
+a floor under the fixtures so an unlit corner is dark grey and not a hole.
+The probes cost within the round-to-round noise (-1.8 to +1.5 ms).
+
+### The street, and the mechanism that keeps its ambient
+Contribution 1.0 drops the flat `ambient_color` term outdoors and keeps the
+sky-sampled one. The street station, sun shadowed:
+
+    contribution 0.5 (0.37.0)                       77.3
+    contribution 1.0 (the knob, as shipped)         70.1     0.37.0 as shipped: 68.5
+    ambient_mode Flat Color + contribution 1.0      82.5     interiors identical
+    contribution 1.0 + ambient_energy 1.3           70.2     null result
+
+So the street sits 1.6 codes over where it shipped with the knob on and
+nothing was compensated. Flat Color is the lever for a preset that wants a
+brighter street -- the whole flat ambient stays outdoors and the probes
+still replace it indoors, frame for frame. `ambient_energy` is NOT a lever
+at contribution 1.0 under GL Compatibility: +30% moved the frame 0.1.
+Recorded so nobody turns it twice. Without the shadow (as shipped) the
+street reads 62.7: the knob's 7 codes, uncovered by the shadow's contrast.
+
+### The sun's shadow: priced at every setting and REFUSED
+Delta GPU ms against the same station unshadowed (median of 2 x 240
+frames):
+
+    station        ortho 60  ortho 40  ortho 90  PSSM2 60  PSSM4 100
+    street          +4.9      +5.3      +5.1      +5.8      +7.2
+    spawn wing      +3.3      +2.5      +5.4      +2.6      +5.4
+    vault           +5.9      +6.4      +9.5      +7.9     +11.6
+    office          +8.1     +10.8      +7.6     +17.9     +19.6
+    lobby           +3.2      +3.7      +2.8      +1.9      +5.2
+    antechamber     +3.2      +3.8      +2.5      +2.6      +4.4
+
+The office and vault rounds spread up to 7 ms, so the three orthogonal
+columns are one number; PSSM4 at the tier's 100 m (the engine default,
+what 0.37.0 priced at +0.5 to +9.9) is the dearest everywhere. The atlas
+at 4096, 2048 and 1024 with a hard filter: +1.5 to +9.0 at every
+combination, no order among them -- the cost is the shadow PASS re-drawing
+the site, not sampling the map. REFUTED, kept: LuxRain's 9000 particles
+were the next suspect; `lux_rain.gd` already casts none, and setting it
+again or hiding the rain moved -0.7 to +1.5 ms, inside noise.
+
+The budget was ~2 ms at any station. The cheapest setting is over it at
+five of six, so the shadow is refused for the presets that shipped without
+one: Heavy Rain and Gas Station Fluorescent keep `sun_shadows = false`.
+Blue Hour and Delco Summer Afternoon already paid for a PSSM4 map and now
+pay for the orthogonal one -- a saving of 2 to 11.6 ms on these stations.
+What the refusal costs is the biggest of the three terms: with the sun
+unshadowed the rooms read 43-61 (table above, middle columns) against
+23-37 with it. Turning it on is one line per preset with a measured price.
+The lever this release did not price is a cull-mask split -- the sun
+lighting exterior layers only -- which costs nothing per frame and is a
+layering question for the geometry's owners.
+
+### Fog
+Stays scene-wide. With it, as shipped, the rooms are the middle columns;
+without it (`fog_enabled` false, sun shadowed) spawn 8.0, vault 12.8,
+office 24.5, lobby 11.9, antechamber 17.6 and the street 28.5.
+
+### Changed
+- `LuxLighting.apply` sets `directional_shadow_mode` and takes the preset's
+  reach when it has one.
+- `LuxLightLoader.clear` frees both containers and returns how many; the
+  dock says "bake container(s)".
+
+### Noticed, not changed
+- Deli Counter does not write `room_box_local` yet; until it does every room
+  is `without_box` and the pipeline reports it (Level Factory 0.87.0).
+- Lot's `merge_lights` copies `target` untransformed (0.37.0's stage light).
+- The `spawn_wing` given station in the measurements faces a partition
+  2.7 m away; the derived `spawn` shot is the one in the table.
+
 ## [0.37.0] - a club can be lit like a club, and what keeps it from reading dark is measured
 
 The walker, with two frames of GTA IV's Triangle Club: "strip clubs should

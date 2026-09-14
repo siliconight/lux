@@ -95,18 +95,29 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 		env.background_mode = Environment.BG_SKY
 
 	# --- Ambient ---
+	# THE CONTRIBUTION IS WRITTEN FOR BOTH LIVE SOURCES (0.38.0). It is not
+	# only the sky/colour mix: it is also the share of ambient an interior
+	# ReflectionProbe replaces inside its box, whatever the source (measured,
+	# tools/probe_weight_probe.gd). A preset that wants its rooms lit by
+	# their probes alone says so with `room_probes_replace_ambient`, and the
+	# value goes to 1.0; the Flat Color branch used to leave the field at
+	# whatever the Environment had, which is 1.0 for a fresh one and the
+	# previous preset's for a re-applied one.
+	var contribution := 1.0 if preset.room_probes_replace_ambient \
+		else preset.ambient_sky_contribution
 	match preset.ambient_mode:
 		1:  # Flat Color — GI-free uniform fill, the honest PS2-era look
 			env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 			env.ambient_light_color = preset.ambient_color
 			env.ambient_light_energy = preset.ambient_energy
+			env.ambient_light_sky_contribution = contribution
 		2:  # Disabled
 			env.ambient_light_source = Environment.AMBIENT_SOURCE_DISABLED
 		_:  # Sky
 			env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 			env.ambient_light_color = preset.ambient_color
 			env.ambient_light_energy = preset.ambient_energy
-			env.ambient_light_sky_contribution = preset.ambient_sky_contribution
+			env.ambient_light_sky_contribution = contribution
 
 	# --- Tonemap / exposure ---
 	env.tonemap_mode = _tonemap_mode(preset.tonemap_mode)

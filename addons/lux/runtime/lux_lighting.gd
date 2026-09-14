@@ -46,9 +46,25 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 	sun.light_color = preset.sun_color
 	sun.light_energy = preset.sun_energy
 	sun.shadow_enabled = preset.sun_shadows and quality.allow_sun_shadows
-	sun.directional_shadow_max_distance = quality.shadow_max_distance
+	# The preset prices its own sun shadow (0.38.0): one orthogonal split
+	# over a short reach is what an interior needs from it, and the tier's
+	# 100 m 4-split cascade is what it used to be charged. 0 keeps the tier's
+	# distance, and the mode is the engine's enum in the preset's order.
+	sun.directional_shadow_mode = _shadow_mode(preset.sun_shadow_mode)
+	sun.directional_shadow_max_distance = preset.sun_shadow_max_distance \
+		if preset.sun_shadow_max_distance > 0.0 else quality.shadow_max_distance
 	_alarm_color = preset.alarm_color
 	apply_shadow_policy(quality)
+
+
+static func _shadow_mode(mode: int) -> int:
+	match mode:
+		0:
+			return DirectionalLight3D.SHADOW_ORTHOGONAL
+		1:
+			return DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
+		_:
+			return DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
 
 
 func register_light(light: Node3D) -> void:

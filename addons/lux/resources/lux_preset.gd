@@ -20,6 +20,55 @@ extends Resource
 @export var sun_color: Color = Color(1.0, 0.95, 0.85)
 @export_range(0.0, 8.0) var sun_energy: float = 1.2
 @export var sun_shadows: bool = true
+## HOW THE SUN'S SHADOW IS PAID FOR (0.38.0). A directional light with no
+## shadow lights every floor under a roof, and an interior cannot read dark
+## while it does (0.37.0 measured it: the unshadowed Heavy Rain sun was the
+## first of three terms keeping a lounge lit). Shadows are the expensive
+## lever -- the engine's default 4-split PSSM at the tier's 100 m cost 0.5 to
+## 9.9 GPU ms per station on an RTX 2060 in that measurement. What stops the
+## sun lighting a floor through its roof is any shadow map that CONTAINS the
+## roof, which a single orthogonal split over the metres around the camera
+## does; the splits and the reach buy exterior shadow quality at a distance
+## the interior question never asks about. So a preset says how much it
+## wants: Orthogonal is the one-pass map, PSSM 2 / 4 the engine's cascades.
+##
+## MEASURED on the walk of cold run 9054 (RTX 2060, 1600 x 900, GL
+## Compatibility, tools/club_walk_probe.py, median viewport GPU ms of 2 x 240
+## frames, delta against the same station with the sun unshadowed):
+##
+##     station        ortho 60  ortho 40  ortho 90  PSSM2 60  PSSM4 100
+##     street          +4.9      +5.3      +5.1      +5.8      +7.2
+##     spawn wing      +3.3      +2.5      +5.4      +2.6      +5.4
+##     vault           +5.9      +6.4      +9.5      +7.9     +11.6
+##     office          +8.1      +10.8     +7.6     +17.9     +19.6
+##     lobby           +3.2      +3.7      +2.8      +1.9      +5.2
+##     antechamber     +3.2      +3.8      +2.5      +2.6      +4.4
+##
+## Round-to-round spread at the office and vault is up to 7 ms, so the
+## orthogonal columns are one number; PSSM4 at the tier's 100 m -- the
+## engine default, what 0.37.0 priced -- is the dearest everywhere. The
+## atlas (4096 / 2048 / 1024) and a hard filter moved nothing (+1.5 to
+## +9.0 at every combination): the cost is the shadow PASS re-drawing the
+## site, not sampling it. LuxRain already casts none (lux_rain.gd).
+##
+## SO THE SUN SHADOW WAS REFUSED for the presets that shipped without one.
+## The budget was ~2 ms at every station and the cheapest setting is over
+## it at five of six. Heavy Rain and Gas Station Fluorescent keep
+## `sun_shadows = false`; Blue Hour and Delco Summer Afternoon, which
+## already paid for a shadow, now pay for the orthogonal one. Every one of
+## the four carries mode 0 and 60 m, so turning a shadow on is one line
+## with a measured price -- and what it buys is the biggest of the three
+## terms: at the same stations the unshadowed sun leaves the rooms at luma
+## 47-65 where the shadowed one leaves them at 20-38 (0.38.0 changelog). The
+## unpriced lever is a cull-mask split -- the sun lighting exterior layers
+## only -- which costs nothing per frame and is a layering question for
+## the geometry's owners, not for this preset.
+@export_enum("Orthogonal", "PSSM 2 Splits", "PSSM 4 Splits") var sun_shadow_mode: int = 2
+## Metres the sun's shadow reaches from the camera. 0 = the quality tier's
+## (100 m High, 45 m Medium). Past it the sun is unshadowed again, so a
+## roof beyond this distance lets the sun back into the room under it --
+## which is out of sight at that range, and is the trade the number buys.
+@export_range(0.0, 500.0) var sun_shadow_max_distance: float = 0.0
 
 @export_group("Ambient")
 ## Sky = gather ambient from the sky (softer, modern). Flat Color = a single
@@ -30,6 +79,34 @@ extends Resource
 @export_range(0.0, 4.0) var ambient_energy: float = 1.0
 ## How much the sky contributes when ambient_mode is Sky (0 = pure color).
 @export_range(0.0, 1.0) var ambient_sky_contribution: float = 0.5
+## INTERIORS READ DARK, LIT BY THEIR OWN FIXTURES (0.38.0, the walker's
+## decision). An interior ReflectionProbe replaces the environment's ambient
+## inside its box -- but only the `ambient_light_sky_contribution` share of
+## it, whatever the ambient source (MEASURED, tools/probe_weight_probe.gd,
+## 0.37.0: 1.0 takes every face to the probe's colour, 0.5 about half in
+## linear light, 0.0 nothing). At this preset's 0.5 a room keeps half the
+## sky's ambient through its roof. With this on, LuxEnvironment writes the
+## contribution as 1.0 regardless of `ambient_sky_contribution`, so a probed
+## room's ambient is the probe's alone and an unprobed one is the sky's. The
+## street pays for it: outdoors, contribution 1.0 drops the flat
+## `ambient_color` term and keeps the sky-sampled one, which under Heavy Rain
+## is the darker of the two. MEASURED on the walk of cold run 9054 (RTX 2060,
+## 1600 x 900, sun shadowed, whole-frame luma, tools/club_walk_probe.py),
+## the street station:
+##
+##     0.37.0 as shipped (contribution 0.5, no sun shadow)      68.5
+##     contribution 1.0, sun shadowed  (this knob, as shipped)   70.1
+##     contribution 0.5, sun shadowed                            77.3
+##     ambient_mode Flat Color + contribution 1.0                82.5
+##     contribution 1.0 + ambient_energy 1.3                     70.2
+##
+## So with the knob on the street sits 1.6 codes over where it shipped and
+## needs no compensating; Flat Color keeps the whole flat ambient outdoors
+## (the probes still replace it indoors -- interior frames identical) and
+## is the lever for a preset that wants a brighter street. `ambient_energy`
+## is NOT that lever: at contribution 1.0 under GL Compatibility raising it
+## 30% moved the frame 0.1, a null result recorded so nobody turns it twice.
+@export var room_probes_replace_ambient: bool = false
 
 @export_group("Tonemap & Grade")
 @export_enum("Linear", "Reinhard", "Filmic", "ACES") var tonemap_mode: int = 2
