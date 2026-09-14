@@ -15,6 +15,9 @@ extends RefCounted
 ##   sun -> handled by the preset. Zoo's fixture pass (--fixtures) bakes the
 ##   matching HARDWARE at the same anchors; LuxEmissiveBinder ties its lit
 ##   faces to set_fixtures_powered.
+##   club_wash / neon -> LuxFluorescentRig in a coloured costume (0.37.0)
+##   stage_light      -> LuxStageLightRig      room_ambient -> ReflectionProbe
+##   (the club set: see CLUB_PALETTE and _club_rig below)
 ##
 ## TWO CALLERS, TWO CONTAINERS. `bake` is the editor's: everything in the
 ## manifest under `LuxLights`. `bake_daylight` is the pipeline's (0.30.0,
@@ -31,6 +34,88 @@ const DAYLIGHT_CONTAINER := "LuxDaylight"
 ## The anchor types daylight owns. `sun` is the preset's and is never baked
 ## here; `window` is the one with no hardware and no marker.
 const DAYLIGHT_TYPES: Array[String] = ["window"]
+
+const CLUB_CONTAINER := "LuxClub"
+
+## The club set (0.37.0). No hardware and no marker today, so like `window`
+## they reach a level only through a manifest bake -- `bake_club` below.
+const CLUB_TYPES: Array[String] = ["club_wash", "stage_light", "neon", "room_ambient"]
+
+## THE CLUB PALETTE, and its names are a contract: Deli Counter writes them
+## into an anchor's `color`. Saturated on purpose -- the walker's references
+## (GTA IV's Triangle Club) are a room lit almost entirely by coloured light,
+## with next to no white in it. Values are `light_color`, which Godot treats
+## as an sRGB multiplier, each with its largest channel at 1.0 so that
+## `energy` means the same thing for every colour. NOT luminance-matched: a
+## blue pool at the same energy reads darker than an amber one, which is what
+## the references show too.
+const CLUB_PALETTE := {
+	"magenta": Color(1.0, 0.0, 0.8),
+	"hot_pink": Color(1.0, 0.12, 0.5),
+	"red": Color(1.0, 0.04, 0.06),
+	"violet": Color(0.55, 0.1, 1.0),
+	"blue": Color(0.1, 0.2, 1.0),
+	"cyan": Color(0.0, 0.8, 1.0),
+	"amber": Color(1.0, 0.55, 0.08),
+}
+## The order a colour is picked in when an anchor names none. Appending keeps
+## every existing pick where it was only if the list length does not change,
+## so it does not: a new colour moves every derived pick. Say so if you add one.
+const CLUB_COLOR_ORDER: Array[String] = ["magenta", "hot_pink", "red", "violet",
+	"blue", "cyan", "amber"]
+
+## A storey's drop when an anchor carries none: the 3.2 m ceiling Deli Counter
+## writes for the strip clubs, less the 0.2 m slab gap. Only a fallback.
+const CLUB_DEFAULT_DROP := 3.0
+
+## HOW BRIGHT, AS A MULTIPLE OF THE OFFICE THE CLUB REPLACES. Every club
+## energy below is solved from the falloff Godot applies (measured against
+## this closed form under GL Compatibility, 4.7, RTX 2060: an omni and an
+## 89-degree spot at 2.95 m over a matte floor, R 5.0, attenuation 2 and 1,
+## 13 radii each, within 2% at every lit sample):
+##
+##     value(d) = energy * (1 - (d / R)^4)^2 / d^attenuation * cos(incidence)
+##
+## so that a club light puts LEVEL x what ONE fluorescent lamp from this
+## loader puts on the floor straight below it at the same drop
+## (`office_floor_value`). A number of that kind holds when the drop, the
+## pool radius or the throw moves; a flat energy does not.
+##
+## The levels themselves are a LOOK, set against frames of a scratch copy of
+## the vault_surface walk: country club_a01's grand lounge, 17 x 40 m, lamps
+## at 3.39 m over a dark purple carpet, Heavy Rain, GL Compatibility, RTX
+## 2060, the room's five fluorescents replaced by five washes, a two-spot
+## stage light and two neons. RETRACTED FIRST GUESS, kept: the wash level was
+## 1.0 -- "the office's own floor value, in colour" -- and in those frames it
+## was invisible. Hiding every club light moved mean luma 57.8 -> 57.7;
+## scaling the washes x4 and x8 at runtime moved it 49.0 -> 49.3 and 49.5, and chroma
+## >= 40 stayed at 0.0% of the frame. The office row it replaced was just as
+## invisible on that carpet: the room was lit by the environment (sky
+## ambient, the unshadowed preset sun, fog), not by its fixtures. With the sun
+## shadowed and fog off, washes read as coloured pools on the carpet and walls at x12
+## (0.6% of the frame >= 40 chroma looking down the room, 1.3% at the stage)
+## and the stage and neons already read at 3 and 1.5. So the wash level is
+## 12. It is tuned to a dark floor; on a light one it will be loud.
+const CLUB_WASH_LEVEL := 12.0
+const CLUB_STAGE_LEVEL := 3.0
+const CLUB_NEON_LEVEL := 1.5
+## A room_ambient probe's ambient energy on its palette colour.
+const ROOM_AMBIENT_ENERGY := 0.05
+## How far a room_ambient probe's box stands proud of `size` on every side.
+## MEASURED (GL Compatibility, a 10 x 3 x 10 m room of six planes, flat grey
+## ambient, a black interior probe): a box exactly the room's size left the
+## walls at the full environment ambient (RGB sum 317 of 317), the ceiling at
+## 278 and the floor at 104 -- the faces ON the boundary fall outside it. Any
+## margin from 0.05 m up took all three to 0, and blend_distance 1.0 or 0.1
+## changed nothing. 0.1 is twice the smallest margin that worked.
+const ROOM_AMBIENT_MARGIN := 0.1
+## A wash's floor pool radius when the anchor carries none, per metre of drop.
+const CLUB_WASH_RADIUS_PER_DROP := 1.25
+
+## The fluorescent branch's energy and hang, named so the club rigs price
+## themselves against the lamp that is actually built rather than a copy.
+const FLUORESCENT_ENERGY := 1.0
+const FLUORESCENT_MOUNT := -0.25
 
 
 ## Bake ONLY the daylight anchors of `path` under a `LuxDaylight` container,
@@ -72,6 +157,56 @@ static func bake_daylight(path: String, scene_root: Node) -> Dictionary:
 		made += 1
 	return {"ok": true, "count": made, "in_manifest": in_manifest,
 		"msg": "Baked %d daylight rig(s) from %d window anchor(s)" % [made, in_manifest]}
+
+
+## Bake ONLY the club anchors of `path` (CLUB_TYPES) under a `LuxClub`
+## container, the same shape as `bake_daylight`: nothing else is touched, and
+## the result says how many the file asked for. `refused` lists the ids the
+## tuning table would not build -- an unknown colour name, a stage light with
+## no target -- so a caller can tell a typo from an empty manifest. A caller
+## that packs the scene must re-own the container's children, as Level
+## Factory's driver already does for `LuxDaylight`.
+static func bake_club(path: String, scene_root: Node) -> Dictionary:
+	if scene_root == null:
+		return {"ok": false, "msg": "no scene root", "count": 0, "in_manifest": 0,
+			"refused": []}
+	if not FileAccess.file_exists(path):
+		return {"ok": false, "msg": "File not found: %s" % path, "count": 0,
+			"in_manifest": 0, "refused": []}
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(data) != TYPE_DICTIONARY or not data.has("anchors"):
+		return {"ok": false, "msg": "Not a .lights.json (no 'anchors').",
+			"count": 0, "in_manifest": 0, "refused": []}
+	var old := scene_root.get_node_or_null(NodePath(CLUB_CONTAINER))
+	if old != null:
+		old.free()
+	var container := Node3D.new()
+	container.name = CLUB_CONTAINER
+	scene_root.add_child(container)
+	container.owner = scene_root
+	var made := 0
+	var in_manifest := 0
+	var refused: Array = []
+	for a in data["anchors"]:
+		if typeof(a) != TYPE_DICTIONARY:
+			continue
+		if not CLUB_TYPES.has(String(a.get("type", ""))):
+			continue
+		in_manifest += 1
+		var node := _rig_for(a)
+		if node == null:
+			refused.append(String(a.get("id", "?")))
+			continue
+		container.add_child(node)
+		node.owner = scene_root
+		_reown(node, scene_root)
+		_place(node, a)
+		made += 1
+	var msg := "Baked %d club rig(s) from %d club anchor(s)" % [made, in_manifest]
+	if not refused.is_empty():
+		msg += "; refused %s" % ", ".join(refused)
+	return {"ok": refused.is_empty(), "count": made, "in_manifest": in_manifest,
+		"refused": refused, "msg": msg}
 
 
 ## Read `path`, replace any previous bake, and spawn a rig per anchor under a
@@ -157,7 +292,7 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			var r := LuxLightRig.new()
 			r.rig_name = &"Fluorescent (baked)"
 			r.light_color = LuxColorTemp.cool_fluorescent()
-			r.energy = 1.0          # per-light; rooms pack 5+ so they sum — 2.2
+			r.energy = FLUORESCENT_ENERGY   # per-light; rooms pack 5+ so they sum — 2.2
 			                        # each blew interiors to white. Tune per bake.
 			# RANGE IS DERIVED FROM THE ANCHOR'S DROP TO ITS FLOOR
 			# (deli_counter >= 0.97 stamps `drop`), because a flat number was
@@ -189,7 +324,7 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			# interiors read too dark BETWEEN fixtures, raise `energy`,
 			# never this.
 			var drop := float(a.get("drop", 0.0))
-			r.light_range = clampf(drop + 0.75, 4.0, 7.5) if drop > 0.0 else 4.0
+			r.light_range = fluorescent_range(drop)
 			# Inverse-square falloff: at the default near-linear 1.0 the pool
 			# cuts to zero AT the range and rims every ceiling with a visible
 			# circle (walked 2026-08-23, zoo corridor). 2.0 fades out inside
@@ -201,7 +336,7 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			# plane spends half its sphere grazing the ceiling -- streaks at
 			# glancing angles and a scorched ring around the fixture (same
 			# walk). Real tubes hang; ours do now too.
-			r.mount_height = -0.25
+			r.mount_height = FLUORESCENT_MOUNT
 			r.flicker_amount = 0.12
 			r.flicker_speed = 9.0
 			_make_downlight(r)
@@ -351,8 +486,224 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			ra.shadows_enabled = true
 			ar.rig = ra
 			return ar
+		"club_wash", "stage_light", "neon", "room_ambient":
+			return _club_rig(t, a, row)
 		_:
 			return null   # 'sun' is owned by the preset/SkyMint; others skipped
+
+
+## The fluorescent row's range rule (see its branch), as a function so the
+## club rigs can price themselves against the same lamp.
+static func fluorescent_range(drop: float) -> float:
+	return clampf(drop + 0.75, 4.0, 7.5) if drop > 0.0 else 4.0
+
+
+## The attenuation window Godot multiplies every omni and spot by (see the
+## closed form over CLUB_WASH_LEVEL).
+static func range_window(d: float, light_range: float) -> float:
+	if light_range <= 0.0:
+		return 0.0
+	return pow(maxf(1.0 - pow(d / light_range, 4.0), 0.0), 2.0)
+
+
+## What ONE fluorescent lamp from this loader puts on the floor straight
+## below it at a room drop of `drop` metres: energy 1, attenuation 2, hung a
+## hand's width under its anchor, range from `fluorescent_range`. At the
+## strip clubs' 3.2 m that is 0.0570. The unit every club level is in.
+static func office_floor_value(drop: float) -> float:
+	var h := maxf(drop + FLUORESCENT_MOUNT, 0.25)
+	return FLUORESCENT_ENERGY * range_window(h, fluorescent_range(drop)) / (h * h)
+
+
+## The energy that puts `value` at distance `d` from a light of range
+## `light_range` and attenuation 2, on a surface facing it. Capped at the 16
+## LuxLightRig.energy allows; 0 when `d` is at or past the range.
+static func energy_for(value: float, d: float, light_range: float) -> float:
+	var w := range_window(d, light_range)
+	if w <= 0.0:
+		return 0.0
+	return minf(value * d * d / w, 16.0)
+
+
+## A stable 32-bit djb2 over the id's UTF-8 bytes. Spelled out instead of
+## String.hash() so that Deli Counter can predict a derived colour in Python:
+##     h = 5381
+##     for b in s.encode("utf-8"): h = (h * 33 + b) & 0xFFFFFFFF
+static func club_hash(s: String) -> int:
+	var h := 5381
+	for b in s.to_utf8_buffer():
+		h = (h * 33 + b) & 0xFFFFFFFF
+	return h
+
+
+## The colour NAME an anchor gets: its own `color` when it has one, else the
+## pick `CLUB_COLOR_ORDER[club_hash(id) % 7]`. Returns "" for a name that is
+## not in CLUB_PALETTE -- a refusal, never a quiet substitute: a typo that
+## silently became magenta would look like a design decision.
+static func club_color_name(a: Dictionary) -> String:
+	if a.has("color"):
+		var n := String(a.get("color"))
+		return n if CLUB_PALETTE.has(n) else ""
+	return CLUB_COLOR_ORDER[club_hash(String(a.get("id", ""))) % CLUB_COLOR_ORDER.size()]
+
+
+## Deli Counter Z-up [x, y, z] -> Godot Y-up (x, z, -y); see _place.
+static func _godot_point(p: Variant) -> Vector3:
+	if typeof(p) != TYPE_ARRAY or (p as Array).size() < 3:
+		return Vector3.ZERO
+	return Vector3(float(p[0]), float(p[2]), -float(p[1]))
+
+
+## THE CLUB SET (0.37.0). The walker, with two frames of GTA IV's Triangle
+## Club: "strip clubs should have a dingy lived in feel, dark with colored
+## lights, couches and bars". Deli Counter gives a club's main floor the same
+## five cool fluorescent lamps as an office. These are what it can write
+## instead; every range and energy is derived (see CLUB_WASH_LEVEL).
+##
+##   club_wash    a dim saturated pool for one zone of a room. The fluorescent
+##                rig's machinery, one downlight per lamp (0.34.0's reason:
+##                nothing through the slab above), `row` honoured. The pool's
+##                floor radius is the anchor's `radius` or 1.25 x drop, held
+##                to 1.5-6.0 m; range = the lamp-to-pool-edge distance
+##                sqrt(h^2 + radius^2), capped at the fluorescent's 7.5 m for
+##                the same per-mesh budget; energy puts CLUB_WASH_LEVEL x the
+##                office lamp's floor value on the floor below it.
+##   stage_light  SpotLight3D(s) aimed at `target` [x, y, z], the same frame as
+##                `pos`. Refused without one. Cone half-angle atan(radius /
+##                throw), `radius` default 1.5 m; range 1.25 x throw, so the
+##                attenuation window at the target is a constant 0.349; energy
+##                puts CLUB_STAGE_LEVEL x the office value on the target. A
+##                `row` lays several spots along rot_y, each its own colour
+##                (the anchor's, then onward through CLUB_COLOR_ORDER).
+##                `cycle_s` > 0 steps every spot through the palette, holding
+##                each colour that many seconds (LuxStageLightRig).
+##   neon         a small omni at a lit sign or LED strip, for spill. Range
+##                0.5 x the sign's longer side + 1.0 m, held to 1.0-2.5; energy
+##                puts CLUB_NEON_LEVEL x the office value at half the range.
+##                rot_y is the sign's FACING, as for `sign`, and a `row` runs
+##                ALONG the wall (so _place gives it the area rigs' quarter
+##                turn). The source stands AT the anchor: Deli Counter must put
+##                it in free air, never inside a cabinet (roadmap 139).
+##   room_ambient a ReflectionProbe the size of the room (`size` [x, y, z],
+##                Deli Counter axes, centred on `pos`) plus ROOM_AMBIENT_MARGIN
+##                a side, whose ambient replaces the environment's inside it.
+##                The only per-room darkness GL Compatibility offers, and only
+##                PART of one. MEASURED (tools/probe_weight_probe.gd, a 17 x
+##                3.48 x 40 m room): the share of ambient the probe replaces is
+##                the Environment's ambient_light_sky_contribution, whatever
+##                the ambient source -- 1.0 takes every face to the probe's
+##                colour, 0.5 (Heavy Rain, and LuxPreset's default) about half
+##                in linear light, 0.0 nothing. RETRACTED, kept: a first reading
+##                said "the sky-sampled share, never a flat colour"; it came
+##                from a synthetic room whose fresh Environment defaulted to
+##                contribution 1.0. The sun and fog are the scene's and no probe
+##                touches them (see the 0.37.0 changelog).
+##                Colour defaults to violet, not a hash pick.
+##
+## An unknown `color` name returns null with a warning, on every path.
+static func _club_rig(t: String, a: Dictionary, row: Dictionary) -> Node3D:
+	var id := String(a.get("id", t))
+	var cname := club_color_name(a)
+	if t == "room_ambient" and not a.has("color"):
+		cname = "violet"
+	if cname == "":
+		push_warning("LuxLightLoader: %s '%s' names colour '%s', which is not one of %s -- not built"
+			% [t, id, String(a.get("color")), ", ".join(CLUB_COLOR_ORDER)])
+		return null
+	var col: Color = CLUB_PALETTE[cname]
+	var drop := float(a.get("drop", 0.0))
+	if drop <= 0.0:
+		drop = CLUB_DEFAULT_DROP
+	var office := office_floor_value(drop)
+	match t:
+		"club_wash":
+			var w := LuxFluorescentRig.new()
+			w.name = id
+			var rw := LuxLightRig.new()
+			rw.rig_name = &"Club Wash (baked)"
+			rw.light_color = col
+			var h := maxf(drop + FLUORESCENT_MOUNT, 0.25)
+			var radius := clampf(float(a.get("radius", drop * CLUB_WASH_RADIUS_PER_DROP)), 1.5, 6.0)
+			rw.light_range = minf(sqrt(h * h + radius * radius), 7.5)
+			rw.attenuation = 2.0
+			rw.energy = energy_for(CLUB_WASH_LEVEL * office, h, rw.light_range)
+			rw.count = int(row.get("count", 1))
+			rw.spacing = float(row.get("spacing", 0.0))
+			rw.mount_height = FLUORESCENT_MOUNT
+			rw.flicker_amount = 0.0
+			_make_downlight(rw)
+			w.rig = rw
+			return w
+		"neon":
+			var n := LuxFluorescentRig.new()
+			n.name = id
+			var rn := LuxLightRig.new()
+			rn.rig_name = &"Neon (baked)"
+			rn.light_color = col
+			var longer := 0.5
+			if typeof(a.get("size")) == TYPE_ARRAY and (a.get("size") as Array).size() >= 2:
+				longer = maxf(float(a.get("size")[0]), float(a.get("size")[1]))
+			rn.light_range = clampf(longer * 0.5 + 1.0, 1.0, 2.5)
+			rn.attenuation = 2.0
+			rn.energy = energy_for(CLUB_NEON_LEVEL * office, rn.light_range * 0.5, rn.light_range)
+			rn.count = int(row.get("count", 1))
+			rn.spacing = float(row.get("spacing", 0.0))
+			rn.mount_height = 0.0
+			rn.flicker_amount = 0.0
+			n.rig = rn
+			return n
+		"stage_light":
+			if typeof(a.get("target")) != TYPE_ARRAY or (a.get("target") as Array).size() < 3:
+				push_warning("LuxLightLoader: stage_light '%s' has no target [x, y, z] -- not built" % id)
+				return null
+			var aim_parent := _godot_point(a.get("target")) - _godot_point(a.get("pos"))
+			var throw := aim_parent.length()
+			if throw < 0.25:
+				push_warning("LuxLightLoader: stage_light '%s' target is %.2f m from its pos -- not built"
+					% [id, throw])
+				return null
+			var s := LuxStageLightRig.new()
+			s.name = id
+			# _place turns the rig by rot_y AFTER this; express the aim in the
+			# rig's own frame so the turn carries it back onto the target.
+			s.aim_local = Basis(Vector3.UP, deg_to_rad(float(a.get("rot_y", 0.0)))).inverse() * aim_parent
+			var sradius := clampf(float(a.get("radius", 1.5)), 0.5, 4.0)
+			s.spot_angle_deg = clampf(rad_to_deg(atan(sradius / throw)), 3.0, 60.0)
+			s.spot_rim = 0.5
+			var base := CLUB_COLOR_ORDER.find(cname)
+			var cols := PackedColorArray()
+			for k in CLUB_COLOR_ORDER.size():
+				cols.append(CLUB_PALETTE[CLUB_COLOR_ORDER[(base + k) % CLUB_COLOR_ORDER.size()]])
+			s.colors = cols
+			s.cycle_period_s = maxf(float(a.get("cycle_s", 0.0)), 0.0)
+			var rs := LuxLightRig.new()
+			rs.rig_name = &"Stage Light (baked)"
+			rs.light_color = col
+			rs.light_range = clampf(throw * 1.25, 2.0, 12.0)
+			rs.attenuation = 2.0
+			rs.energy = energy_for(CLUB_STAGE_LEVEL * office, throw, rs.light_range)
+			rs.count = int(row.get("count", 1))
+			rs.spacing = float(row.get("spacing", 0.0))
+			rs.mount_height = 0.0
+			s.rig = rs
+			return s
+		"room_ambient":
+			var sz: Variant = a.get("size")
+			if typeof(sz) != TYPE_ARRAY or (sz as Array).size() < 3:
+				push_warning("LuxLightLoader: room_ambient '%s' has no size [x, y, z] -- not built" % id)
+				return null
+			var probe := ReflectionProbe.new()
+			probe.name = id
+			probe.size = Vector3(absf(float(sz[0])), absf(float(sz[2])), absf(float(sz[1]))) \
+				+ Vector3.ONE * 2.0 * ROOM_AMBIENT_MARGIN
+			probe.interior = true
+			probe.update_mode = ReflectionProbe.UPDATE_ONCE
+			probe.ambient_mode = ReflectionProbe.AMBIENT_COLOR
+			probe.ambient_color = col
+			probe.ambient_color_energy = ROOM_AMBIENT_ENERGY
+			probe.blend_distance = 0.1
+			return probe
+	return null
 
 
 ## CEILING LAMPS LIGHT DOWNWARD, NOT THROUGH THE SLAB ABOVE (0.34.0). A person
@@ -444,7 +795,10 @@ static func _place(node: Node3D, a: Dictionary) -> void:
 	# as white quads sticking out of cold run 9005's west facade in the S
 	# elevation. The omni beneath it never cared; only the quad did.
 	var yaw := float(a.get("rot_y", 0.0))
-	if node is LuxAreaLightRig:
+	# A neon's rot_y is its sign's facing and its row runs along the wall, so
+	# it takes the area rigs' quarter turn: local +X (the row) lands on the
+	# wall, local +Z on the facing (0.37.0).
+	if node is LuxAreaLightRig or String(a.get("type", "")) == "neon":
 		yaw += 90.0
 	node.rotation = Vector3(0.0, deg_to_rad(yaw), 0.0)
 

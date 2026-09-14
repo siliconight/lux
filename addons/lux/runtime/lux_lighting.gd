@@ -134,6 +134,15 @@ static func _rig_type_name(light: Node3D) -> String:
 
 
 static func shadow_rank_of_name(name: String) -> int:
+	# THE CLUB SET RANKS LAST, AND IS ASKED FIRST (0.37.0). Its lights are
+	# interior, short and deliberately unshadowed, but their NODE names are
+	# Deli Counter's anchor ids -- and a neon on a storefront sign will be
+	# called `..._sign_neon`, which the test below would rank with the 8 m
+	# signs and hand a shadow map. The rig resource's name is appended to the
+	# node name (`_rig_type_name`), so the loader's own words decide.
+	if name.contains("club wash") or name.contains("stage light") \
+			or name.contains("neon (baked)"):
+		return 4
 	if name.contains("sign") or name.contains("pack") or name.contains("street"):
 		return 0
 	if name.contains("window"):

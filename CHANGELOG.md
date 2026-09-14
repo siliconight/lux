@@ -7,6 +7,198 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.37.0] - a club can be lit like a club, and what keeps it from reading dark is measured
+
+The walker, with two frames of GTA IV's Triangle Club: "strip clubs should
+have a dingy lived in feel, dark with colored lights, couches and bars". Deli
+Counter gives a club's main floor the same five cool fluorescent lamps as an
+office (`strip_club_a01.lights.json`: `main_floor_ceiling`, count 5), and this
+loader knew fluorescent, pendant, window, sign, wall_pack and nothing coloured.
+
+### Added
+- **Four anchor types in `LuxLightLoader`, names a contract Deli Counter can
+  write against.** `club_wash`: a dim saturated pool for one zone of a room,
+  built on the fluorescent rig's machinery as a downlight (0.34.0's reason:
+  nothing through the slab above), `row` honoured. `stage_light`: coloured
+  SpotLight3D(s) aimed at `target` [x, y, z] in the same frame as `pos`,
+  refused without one; `row` lays several spots along rot_y, each a colour
+  further along the palette; `cycle_s` > 0 steps them through it.
+  `neon`: a small omni at a lit sign or LED strip, `rot_y` its facing as for
+  `sign`, `row` along the wall. `room_ambient`: a ReflectionProbe the size of
+  the room whose ambient replaces the environment's inside it (see below for
+  how much of it).
+- **`CLUB_PALETTE`**: magenta, hot_pink, red, violet, blue, cyan, amber, each
+  with its largest channel at 1.0. An anchor's `color` names one; an absent
+  colour is `CLUB_COLOR_ORDER[djb2(id) % 7]`, the hash spelled out in GDScript
+  so Python can predict it. **An unknown name is refused** -- null and a
+  warning on `rig_for_anchor`, listed in `refused` by `bake_club` -- never a
+  quiet substitute. `room_ambient` defaults to violet rather than a hash pick.
+- **`LuxLightLoader.bake_club(path, scene_root)`**, the shape of
+  `bake_daylight`: only the club types, under a `LuxClub` container, returning
+  `{ok, count, in_manifest, refused, msg}`. Nothing calls it yet.
+- **`LuxStageLightRig`** (`runtime/rigs/lux_stage_light_rig.gd`). The colour
+  cycle is a pure function of accumulated time (`colour_at`): hold 75% of the
+  period, crossfade 25%, lamp i running i colours ahead. It writes
+  `light_color` only, never range or energy, so a lamp's mesh pairing does not
+  change while it cycles.
+- `tools/club_light_selftest.gd`: each type builds the node it should; range
+  and energy recomputed from the closed form in the test, not read back from
+  the loader's helpers; a taller room derives a different answer that still
+  meets its own target; seven ids pick the djb2 colour twice alike and not all
+  the same; `chartreuse` is refused on all four types and `bake_club` names
+  what it refused; a stage spot's axis points at its target after placement
+  with rot_y 90 (dot 1.00000); the neon row runs along the wall; the probe box
+  swaps axes and adds its margin; the cycle's colours at t = 0, 2.9, 3.5, 4;
+  a sign-mounted neon ranks last for shadows; a cycling two-spot stage rig
+  survives a PackedScene round trip with two lamps, not four. 74 checks.
+  Against the 0.36.0 loader it exits 2 ("no CLUB_PALETTE"); the first draft
+  HUNG there instead, on a typed assignment from the missing constant, and
+  now type-checks every contract constant before using it.
+  `window_glass`, `colocation`, `light_leak` and `rain` selftests pass.
+- Measurement tools, each printing numbers only:
+  `tools/falloff_probe.gd`, `tools/light_limit_probe.gd`,
+  `tools/probe_weight_probe.gd` (GL Compatibility, need a window), and
+  `tools/club_walk_probe.py` / `.gd`, which runs a built level through the
+  factory's `godot_probe` mirror and reports frames and cost per variant
+  (hide/show, shadows, sun shadow, fog, environment properties, energy scale).
+
+### Changed
+- `LuxLighting.shadow_rank_of_name` ranks the club set last BEFORE the
+  sign/pack/street test. Node names are Deli Counter's anchor ids, and a neon
+  on a storefront sign will be `..._sign_neon`, which would otherwise rank with
+  the 8 m signs and take a shadow map. Decided by the loader's rig names.
+- The fluorescent branch's energy, hang and range rule are named
+  (`FLUORESCENT_ENERGY`, `FLUORESCENT_MOUNT`, `fluorescent_range`) so the club
+  rigs price themselves against the lamp that is built. Values unchanged
+  (the selftest holds range 4.0 and energy 1.0 at drop 3.2).
+
+### How bright, and why that is derived
+Every club energy is solved from the falloff the engine applies, measured
+first. `tools/falloff_probe.gd`, Godot 4.7, GL Compatibility, RTX 2060: one
+light 2.95 m over a matte floor, R 5.0, 13 radii, linearised 8-bit samples
+against `energy * (1 - (d/R)^4)^2 / d^attenuation * cos(incidence)`: omni
+attenuation 2, 89-degree spot attenuation 2, omni attenuation 1 -- within 2%
+at every lit sample (0.0437 against 0.0444 under the lamp). So a club light
+puts LEVEL x `office_floor_value(drop)` -- what one fluorescent lamp puts on
+the floor below it at that drop, 0.0570 at 3.2 m -- where it is aimed:
+
+    club_wash    radius (default 1.25 x drop, 1.5-6.0 m); range sqrt(h^2 + r^2),
+                 capped at the fluorescent's 7.5; the value on the floor below
+    stage_light  cone atan(radius / throw); range 1.25 x throw (window 0.349 at
+                 the target); the value on the target
+    neon         range 0.5 x the longer side + 1.0 (1.0-2.5); the value at
+                 half range
+
+Built for the scratch club below: washes 6.74-8.37 at ranges 4.70-5.49 m, the
+stage spots 9.28 at 6.09 m with a 17.1-degree cone, neons 0.15 at 2.1 m and
+0.087 at 1.6 m.
+
+**The levels are a look, and the first one was wrong.** RETRACTED, kept: the
+wash level was 1.0, "the office's own floor value, in colour". In frames it
+was invisible -- hiding every club light moved mean luma 57.8 -> 57.7, and
+scaling the washes x4 and x8 at runtime moved it 49.0 -> 49.3 and 49.5,
+with 0.0% of the frame at chroma 40. The fluorescent row was just as invisible on that carpet
+(hiding it: 58.0 -> 57.7). With the sun shadowed and fog off, washes read as
+pools on the carpet and walls at x12, and the stage (3) and neons (1.5)
+already read. `CLUB_WASH_LEVEL` is 12. It is tuned to a dark floor.
+
+### The light limit, GL Compatibility
+`rendering/limits/opengl/max_lights_per_object` (default 8) is per mesh;
+`max_renderable_lights` is the global cap Level Factory sets to the package's
+light count. `tools/light_limit_probe.gd`: a 21.68 m square floor (470 m2)
+under a grid of coloured lights 3 m up, each station rendered with all lights
+and then with each light alone; a light is missing where the all-on frame is
+under half its single frame in its own footprint.
+
+    one mesh, cap 8,  8 lights    0 missing at 6 stations
+    one mesh, cap 8, 10 lights    2 missing -- [0, 8] from above, [0, 3] from the
+                                  other five stations: WHICH lights drop changes
+                                  with the camera, i.e. popping
+    one mesh, cap 8, 12 lights    4 missing at every station, always the four
+                                  corner lights, even where only 6 are on screen
+                                  (off-screen lights still hold slots)
+    one mesh, cap 8, 12 spots     identical to omnis
+    one mesh, cap 16, 12 lights   0 missing
+    4 x 4 tiles (5.42 m), cap 8   0 missing with 12 and with 16 lights
+
+The shipped grand lounge floor is 20 tiles, not one mesh. On the walk copy
+`mesh_light_census.py` counted 82 positional lights against 77, and meshes
+over 8 claimants stayed at 2 (both in the bank, unchanged).
+
+### What keeps the room from reading dark
+Measured on a scratch copy of the vault_surface walk (Heavy Rain), country
+club_a01's grand lounge, 17 x 40 m, lamps at 3.39 m: its five fluorescents
+replaced by five washes, a two-spot stage light, a bar LED strip and a sign
+neon, and a room_ambient probe, baked through `bake_club` and
+`max_renderable_lights` raised to 82. `club_walk_probe.py`, 1600 x 900, whole
+frame, looking down the room (the other four interior stations agree):
+
+    variant                              office row       club set
+                                         luma  chroma>=40  luma  chroma>=40
+    A as built (Heavy Rain)              58.0   0.00%      49.7   0.00%
+    B + sun shadows                      50.2   0.00%      41.3   0.03%
+    C + ambient_light_sky_contribution 1 29.6   0.00%      27.9   0.32%
+    D + fog off                           8.9   0.00%       5.8   1.63%
+    room unlit (row / club set hidden)   57.7              57.7
+
+`look_shots.py` at the same six stations agrees with A within 0.7 luma. At A,
+as a level ships today, the club set is 8 luma darker than the office and no
+more coloured. Three terms, none of them a light:
+
+- **The sun.** Heavy Rain's sun is unshadowed, and a directional light with no
+  shadow lights every floor under a roof. B is the preset turning its shadows
+  on; nothing per room can.
+- **Ambient, which the probe only partly replaces.** Measured
+  (`tools/probe_weight_probe.gd`, a 17 x 3.48 x 40 m room, black interior
+  probe, linear tonemap): the share replaced is the Environment's
+  `ambient_light_sky_contribution`, whatever the ambient source -- 1.0 takes
+  every face to black, 0.5 (Heavy Rain, LuxPreset's default) about half in
+  linear light, 0.0 nothing. RETRACTED, kept: a first reading said "the
+  sky-sampled share, never a flat colour"; it came from a synthetic room whose
+  fresh Environment defaulted to contribution 1.0, and a walk variant that
+  switched the source to Color at runtime kept 0.5 and stayed lit. Separately,
+  a probe box exactly the room's faces leaves them at full ambient (walls 317
+  of 317, ceiling 278, floor 104); any margin from 0.05 m took them to 0, so
+  `ROOM_AMBIENT_MARGIN` is 0.1. C also moves the street outside the door from
+  93.1 to 85.3: contribution is per scene.
+- **Fog.** Depth fog is the Environment's and in-scatters into every interior;
+  C -> D is 29.6 -> 8.9 in the office and 27.9 -> 5.8 in the club, and the
+  street frame drops 85.3 -> 49.8. Compatibility has no fog volumes.
+
+Per-room darkness in GL Compatibility is therefore the probe's share of
+ambient and no more. The rest is the preset's, or a camera-inside-room
+override of the scene's environment that nothing implements.
+
+### Cost
+Median of 3 rounds x 240 frames, viewport GPU ms from the engine's timestamps,
+1600 x 900, vsync off, RTX 2060. "Unlit" hides the row, or the club set with
+its probe:
+
+    station          office A / unlit   club A / unlit   club, 2 stage spots shadowed
+    lounge_s_to_n     1.53 / 1.41        2.38 / 1.43      3.15
+    lounge_n_to_s     5.02 / 5.01        5.43 / 4.54      6.00
+    couches_west      9.23 / 9.34        9.82 / 9.06     10.78
+    bar_north         0.80 / 0.75        0.89 / 0.75      1.06
+    stage_spot        1.08 / 0.94        1.12 / 0.94      1.44
+    street_door       2.63 / 2.54        3.81 / 3.27      4.73
+
+The row costs within +/-0.14 ms of nothing, the club set with its probe
+0.14-0.95. Two shadowed stage spots add 0.2-1.0. Sun shadows (B) add 0.5-9.9
+ms on the same stations in the two copies, 9.3-9.9 on lounge_n_to_s: they are
+the expensive lever. street_door's rounds spread up to 1.3 ms, wider than the
+club's delta there.
+
+### Noticed, not changed
+- Nothing emits these anchors and nothing bakes them. Deli Counter would write
+  the club types for a club room instead of its fluorescent row; Level
+  Factory's `run_lux_apply.gd` would call `bake_club` beside `bake_daylight`,
+  re-own `LuxClub`, and count its lights into `max_renderable_lights`.
+- The Zoo fixture hardware of a removed fluorescent row still hangs lit in the
+  ceiling; a club room would need Zoo to skip it.
+- The marker path (`LuxFixtureSpawner`) passes only type, id and drop, so a
+  club light spawned from a marker gets a hash colour and a stage light is
+  refused for want of a target.
+
 ## [0.36.0] - a window's light draws no pane in front of the glass
 
 ### Changed
