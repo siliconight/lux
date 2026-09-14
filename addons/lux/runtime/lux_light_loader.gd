@@ -302,6 +302,22 @@ static func _rig_for(a: Dictionary) -> Node3D:
 				# lands on the floor in front of the glass rather than on the
 				# ceiling and floor symmetrically at the wall (roadmap 145).
 				ar.light_offset = Vector3(0.0, 0.0, 0.35)
+				# NO PREVIEW QUAD IN A WINDOW: THE GLASS IS THE PANE. The quad
+				# was the lit window while glazing was opaque (roadmap 138: a
+				# near-black skin, so the room's light had to be painted on).
+				# Since Pixelcoat 0.40.0 every theme's `glass` blends, and the
+				# quad -- unshaded, emissive, double-sided, the size of the
+				# opening, on the wall plane -- became the thing a viewer sees
+				# through the glass from BOTH sides. Measured on a scratch copy
+				# of walk 9050 with see-through panes, look_shots given
+				# stations at the bank's west window: through the pane from the
+				# street, mean RGB (177, 176, 164) std 26 -- a flat light panel
+				# -- against the room's cabinet, ceiling lamp and back wall
+				# once the quad is off; from inside, (191, 189, 176) std 17
+				# against the sidewalk and the street. The omni is kept: it is
+				# the daylight pool on the floor, and light, not a picture of
+				# it, is what a lit room shows through glass at night.
+				ar.show_emissive_quad = false
 			else:
 				# A SIGN'S SOURCE STANDS IN FRONT OF ITS CABINET. The anchor
 				# is the sign's FACE plane (Deli Counter, 0.20 m proud of the

@@ -7,6 +7,50 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.36.0] - a window's light draws no pane in front of the glass
+
+### Changed
+- **`LuxLightLoader` builds window rigs with `show_emissive_quad = false`.**
+  The quad was the lit window while glazing was opaque (roadmap 138: a
+  near-black skin, so the room's light had to be painted on the opening). As
+  of Pixelcoat 0.40.0 every theme's `glass` blends, and the quad -- unshaded,
+  emissive, double-sided, the size of the opening, on the wall plane -- became
+  the only thing a viewer saw through the glass, from both sides.
+
+  MEASURED on a scratch copy of walk 9050 whose glass modules were rebuilt
+  see-through (Godot 4.7, GL Compatibility, RTX 2060, `look_shots.py` given
+  stations at the bank's west window). Through the pane with the quad, from
+  the street: mean RGB (177, 176, 164), std 26 -- a flat light panel; from the
+  room: (191, 189, 176), std 17. With the saved window rigs set to
+  `show_emissive_quad = false` and nothing else changed, the street frame shows
+  the room's cabinet, ceiling lamp and back wall through the glass, and the
+  room frame shows the sidewalk and the street. The omni is kept: it is the
+  pool on the floor inside the sill, and a lit room through see-through glass
+  is what a facade shows at night now.
+
+  Signs are untouched. `rig_for_anchor("sign")` still builds its quad, and
+  the fixture spawner still turns it off under spawned hardware (0.33.0).
+
+  Scope, stated because the walk copy was not re-baked: the frames above came
+  from editing the SAVED rigs in the copy's `presentation/lux.applied.tscn`,
+  which is what this loader change writes on the next apply -- the rig
+  rebuilds its children from that property in `_ready`, and
+  `window_glass_selftest` case C holds that it survives a pack/instantiate
+  round trip.
+
+### Added
+- `tools/window_glass_selftest.gd`: a window rig asks for no quad, builds its
+  light and no `AreaPanel_Surface`, keeps both through a PackedScene round
+  trip, and a loader sign keeps its quad. Against the 0.35.0 loader, four of
+  its eight checks fail. `colocation_selftest`, `light_leak_selftest` and
+  `rain_selftest` pass unchanged.
+
+### Noticed, not changed
+- With the pane no longer casting a shadow (Level Factory 0.84.0), a window
+  omni's 3.2-4.0 m sphere reaches the pavement outside: a faint pool below the
+  bank's south storefront window in daylight frames. Correct at night; in
+  daylight it reads as light leaking out.
+
 ## [0.35.0] - it rains, and not indoors
 
 The walker asked for "another layer" over the level: rain and wetness on top
