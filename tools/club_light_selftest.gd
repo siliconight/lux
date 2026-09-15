@@ -222,6 +222,22 @@ func _main() -> void:
 	_check("interior", (amb as ReflectionProbe).interior, true)
 	_check("default colour violet", (amb as ReflectionProbe).ambient_color, palette["violet"])
 	_check("no size -> refused", Loader.rig_for_anchor({"type": "room_ambient", "id": "a"}) == null, true)
+	# Deli Counter 0.132.0 writes `"color": null` on every non-club room: an
+	# untinted probe, not a refused name (cold run 9057 refused 13 of 15)
+	var plain: Node = Loader.rig_for_anchor({"type": "room_ambient", "id": "lobby_ambient",
+		"pos": [0, 0, 1.65], "size": [30.0, 13.0, 3.3], "color": null})
+	_check("color null -> built", plain is ReflectionProbe, true)
+	if plain is ReflectionProbe:
+		_check("color null -> the derived neutral colour", (plain as ReflectionProbe).ambient_color,
+			Loader.get("ROOM_AMBIENT_DERIVED_COLOR"))
+		_near("color null -> the derived energy", (plain as ReflectionProbe).ambient_color_energy,
+			float(Loader.get("ROOM_AMBIENT_DERIVED_ENERGY")), 1e-6)
+		plain.free()
+	var wash_null: Node = Loader.rig_for_anchor({"type": "club_wash", "id": "w", "pos": [0, 0, 3],
+		"drop": 3.0, "color": null})
+	_check("a null colour on a wash takes the hash pick, not a refusal", wash_null != null, true)
+	if wash_null != null:
+		wash_null.free()
 
 	print("case H -- the cycle is a pure function of time")
 	var cols := PackedColorArray([Color.RED, Color.GREEN, Color.BLUE])

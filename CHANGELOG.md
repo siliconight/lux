@@ -7,6 +7,39 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.38.1] - a null colour is no colour, so every room gets its probe
+
+Cold run 9057 (2026-09-14) is the first package with a generated strip club,
+and its `lux.quality.json` says the dark-interiors work reached only the club:
+"Baked 17 club rig(s) from 30 club anchor(s); refused b0/cash_office_ambient,
+b1/lobby_ambient, b1/manager_office_ambient, ... b2/upper_frame_n_ambient" --
+13 of 15 room ambients refused -- and "Baked 0 room probe(s) for 15 room(s);
+15 left to an explicit room_ambient". The bank and the construction site kept
+the sky's ambient.
+
+Both halves did what they said. Deli Counter 0.132.0 writes a `room_ambient`
+for every room with `"color": null` outside a club (untinted, per its light
+manifest doc). 0.38.0's `bake_room_ambient` leaves a room with an explicit
+`room_ambient` to `bake_club`. And `club_color_name` asked `a.has("color")`,
+which is true for a null value; `String(null)` is "<null>", not a palette name,
+so the anchor was refused. The contract said null; the check read presence.
+
+**`club_color_name` treats a null `color` as absent** (the hash pick), and
+`_club_rig` builds a `room_ambient` whose colour is null as the untinted probe
+`bake_room_ambient` derives: `ROOM_AMBIENT_DERIVED_COLOR` white at
+`ROOM_AMBIENT_DERIVED_ENERGY` 0.04, the energy 0.38.0 measured (0.0 crushed a
+lobby to p05 0, 0.08 returned the sky's level). An ABSENT colour on a
+room_ambient stays violet, the 0.37.0 club default.
+
+`tools/club_light_selftest.gd` case G: a `room_ambient` with `"color": null`
+builds the neutral probe at the derived energy, and a `club_wash` with a null
+colour builds rather than refusing. Both fail on 0.38.0 ("club light selftest
+FAILED: 2 case(s)"). All six selftests pass; both edited files pass gdcheck.
+
+Not re-measured: interior luma in the bank and the construction site of a
+package baked with this. The next cold run's `room`/`club` lines in
+`lux.quality.json` and its frames are where it shows.
+
 ## [0.38.0] - interiors read dark by default, and the sun's shadow is priced and refused
 
 The walker's decision: interiors read dark, lit by their own fixtures, not by

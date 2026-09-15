@@ -753,8 +753,17 @@ static func club_hash(s: String) -> int:
 ## pick `CLUB_COLOR_ORDER[club_hash(id) % 7]`. Returns "" for a name that is
 ## not in CLUB_PALETTE -- a refusal, never a quiet substitute: a typo that
 ## silently became magenta would look like a design decision.
+##
+## `"color": null` IS NO COLOUR, NOT A NAME (0.38.1). Deli Counter 0.132.0
+## writes a `room_ambient` for every room and sets `color` to null outside a
+## club -- untinted, its contract says. `a.has("color")` was true for that key,
+## `String(null)` is "<null>", and the name was refused: cold run 9057's bake
+## refused 13 of 15 room ambients, so only the club was darkened and the bank
+## and the construction site kept the sky's ambient. A null now takes the
+## no-colour path (the hash pick here; `_club_rig` gives a room_ambient the
+## derived neutral probe instead).
 static func club_color_name(a: Dictionary) -> String:
-	if a.has("color"):
+	if a.has("color") and a.get("color") != null:
 		var n := String(a.get("color"))
 		return n if CLUB_PALETTE.has(n) else ""
 	return CLUB_COLOR_ORDER[club_hash(String(a.get("id", ""))) % CLUB_COLOR_ORDER.size()]
@@ -817,8 +826,13 @@ static func _godot_point(p: Variant) -> Vector3:
 static func _club_rig(t: String, a: Dictionary, row: Dictionary) -> Node3D:
 	var id := String(a.get("id", t))
 	var cname := club_color_name(a)
+	# an ABSENT colour on a room_ambient is violet (0.37.0, the club default);
+	# a NULL one is untinted -- the room probe `bake_room_ambient` derives
+	var untinted := t == "room_ambient" and a.has("color") and a.get("color") == null
 	if t == "room_ambient" and not a.has("color"):
 		cname = "violet"
+	if untinted:
+		cname = "violet"   # a valid name so the palette read below cannot fail; overridden
 	if cname == "":
 		push_warning("LuxLightLoader: %s '%s' names colour '%s', which is not one of %s -- not built"
 			% [t, id, String(a.get("color")), ", ".join(CLUB_COLOR_ORDER)])
@@ -912,8 +926,8 @@ static func _club_rig(t: String, a: Dictionary, row: Dictionary) -> Node3D:
 			probe.interior = true
 			probe.update_mode = ReflectionProbe.UPDATE_ONCE
 			probe.ambient_mode = ReflectionProbe.AMBIENT_COLOR
-			probe.ambient_color = col
-			probe.ambient_color_energy = ROOM_AMBIENT_ENERGY
+			probe.ambient_color = ROOM_AMBIENT_DERIVED_COLOR if untinted else col
+			probe.ambient_color_energy = ROOM_AMBIENT_DERIVED_ENERGY if untinted else ROOM_AMBIENT_ENERGY
 			probe.blend_distance = 0.1
 			return probe
 	return null
