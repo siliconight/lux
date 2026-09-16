@@ -34,6 +34,14 @@ func _check(label: String, got: Variant, want: Variant) -> void:
 		"" if ok else "   (wanted %s)" % str(want)])
 
 
+func _near(label: String, got: float, want: float, tol: float) -> void:
+	var ok := absf(got - want) <= tol
+	if not ok:
+		_fails += 1
+	print("  %s %s: %.6f%s" % ["ok  " if ok else "FAIL", label, got,
+		"" if ok else "   (wanted %.6f +/- %.6f)" % [want, tol]])
+
+
 func _main() -> void:
 	await process_frame
 	var Loader: GDScript = load(LOADER) as GDScript
@@ -76,6 +84,45 @@ func _main() -> void:
 		again.get_node_or_null(NodePath("AreaPanel_Surface")) == null, true)
 	again.queue_free()
 
+	print("case C2 -- the light is an APERTURE, not a bulb in the wall (0.40.0)")
+	# Walked 2026-09-16 on cold run 9060 as "is the light inside the wall
+	# here?": an omni 0.35 m inboard of a 1.8 x 1.4 opening, range 3.6, in a
+	# 3.7 m room put 1.55x as much on the ceiling as on the floor and 7x as
+	# much on the reveal 0.35 m away. A cone whose upper rim is the opening's
+	# head and whose lower rim is the wall under its sill is a quarter sphere:
+	# half-angle 45, pitched 45 down, nothing left to choose.
+	var half: float = Loader.get("WINDOW_CONE_HALF_ANGLE_DEG")
+	var ap: Node3D = Loader.rig_for_anchor({"type": "window", "id": "w2",
+		"size": [1.8, 1.4]})
+	_check("half-angle", ap.get("cone_angle_deg"), half)
+	_check("pitched down by the same, so the upper rim is horizontal",
+		ap.get("cone_pitch_deg"), half)
+	root.add_child(ap)
+	await process_frame
+	var lamp: Light3D = null
+	for c in ap.get_children():
+		if c is Light3D:
+			lamp = c
+	_check("the Compatibility fallback is a SpotLight3D", lamp is SpotLight3D, true)
+	if lamp is SpotLight3D:
+		var sp := lamp as SpotLight3D
+		_check("cone half-angle reaches the engine", sp.spot_angle, half)
+		# THE RANGE IS THE DERIVED ONE, not the engine's 5.0 default: a spot
+		# has no `omni_range`, and setting one on it is a silent no-op.
+		_near("the derived range reached spot_range, not omni_range",
+			sp.spot_range, clampf(1.8 * 2.0, 3.0, 4.0), 1e-4)
+		# WHICH WAY IT POINTS is the whole fix. A spot emits along local -Z;
+		# the panel's forward is +Z. Forward and DOWN, and its topmost ray
+		# (axis pitched up by the half-angle) no higher than horizontal.
+		var dir := sp.transform.basis * Vector3(0.0, 0.0, -1.0)
+		_near("aimed into the room: +Z is cos(45)", dir.z, cos(deg_to_rad(half)), 1e-5)
+		_near("and downward: -Y is -sin(45)", dir.y, -sin(deg_to_rad(half)), 1e-5)
+		_near("with no sideways lean", dir.x, 0.0, 1e-5)
+		var top := rad_to_deg(asin(dir.y)) + half
+		_near("nothing above the opening's own head: top ray at 0 deg", top, 0.0, 1e-3)
+	ap.queue_free()
+	await process_frame
+
 	print("case D -- a sign from the loader keeps its face quad (unchanged)")
 	var sign: Node3D = Loader.rig_for_anchor({"type": "sign", "id": "s1",
 		"size": [1.4, 1.4]})
@@ -84,6 +131,15 @@ func _main() -> void:
 	await process_frame
 	_check("sign has AreaPanel_Surface",
 		sign.get_node_or_null(NodePath("AreaPanel_Surface")) != null, true)
+	# ...and its source is still a sphere: a sign lights the facade around it
+	# in every direction, and the aperture rule is the OPENING's, not every
+	# area rig's. 0 half-angle is the untouched path.
+	_check("sign cone_angle_deg is 0", sign.get("cone_angle_deg"), 0.0)
+	var sign_lamp: Light3D = null
+	for c in sign.get_children():
+		if c is Light3D:
+			sign_lamp = c
+	_check("so a sign's fallback is still an OmniLight3D", sign_lamp is OmniLight3D, true)
 	sign.queue_free()
 	await process_frame
 

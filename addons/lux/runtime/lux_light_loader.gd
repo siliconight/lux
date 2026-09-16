@@ -90,16 +90,54 @@ const ROOM_AMBIENT_DERIVED_ENERGY := 0.04
 ## here; `window` is the one with no hardware and no marker.
 const DAYLIGHT_TYPES: Array[String] = ["window"]
 
+## A WINDOW'S CONE, AND WHY IT IS EXACTLY 45 (0.40.0). Not a taste: the
+## opening's head cuts everything above horizontal and the wall under the
+## sill cuts everything behind, so what a vertical opening passes is a
+## quarter of the sphere. A cone is symmetric about its axis, so an upper rim
+## on the horizon and a lower rim straight down fix BOTH the half-angle and
+## the pitch at 45 degrees with nothing left to choose. See the window branch
+## of `_rig_for` and LuxAreaLightRig.cone_angle_deg.
+const WINDOW_CONE_HALF_ANGLE_DEG := 45.0
+
 const CLUB_CONTAINER := "LuxClub"
 
-## The club set (0.37.0). No hardware and no marker today, so like `window`
-## they reach a level only through a manifest bake -- `bake_club` below.
+## The club set (0.37.0). They reach a level only through a manifest bake --
+## `bake_club` below -- and that stays true in 0.40.0 even though two of them
+## now HAVE hardware. Zoo 0.94.0 builds a recessed can at every `club_wash`
+## and a par can at every `stage_light`, and deliberately emits NO
+## `LuxEmit_*` marker for either, because the marker path hands
+## `rig_for_anchor` only {type, id, drop}: a club_wash would lose the zone
+## colour and the pool radius Deli Counter measured and take a hash pick
+## instead, and a stage_light would lose its `target` and be refused
+## outright. Hardware from the fixture pass, light from the manifest bake,
+## both at the same anchor -- so they co-locate by construction. Moving the
+## club set onto markers means widening the marker payload first; until then
+## a marker here would DOUBLE every club light.
 ## 0.39.0 adds `back_bar`: the warm practical inside a club's back bar, the
 ## bulbs behind its glass shelves and the lit porthole in its centre bay
 ## (Zoo 0.92.0's `back_bar`). It is the club set's only WARM light and the
 ## only one that is a lamp somebody could point at rather than a wash.
 const CLUB_TYPES: Array[String] = ["club_wash", "stage_light", "neon", "room_ambient",
 	"back_bar"]
+
+## THE CLUB TYPES A ZOO FIXTURE BAKE BUILDS HARDWARE FOR (0.40.0), named
+## here so a caller that wants to check "is there a lamp where this light
+## comes from" does not have to guess the list -- Level Factory's lux_apply
+## driver reads it off this script exactly as it reads CLUB_TYPES, and says
+## it could not evaluate when an older Lux has no such constant.
+##
+## The other three are not omissions and must not be added: a `neon` IS its
+## sign and `sign_box` builds it, a `back_bar` is the bar's own bulbs and
+## porthole, and a `room_ambient` is a ReflectionProbe with nothing to hang.
+## The pairing lives in Zoo's `core.fixtures.FIXTURES` (0.94.0), where these
+## two are the rows marked `marker: False`; if that file and this line
+## disagree, that file is the one that builds geometry.
+const CLUB_HARDWARE_TYPES: Array[String] = ["club_wash", "stage_light"]
+## What Zoo names the meshes it builds for them. A prefix, because Blender
+## dedupes repeats (`.001`) and Godot's importer swaps the dot for an
+## underscore -- the same reason `LuxFixtureSpawner` matches markers by
+## prefix.
+const CLUB_HARDWARE_PREFIX := "ClubFixture"
 
 ## THE CLUB PALETTE, and its names are a contract: Deli Counter writes them
 ## into an anchor's `color`. Saturated on purpose -- the walker's references
@@ -184,6 +222,33 @@ const BACKBAR_AISLE := 1.25
 ## depth in the aisle; the upper is the neon's 2.5 plus the deepest aisle
 ## Deli Counter's rule can produce, so a back bar never lights a room.
 const BACKBAR_RANGE := Vector2(1.5, 4.0)
+## HOW MANY SOURCES A BACK BAR'S LIT FACE GETS, AND WHY NOT ONE (0.40.0).
+## A back bar is metres of luminous shelving, and 0.39.0 stood ONE omni in
+## for all of it at the middle of that face -- which is a point where an area
+## belongs, and the near field says so. MEASURED on the walk of cold run 9060
+## (Heavy Rain, GL Compatibility, RTX 2060; anchor `b0/back_bar_..._niche`,
+## energy 4.711, range 3.826 as baked), with the closed form above:
+##
+##   surface                         d (m)   value   x the shelves
+##   the niche's own lit disc         0.596   13.25       6.6
+##   the shelf front                  1.0      4.62       2.3
+##   the bottles / design point       1.91     1.13       1.0
+##
+## and in frames at the walker's station 4.0 m out, the disc's 0.74 m face
+## came back at mean luma 200.8 with 1.57% of it pinned at 250+ and a
+## channel maximum of 255 -- white, not tungsten. Killing the omni alone took
+## the same face to 121.5 with nothing above 239, so the omni owned the
+## clipping and the disc's own emission owned the rest (Zoo 0.94.0 has that
+## half).
+##
+## So the row: one source per SQUARE of the lit face, `round(width / lit
+## height)`, at a pitch of `width / count`, and the per-lamp energy solved so
+## the ROW's value at half the range on the face's normal is still
+## CLUB_BACKBAR_LEVEL x the office unit -- the design point does not move,
+## only the hot spot. Held to this cap because every lamp is a real
+## per-mesh light in the renderer's budget; 6 covers a 7.4 m bar at a
+## 1.24 m lit height and nothing Deli Counter emits is wider.
+const BACKBAR_LAMP_CAP := 6
 ## A room_ambient probe's ambient energy on its palette colour.
 const ROOM_AMBIENT_ENERGY := 0.05
 ## How far a room_ambient probe's box stands proud of `size` on every side.
@@ -680,6 +745,28 @@ static func _rig_for(a: Dictionary) -> Node3D:
 				# lands on the floor in front of the glass rather than on the
 				# ceiling and floor symmetrically at the wall (roadmap 145).
 				ar.light_offset = Vector3(0.0, 0.0, 0.35)
+				# AN OPENING, NOT A BULB IN THE WALL (0.40.0). Roadmap 145
+				# moved the source 0.35 m inboard and the pool with it; it did
+				# not stop the source being a SPHERE, so the ceiling above the
+				# opening still took 1.55x the floor and the reveal 7x it (the
+				# numbers are in LuxAreaLightRig.cone_angle_deg). Walked
+				# 2026-09-16 on cold run 9060 as "is the light inside the wall
+				# here?" -- a lit reveal and a broad wash on the ceiling above
+				# and inboard of a window whose pane is the darkest thing in
+				# the frame.
+				#
+				# THE CONE IS THE OPENING'S, so it has no free parameter: its
+				# upper rim is HORIZONTAL, because the head of the opening
+				# stops everything above it, and its lower rim is VERTICAL,
+				# because there is wall behind the sill. That is a quarter
+				# turn of sky -- half-angle 45, axis 45 below the forward --
+				# and it is also where the light from an overcast sky actually
+				# arrives from through a vertical opening. Nothing above the
+				# window's own head is lit by it any more, the reveal is
+				# behind the apex, and the pool lands on the floor in front of
+				# the glass, which is what roadmap 145 asked for.
+				ar.cone_angle_deg = WINDOW_CONE_HALF_ANGLE_DEG
+				ar.cone_pitch_deg = WINDOW_CONE_HALF_ANGLE_DEG
 				# NO PREVIEW QUAD IN A WINDOW: THE GLASS IS THE PANE. The quad
 				# was the lit window while glazing was opaque (roadmap 138: a
 				# near-black skin, so the room's light had to be painted on).
@@ -768,6 +855,39 @@ static func energy_for(value: float, d: float, light_range: float) -> float:
 	return minf(value * d * d / w, 16.0)
 
 
+## What a ROW of `count` unit-energy lamps, `spacing` apart and centred on the
+## anchor, puts on a surface `d` metres out along the row's own normal, facing
+## it (0.40.0). Each lamp is `di = sqrt(d^2 + lat^2)` away and lands at
+## incidence `cos = d / di`, so a row is NOT a single lamp with the energy
+## divided: spreading it costs the cosine as well as the distance, and the
+## loss grows as `d` shrinks. That is the whole point -- it is the near field
+## the spread is for -- but it means the per-lamp energy has to be solved
+## against this, not guessed. `count` 1 reduces to `range_window(d, R) / d^2`
+## exactly, which is `energy_for`'s own denominator.
+static func row_axis_value(count: int, spacing: float, d: float,
+		light_range: float) -> float:
+	if d <= 0.0 or count < 1:
+		return 0.0
+	var start := -(count - 1) * 0.5 * spacing
+	var total := 0.0
+	for i in count:
+		var lat := start + i * spacing
+		var di := sqrt(d * d + lat * lat)
+		total += range_window(di, light_range) / (di * di) * (d / di)
+	return total
+
+
+## The PER-LAMP energy that puts `value` at distance `d` on the row's normal.
+## Capped at the 16 LuxLightRig.energy allows, like `energy_for`; 0 when the
+## whole row is at or past its range.
+static func row_energy_for(value: float, count: int, spacing: float, d: float,
+		light_range: float) -> float:
+	var g := row_axis_value(count, spacing, d, light_range)
+	if g <= 0.0:
+		return 0.0
+	return minf(value / g, 16.0)
+
+
 ## A stable 32-bit djb2 over the id's UTF-8 bytes. Spelled out instead of
 ## String.hash() so that Deli Counter can predict a derived colour in Python:
 ##     h = 5381
@@ -844,11 +964,17 @@ static func _godot_point(p: Variant) -> Vector3:
 ##                Counter measured behind the bar; range is half the face's
 ##                diagonal plus that aisle, held to BACKBAR_RANGE, so the far
 ##                corner of the shelves and a bartender standing in front of
-##                them are both inside it; energy puts CLUB_BACKBAR_LEVEL x
-##                the office value at half the range. Colour defaults to
-##                `tungsten`, not a hash pick. The source stands AT the
-##                anchor, so Deli Counter puts it in free air in front of the
-##                shelves and never inside the cabinet (roadmap 139).
+##                them are both inside it; the ROW's energy puts
+##                CLUB_BACKBAR_LEVEL x the office value ON THE AISLE -- at
+##                `aisle` metres out on the face's normal, where the
+##                bartender the level is defined by actually stands. A row,
+##                because the face is metres of lit
+##                shelving and one omni in the middle of it is a hot spot at
+##                point-blank range (0.40.0, BACKBAR_LAMP_CAP): the lamps are
+##                derived from `size` unless the anchor lays a row itself.
+##                Colour defaults to `tungsten`, not a hash pick. The source
+##                stands AT the anchor, so Deli Counter puts it in free air in
+##                front of the shelves and never inside the cabinet (139).
 ##   room_ambient a ReflectionProbe the size of the room (`size` [x, y, z],
 ##                Deli Counter axes, centred on `pos`) plus ROOM_AMBIENT_MARGIN
 ##                a side, whose ambient replaces the environment's inside it.
@@ -949,10 +1075,39 @@ static func _club_rig(t: String, a: Dictionary, row: Dictionary) -> Node3D:
 			rb.light_range = clampf(0.5 * face.length() + reach,
 				BACKBAR_RANGE.x, BACKBAR_RANGE.y)
 			rb.attenuation = 2.0
-			rb.energy = energy_for(CLUB_BACKBAR_LEVEL * office,
-				rb.light_range * 0.5, rb.light_range)
-			rb.count = int(row.get("count", 1))
-			rb.spacing = float(row.get("spacing", 0.0))
+			# THE ROW IS THE FACE'S, not the anchor's (0.40.0; see
+			# BACKBAR_LAMP_CAP). Deli Counter writes `row {count: 1,
+			# spacing: 0}` on every back_bar it emits -- that is "no row
+			# laid", not "one lamp asked for" -- so a count of 1 derives
+			# from the geometry and a count above 1 is honoured as given.
+			var lamps := int(row.get("count", 1))
+			var pitch := float(row.get("spacing", 0.0))
+			if lamps <= 1:
+				lamps = clampi(int(round(face.x / maxf(face.y, 0.1))), 1,
+					BACKBAR_LAMP_CAP)
+				pitch = face.x / float(lamps)
+			if lamps <= 1:
+				pitch = 0.0
+			rb.count = lamps
+			rb.spacing = pitch
+			# THE DESIGN POINT IS THE AISLE, NOT HALF THE RANGE (0.40.0).
+			# CLUB_BACKBAR_LEVEL's own definition is what the bar puts on a
+			# bartender's face, and `aisle` is the distance Deli Counter
+			# MEASURED to where that bartender stands; half the range was a
+			# stand-in for it while the source was a point. It matters now,
+			# because a row spread across the face loses the cosine as well
+			# as the distance and the solver pays for whatever point it is
+			# given: at the 9060 club's 5.0 x 1.24 m face, solving at half
+			# the range (1.91 m) asked for 8.78 total energy against the
+			# 4.71 one lamp carried and brightened the whole station by 40%
+			# of its mean luma; solving at the 1.25 m aisle asks for 4.30 --
+			# the same light in the room, redistributed off the hot spot.
+			# Clamped so an absent or silly aisle cannot land on or past the
+			# range, where the attenuation window is zero.
+			var design := clampf(reach, 0.5 * BACKBAR_RANGE.x,
+				rb.light_range * 0.9)
+			rb.energy = row_energy_for(CLUB_BACKBAR_LEVEL * office, lamps,
+				pitch, design, rb.light_range)
 			rb.mount_height = 0.0
 			rb.flicker_amount = 0.0
 			bb.rig = rb
@@ -987,6 +1142,29 @@ static func _club_rig(t: String, a: Dictionary, row: Dictionary) -> Node3D:
 			rs.light_range = clampf(throw * 1.25, 2.0, 12.0)
 			rs.attenuation = 2.0
 			rs.energy = energy_for(CLUB_STAGE_LEVEL * office, throw, rs.light_range)
+			# A SPOT AT ENERGY ZERO IS A REFUSAL WEARING A LIGHT'S CLOTHES
+			# (0.40.0). `light_range` is clamped at 12 m and `energy_for`
+			# returns 0 the moment the target is at or past the range, so a
+			# throw over 12 m built a SpotLight3D that emitted nothing, was
+			# counted in `club_lights`, and reported `refused: []`. Walked on
+			# cold run 9060: the club's `b0/main_floor_stage` came back with
+			# aim_local (5.00, -1.52, 54.0), a 54.2 m throw, spot_angle at its
+			# 3.0 minimum and energy 0.0 -- a black stage that every instrument
+			# called a success. The throw is 54 m because Lot's `merge_lights`
+			# transforms an anchor's `pos` into site coordinates and copies
+			# `target` verbatim (building manifest: pos [-1.5, -5.0, 3.2],
+			# target [-6.0, -5.0, 1.68]; site manifest: pos [-54.0, -9.5, 3.2],
+			# target [0.0, -4.5, 1.68], where the placement is x - 52.5, y -
+			# 4.5 and the transformed target would be [-58.5, -9.5, 1.68]).
+			# That is Lot's to fix and this cannot fix it -- an anchor carries
+			# no building transform. What it can do is stop reporting a dark
+			# stage as a lit one.
+			if rs.energy <= 0.0:
+				push_warning(("LuxLightLoader: stage_light '%s' throws %.2f m to its target, "
+					+ "past the %.2f m its range clamps to -- energy solves to 0, not built. "
+					+ "A site-merged `target` that was not transformed with `pos` looks exactly "
+					+ "like this.") % [id, throw, rs.light_range])
+				return null
 			rs.count = int(row.get("count", 1))
 			rs.spacing = float(row.get("spacing", 0.0))
 			rs.mount_height = 0.0

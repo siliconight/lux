@@ -30,6 +30,32 @@ extends Node3D
 ## frame (+Z = the panel's forward). Zero keeps it in the panel plane; the
 ## loader sets a window's to stand inside the room (roadmap 145).
 @export var light_offset: Vector3 = Vector3.ZERO
+## AN APERTURE, NOT A BULB (0.40.0). 0 keeps the Compatibility fallback the
+## OmniLight3D it has always been -- signs, hand-placed rigs and every scene
+## saved before this render byte-identical. Above 0 the fallback is a
+## SpotLight3D of this half-angle instead, aimed along the panel's forward
+## and pitched down by `cone_pitch_deg`.
+##
+## WHY A WINDOW NEEDS ONE. An omni standing in an opening has no head and no
+## sill, so it lights the ceiling as hard as the floor -- harder, when the
+## ceiling is nearer. MEASURED off the walk of cold run 9060, `b2/ext_0_S_
+## window_1`: energy 3.0, range 3.6, source at y 2.1 in a 3.7 m room (its
+## own `room_ambient` box), so 1.6 m up to the ceiling and 2.1 m down to the
+## floor. This rig never touches `omni_attenuation`, so the exponent is the
+## engine's 1.0, NOT the 2.0 the loader's club forms use -- `E (1 -
+## (d/R)^4)^2 / d` gives 1.732 up against 1.117 down: the ceiling takes
+## 1.55x what the floor does. The reveal 0.35 m from the source takes 8.57,
+## seven times the floor, which is the white frame a person at 4.5 m reads
+## as "the light is inside the wall".
+@export_range(0.0, 89.0) var cone_angle_deg: float = 0.0
+## How far BELOW the panel's forward the cone's axis is aimed, degrees. Only
+## read when `cone_angle_deg` > 0.
+@export_range(0.0, 89.0) var cone_pitch_deg: float = 0.0
+## The cone's rim softness, written to `spot_angle_attenuation` (see
+## LuxLightRig.downlight_rim for the engine's own formula). 1.0 is a cosine
+## falloff from the axis, which is what an opening's penumbra looks like and
+## what keeps a window's pool from drawing a circle on the floor.
+@export_range(0.01, 4.0) var cone_rim: float = 1.0
 
 @export_group("Preview Surface")
 ## Spawn a matching emissive quad so the panel reads visually, not just as light.
@@ -74,9 +100,33 @@ func _build() -> void:
 		shadows = rig.shadows_enabled
 
 	if compat or not _area_light_available():
-		# Fallback: approximate the panel with a short-range omni at its center.
-		var omni := OmniLight3D.new()
-		omni.name = &"AreaPanel_Omni"
+		# Fallback: approximate the panel with a short-range omni at its
+		# center -- or, when the placer gave the panel an APERTURE
+		# (`cone_angle_deg`, 0.40.0), with a spot of that half-angle aimed
+		# along the panel's forward and pitched down.
+		var omni: Light3D
+		if cone_angle_deg > 0.0:
+			var spot := SpotLight3D.new()
+			spot.name = &"AreaPanel_Spot"
+			spot.spot_angle = minf(cone_angle_deg, 89.0)
+			spot.spot_angle_attenuation = cone_rim
+			# A SpotLight3D emits along its own local -Z; the panel's
+			# forward is +Z, so the cone turns half a circle first and THEN
+			# pitches down about its own local X. Composed in that order
+			# (`rotation` is YXZ-Euler and would apply the pitch in the
+			# parent's frame, tilting the cone sideways once the rig itself
+			# is turned to face a wall).
+			# NEGATIVE, and the sign is the whole point: with
+			# `basis = Ry(PI) * Rx(t)` the emitted direction in the rig's
+			# frame is (0, sin t, cos t), so a positive pitch aims the cone
+			# UP -- the exact failure it exists to fix. (0, -sin t, cos t)
+			# is forward and down.
+			spot.transform.basis = (Basis(Vector3.UP, PI)
+				* Basis(Vector3.RIGHT, deg_to_rad(-cone_pitch_deg)))
+			omni = spot
+		else:
+			omni = OmniLight3D.new()
+			omni.name = &"AreaPanel_Omni"
 		omni.light_color = col
 		omni.light_energy = energy
 		# RANGE: `omni_range` when the placer set one, else `4 x panel` --
@@ -90,10 +140,16 @@ func _build() -> void:
 		# `rig.light_range`: that resource defaults to 12.0, which this rig
 		# has never read, and honouring it would have made every window a
 		# 12 m sphere the day it started being consulted.
-		if omni_range > 0.0:
-			omni.omni_range = omni_range
+		var reach := omni_range if omni_range > 0.0 \
+			else maxf(panel_size.x, panel_size.y) * 4.0
+		# A SpotLight3D has no `omni_range`: setting one on a spot is a
+		# silent no-op in GDScript's dynamic `set`, and the spot would keep
+		# the engine's 5.0 default -- a range nothing in this package
+		# derived. Name the property the node actually has.
+		if omni is SpotLight3D:
+			(omni as SpotLight3D).spot_range = reach
 		else:
-			omni.omni_range = maxf(panel_size.x, panel_size.y) * 4.0
+			(omni as OmniLight3D).omni_range = reach
 		omni.shadow_enabled = shadows
 		_light = omni
 	else:

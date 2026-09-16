@@ -50,6 +50,22 @@ func _value(energy: float, d: float, r: float) -> float:
 	return energy * pow(maxf(1.0 - pow(d / r, 4.0), 0.0), 2.0) / (d * d)
 
 
+## What a ROW of lamps puts on a surface `d` out along its normal, facing it
+## (0.40.0). Written out again here, like `_value`, so a wrong helper in the
+## loader cannot agree with itself: each lamp is further away by its own
+## lateral offset AND arrives at an angle, and it is the second term that
+## makes a row different from one lamp with the energy divided.
+func _row_value(energy: float, count: int, spacing: float, d: float,
+		r: float) -> float:
+	var start := -(count - 1) * 0.5 * spacing
+	var total := 0.0
+	for i in count:
+		var lat := start + i * spacing
+		var di := sqrt(d * d + lat * lat)
+		total += _value(energy, di, r) * (d / di)
+	return total
+
+
 ## One office lamp's floor value at `drop`, from the fluorescent branch's
 ## documented rule (range clamp(drop + 0.75, 4, 7.5), hung 0.25 m, energy 1).
 func _office(drop: float) -> float:
@@ -299,12 +315,44 @@ func _main() -> void:
 		# half the lit face's diagonal, plus the aisle it has to cross
 		var want_r := clampf(0.5 * Vector2(3.0, 1.24).length() + 1.25, bb_win.x, bb_win.y)
 		_near("range = half the face diagonal + the aisle", br.light_range, want_r, 1e-5)
-		_near("value at half range = level x office", _value(br.energy, want_r * 0.5, want_r),
+		# THE FACE IS AN AREA, SO THE SOURCE IS A ROW (0.40.0). One source
+		# per square of the lit face -- round(3.0 / 1.24) = 2 -- at a pitch
+		# of width / count, and the design point solved against the row as a
+		# whole. On 0.39.0 `count` was whatever Deli Counter's `row` said,
+		# which is 1 on every back_bar it emits.
+		_check("a 3.0 x 1.24 face gets round(3.0 / 1.24) = 2 sources", br.count, 2)
+		_near("pitched at width / count", br.spacing, 1.5, 1e-5)
+		# ON THE AISLE, not at half the range (0.40.0). The level is defined
+		# as what the bar puts on a bartender's face, and `aisle` is the
+		# distance Deli Counter MEASURED to one. It only started to matter
+		# when the source became a row: a spread row loses the cosine as
+		# well as the distance, so solving it at half the range asked for
+		# nearly twice the energy one lamp carried and brightened the whole
+		# station by 40% of its mean luma.
+		_near("the ROW's value AT THE AISLE = level x office",
+			_row_value(br.energy, br.count, br.spacing, 1.25, want_r),
 			bb_level * _office(3.2), 1e-5)
 		root.add_child(bb)
 		await process_frame
 		var bl := _lights_of(bb)
-		_check("one omni", bl.size() == 1 and bl[0] is OmniLight3D, true)
+		_check("one omni per source", bl.size() == 2 and bl[0] is OmniLight3D, true)
+		_near("the two stand a pitch apart", absf(bl[0].position.x - bl[1].position.x),
+			1.5, 1e-5)
+		_near("centred on the anchor", bl[0].position.x + bl[1].position.x, 0.0, 1e-5)
+		# WHAT THE ROW IS FOR. Same design point, far less at point-blank
+		# range -- the surfaces of the unit's own lit face, which on cold run
+		# 9060 came back white (see BACKBAR_LAMP_CAP). Both sides computed
+		# here from the closed form, so this fails on 0.39.0 whichever way
+		# its single lamp was priced.
+		var one_e: float = bb_level * _office(3.2) * pow(1.25, 2.0) \
+			/ pow(maxf(1.0 - pow(1.25 / want_r, 4.0), 0.0), 2.0)
+		var near_d := 0.6
+		var row_near := _row_value(br.energy, br.count, br.spacing, near_d, want_r)
+		var one_near := _value(one_e, near_d, want_r)
+		_check("a row puts less than half of one lamp's light on its own face",
+			row_near < one_near * 0.5, true)
+		print("       near field at %.2f m: row %.3f, one lamp %.3f (%.1fx)"
+			% [near_d, row_near, one_near, one_near / maxf(row_near, 1e-9)])
 		bb.queue_free()
 	# a WIDER bar reaches further, and a deeper aisle further still: the
 	# range follows the geometry rather than being a constant
@@ -338,7 +386,57 @@ func _main() -> void:
 	_check("a named colour still wins", amber_bb.get("rig").light_color, palette["amber"])
 	_check("back_bar is one of the types a club bake takes",
 		(Loader.get("CLUB_TYPES") as Array).has("back_bar"), true)
-	for n in [bb_wide, bb_deep, bb_base, amber_bb]:
+	_check("a wider face gets more sources", bb_wide.get("rig").count > bb_base.get("rig").count,
+		true)
+	var cap: int = Loader.get("BACKBAR_LAMP_CAP")
+	var bb_huge: Node3D = Loader.rig_for_anchor({"type": "back_bar", "id": "huge",
+		"size": [40.0, 0.4], "drop": 3.2})
+	_check("and a preposterous one is held at the cap", bb_huge.get("rig").count, cap)
+	var bb_row: Node3D = Loader.rig_for_anchor({"type": "back_bar", "id": "rowed",
+		"size": [3.0, 1.24], "drop": 3.2, "row": {"count": 3, "spacing": 0.8}})
+	_check("an anchor that lays its OWN row keeps it", bb_row.get("rig").count, 3)
+	_near("...pitch and all", bb_row.get("rig").spacing, 0.8, 1e-5)
+	var bb_tall: Node3D = Loader.rig_for_anchor({"type": "back_bar", "id": "tall",
+		"size": [1.0, 2.0], "drop": 3.2})
+	_check("a face taller than it is wide is one source, not zero",
+		bb_tall.get("rig").count, 1)
+	_near("...and a single source has no pitch", bb_tall.get("rig").spacing, 0.0, 1e-5)
+
+	print("case L -- a stage light that cannot reach its target is REFUSED (0.40.0)")
+	# 0.39.0 built it anyway: `light_range` clamps at 12 m and `energy_for`
+	# returns 0 past the range, so a long throw shipped a SpotLight3D at
+	# energy 0 -- counted in `club_lights`, absent from `refused`, and black
+	# in the level. Cold run 9060's club had exactly one: a 54.2 m throw,
+	# because the site-merged anchor's `target` was never transformed with
+	# its `pos`.
+	var far_stage: Variant = Loader.rig_for_anchor({"type": "stage_light",
+		"id": "unreachable", "pos": [0, 0, 3.2], "target": [54, 0, 1.68],
+		"drop": 3.2, "color": "amber"})
+	_check("a 54 m throw is refused, not built dark", far_stage == null, true)
+	var near_stage: Node3D = Loader.rig_for_anchor({"type": "stage_light",
+		"id": "reachable", "pos": [0, 0, 3.2], "target": [4.5, 0, 1.68],
+		"drop": 3.2, "color": "amber"})
+	_check("a 4.7 m throw still builds", near_stage != null, true)
+	_check("...with energy above zero", near_stage.get("rig").energy > 0.0, true)
+	# and the refusal reaches a caller: bake_club lists it, so Level Factory's
+	# LUX_CLUB_REFUSED fires instead of reporting a dark stage as lit
+	var sfile := "user://selftest_stage_refusal.lights.json"
+	var sfh := FileAccess.open(sfile, FileAccess.WRITE)
+	sfh.store_string(JSON.stringify({"anchors": [
+		{"id": "far_stage", "type": "stage_light", "pos": [0, 0, 3.2],
+			"target": [54, 0, 1.68], "drop": 3.2, "color": "amber"}]}))
+	sfh.close()
+	var sres: Dictionary = Loader.bake_club(sfile, root)
+	_check("bake_club counts it in the manifest", sres.get("in_manifest"), 1)
+	_check("...builds none", sres.get("count"), 0)
+	_check("...and NAMES it", sres.get("refused"), ["far_stage"])
+	_check("...so ok is false", sres.get("ok"), false)
+	var sbox := root.get_node_or_null(NodePath("LuxClub"))
+	if sbox != null:
+		sbox.free()
+
+	for n in [bb_wide, bb_deep, bb_base, amber_bb, bb_huge, bb_row, bb_tall,
+			near_stage]:
 		n.free()
 
 	print("")

@@ -7,6 +7,181 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.40.0] - a window is an opening, a bar is not a point
+
+The walker, 2026-09-16, walking cold run 9060: three frames and three
+findings. Two of them are this release; the third -- the back bar's porthole
+reading as a flat white disc -- is Zoo 0.94.0's, and the two halves were
+measured together.
+
+Every number below is off `_runs/walk_9060_rain` (Heavy Rain, Godot 4.7, GL
+Compatibility, RTX 2060, 1600 x 900, `tools/look_shots.py` at given stations),
+and every A/B is against a CONTROL built the same way through the same Level
+Factory driver with this addon at 0.39.0. The control reproduces the shipped
+frames to the decimal -- backbar mean luma 45.1, p50 34, p95 118 -- which is
+the only reason the differences below are attributable to this release.
+
+### "is the light inside the wall here?"
+
+A window's fallback under GL Compatibility has always been an OmniLight3D at
+the opening. Roadmap 145 moved it 0.35 m inboard so the pool stopped landing
+on the ceiling and the floor symmetrically AT the wall; it did not stop the
+source being a SPHERE. MEASURED on `b2/ext_0_S_window_1` -- energy 3.0, range
+3.6, source at y 2.1 in a 3.7 m room, and this rig never touches
+`omni_attenuation`, so the exponent is the engine's 1.0 and NOT the 2.0 the
+club forms use:
+
+    surface                      d (m)   E (1-(d/R)^4)^2 / d
+    the reveal, 0.35 m away       0.35         8.57
+    the ceiling above it          1.60         1.732
+    the floor below it            2.10         1.117
+
+The ceiling took 1.55x the floor and the reveal seven times it. In a frame
+that is a white picture-frame round the opening and a broad wash on the
+ceiling inboard of it -- a lamp buried in the wall, which is what the walker
+called it.
+
+**The cone is the opening's, and it has no free parameter.** The head of the
+opening stops everything above horizontal and the wall under the sill stops
+everything behind, so what a vertical opening passes is a QUARTER of the
+sphere. A cone is symmetric about its axis, so an upper rim on the horizon
+and a lower rim straight down fix both the half-angle and the pitch at 45
+degrees with nothing left to choose (`WINDOW_CONE_HALF_ANGLE_DEG`).
+
+`LuxAreaLightRig` grows `cone_angle_deg`, `cone_pitch_deg` and `cone_rim`.
+Zero is the OmniLight3D every rig has ever built -- signs, hand-placed rigs
+and every saved scene render byte-identical -- and above zero the fallback is
+a SpotLight3D of that half-angle, aimed along the panel's forward and pitched
+down. Two traps, both caught by measurement rather than by reading: a spot
+has no `omni_range` (setting one is a silent no-op that would have left every
+window at the engine's 5.0 default), and with `basis = Ry(PI) * Rx(t)` a
+POSITIVE pitch aims the cone up.
+
+Two windows in two buildings, control -> 0.40.0, mean luma of the patch:
+
+    b2, ground, 1.8 x 1.4 m     ceiling 135.2 -> 34.4  (x0.25)
+                                reveal  132.8 -> 58.2  (x0.44, peak 250 -> 118)
+                                floor    56.2 -> 43.8  (x0.78)
+    b1, storey 1, 5.0 x 2.4 m   ceiling 146.9 -> 31.0  (x0.21)
+                                floor   163.9 -> 135.7 (x0.83)
+                                wall beside it 19.2 -> 18.7 (x0.97)
+
+The ceiling-to-floor ratio goes 2.41 -> 0.79 at the first and 0.90 -> 0.23 at
+the second. SAY WHAT THIS COSTS: 85% of a sphere's solid angle is outside a
+45-degree cone, so a window no longer lights the room it stands in from every
+direction, and the second station's whole frame drops from 72.6 to 45.3 mean
+luma. That is the fix and not a side effect -- but a room whose only light
+was a window is now a dark room, and lighting it is that room's fixtures' job.
+
+### A back bar is metres of lit shelving, and 0.39.0 stood one omni in it
+
+At the middle of the lit face, which is a point where an area belongs.
+Measured on the same walk (`b0/back_bar_..._niche`, energy 4.711, range
+3.826, attenuation 2):
+
+    surface                        d (m)   value   x the design point
+    the niche's own lit disc        0.596   13.25       11.7
+    the shelf front                 1.0      4.62        4.1
+    the bartender, on the aisle     1.25     1.13        1.0
+
+RETRACTED, kept: the first version of that table said 113 at the disc, from
+reading the site scene's Transform3D as basis COLUMNS. Godot's nine-float
+Basis constructor fills ROWS, so the bar faces the other way and its lit disc
+is 0.596 m from the anchor, not 0.204. The wrong number had the walker
+standing behind the unit he was photographing.
+
+**The row is the face's** (`BACKBAR_LAMP_CAP`): one source per square of the
+lit face, `round(width / lit height)`, held to 6, at a pitch of
+`width / count`. A count above 1 on the anchor is honoured as given; Deli
+Counter writes `{count: 1, spacing: 0}` on every back bar it emits, which is
+"no row laid", not "one lamp asked for".
+
+**And the design point moved to the AISLE.** `CLUB_BACKBAR_LEVEL`'s own
+definition is what the bar puts on a bartender's face, `aisle` is the
+distance Deli Counter MEASURED to one, and half the range was a stand-in for
+it while the source was a point. It stopped being harmless the moment the
+source spread: a row loses the cosine as well as the distance, and the solver
+pays for whatever point it is given. At the 9060 club's 5.0 x 1.24 m face,
+solving at half the range (1.91 m) asked for 8.78 total energy against the
+4.71 one lamp carried and brightened the whole station by 40% of its mean
+luma; solving at the 1.25 m aisle asks for 4.30 -- the same light in the
+room, taken off the hot spot. `row_axis_value` and `row_energy_for` are the
+closed form for a row, written out beside `energy_for`.
+
+Frames at the walker's own station, control -> 0.40.0. The Zoo 0.94.0
+porthole is in these too and the two are NOT separable in a frame; Zoo's
+entry carries the half that is measurable with this omni switched off.
+
+    the niche's lit disc      mean 200.8 -> 114.8, peak (250,255,255) -> (234,228,228)
+                              1.330% of it pinned at 250+ -> 0.000%
+    the shelves' bottles      mean  54.6 ->  84.4
+    the ceiling over the bar  mean  95.6 ->  82.9
+    the room's floor          mean  20.6 ->  21.0
+    the whole frame           mean  45.1 ->  51.1, 123 px at 250+ -> 25
+    the room from the door    mean  30.7 ->  30.7
+
+### A stage light at energy zero is a refusal wearing a light's clothes
+
+`light_range` clamps at 12 m and `energy_for` returns 0 the moment the target
+is at or past the range, so a long throw built a SpotLight3D that emitted
+nothing, was counted in `club_lights`, and reported `refused: []`. Cold run
+9060's club shipped exactly one: `b0/main_floor_stage`, aim_local
+(5.00, -1.52, 54.0), a 54.2 m throw, spot_angle at its 3.0 minimum, energy
+0.0. A black stage that every instrument called a success.
+
+The throw is 54 m because Lot's `merge_lights` transforms an anchor's `pos`
+into site coordinates and copies `target` verbatim. The building manifest has
+pos [-1.5, -5.0, 3.2] and target [-6.0, -5.0, 1.68]; the site manifest has
+pos [-54.0, -9.5, 3.2] -- the placement is x - 52.5, y - 4.5 -- and target
+[0.0, -4.5, 1.68], where the transformed target would be [-58.5, -9.5, 1.68].
+THAT IS LOT'S TO FIX and this cannot fix it: an anchor carries no building
+transform. What it can do is stop reporting a dark stage as a lit one. A
+stage light whose energy solves to 0 is now refused, with a warning naming
+the throw and the range, so it reaches `bake_club`'s `refused` list and Level
+Factory's `LUX_CLUB_REFUSED`. Nothing in any frame changes: it was emitting
+nothing before.
+
+### Two names for hardware that now exists
+
+Zoo 0.94.0 builds a can at every `club_wash` and a par can at every
+`stage_light`, deliberately with NO emitter marker: the marker path hands
+`rig_for_anchor` only {type, id, drop}, so a wash would lose the zone colour
+and pool radius Deli Counter measured and a stage light would lose its
+target. Their light stays on the manifest bake, and a marker would DOUBLE it
+rather than replace it. `CLUB_HARDWARE_TYPES` and `CLUB_HARDWARE_PREFIX` name
+that pairing so a caller can ask "is there a lamp where this light comes
+from" without guessing the list; Level Factory 0.90.0 reads both off this
+script and reports "not evaluated" when an older Lux does not carry them.
+
+### Changed
+- `LuxAreaLightRig`: `cone_angle_deg`, `cone_pitch_deg`, `cone_rim`. Default
+  0 keeps the omni fallback exactly as it was.
+- `LuxLightLoader`: `WINDOW_CONE_HALF_ANGLE_DEG`, `BACKBAR_LAMP_CAP`,
+  `CLUB_HARDWARE_TYPES`, `CLUB_HARDWARE_PREFIX`, `row_axis_value`,
+  `row_energy_for`; the `window`, `back_bar` and `stage_light` branches.
+- `tools/club_light_selftest.gd` case K rewritten for the row and case L
+  added for the refusal; `tools/window_glass_selftest.gd` case C2 added for
+  the cone and case D extended to hold a sign's omni where it was. Both
+  suites fail on 0.39.0.
+
+### Not done, and why
+- The club set still reaches a level only through the manifest bake. Moving
+  it onto the marker path means widening the marker payload first (colour,
+  radius, target, cycle) -- and a stage light's `target` is in the world
+  frame, which is the Lot bug above.
+- `drop` on a WALL-mounted club anchor is the anchor's own HEIGHT, not the
+  room's, and every club level is denominated in a room drop. Solved off the
+  shipped energies: `club_wash` carries the room's 3.2, `neon` carries 2.2
+  and 2.136 (its own mount), `back_bar` 1.71 (its own). `office_floor_value`
+  at 1.71 is 0.4526 against 0.0570 at 3.2, so the wall-mounted types are
+  priced in a unit 7.9x their documented one. The LEVELS were tuned against
+  frames that already had it, so re-deriving the denominator without
+  re-tuning the numerator would only darken them. Written down rather than
+  half-fixed.
+- The window cone is not shadow-cheap or shadow-free: a window rig still asks
+  for `shadows_enabled`, and a spot's shadow map is one face where an omni's
+  was six. Nobody has re-priced that.
+
 ## [0.39.0] - the one warm light in a club is the bar's
 
 The walker, 2026-09-15, with three photos of a lounge bar: a back bar of lit
