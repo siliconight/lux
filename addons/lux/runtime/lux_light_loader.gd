@@ -94,7 +94,12 @@ const CLUB_CONTAINER := "LuxClub"
 
 ## The club set (0.37.0). No hardware and no marker today, so like `window`
 ## they reach a level only through a manifest bake -- `bake_club` below.
-const CLUB_TYPES: Array[String] = ["club_wash", "stage_light", "neon", "room_ambient"]
+## 0.39.0 adds `back_bar`: the warm practical inside a club's back bar, the
+## bulbs behind its glass shelves and the lit porthole in its centre bay
+## (Zoo 0.92.0's `back_bar`). It is the club set's only WARM light and the
+## only one that is a lamp somebody could point at rather than a wash.
+const CLUB_TYPES: Array[String] = ["club_wash", "stage_light", "neon", "room_ambient",
+	"back_bar"]
 
 ## THE CLUB PALETTE, and its names are a contract: Deli Counter writes them
 ## into an anchor's `color`. Saturated on purpose -- the walker's references
@@ -112,6 +117,16 @@ const CLUB_PALETTE := {
 	"blue": Color(0.1, 0.2, 1.0),
 	"cyan": Color(0.0, 0.8, 1.0),
 	"amber": Color(1.0, 0.55, 0.08),
+	# 0.39.0: a 1997 tungsten bulb, and the one entry here that is not a
+	# saturated colour -- it is the light a bar's own lamps make, matched to
+	# the emissive colour Zoo paints on the back bar's bulbs
+	# (`back_bar_forms.BULB_COLOUR`, linear (1.0, 0.72, 0.42)) so the glow
+	# and the spill are the same light. NOT IN `CLUB_COLOR_ORDER`, and that
+	# is deliberate: the order is the sequence a colourless anchor is
+	# hashed into, and appending to it moves every derived pick in every
+	# club already shipped. A palette entry outside the order is reachable
+	# by NAME and by nothing else, which is what a practical wants.
+	"tungsten": Color(1.0, 0.72, 0.42),
 }
 ## The order a colour is picked in when an anchor names none. Appending keeps
 ## every existing pick where it was only if the list length does not change,
@@ -154,6 +169,21 @@ const CLUB_DEFAULT_DROP := 3.0
 const CLUB_WASH_LEVEL := 12.0
 const CLUB_STAGE_LEVEL := 3.0
 const CLUB_NEON_LEVEL := 1.5
+## The back bar's practical, priced the same way. Between the neon's spill
+## (1.5) and the stage's throw (3.0): it has to put a bartender's face and
+## the bottles in front of it above the room's own darkness -- the club
+## rooms it stands in are lit at CLUB_WASH_LEVEL in POOLS with dark between
+## them -- without becoming a second room light. Set against frames of the
+## 9059 walk; see the 0.39.0 changelog for the numbers.
+const CLUB_BACKBAR_LEVEL := 2.5
+## How far past the lit face a back bar's spill has to reach: the working
+## aisle, so a body in it is lit. Deli Counter writes the aisle it measured
+## on the anchor (`aisle`); this is the fallback when it does not.
+const BACKBAR_AISLE := 1.25
+## ...and the window the range is held to. The lower bound is a body's
+## depth in the aisle; the upper is the neon's 2.5 plus the deepest aisle
+## Deli Counter's rule can produce, so a back bar never lights a room.
+const BACKBAR_RANGE := Vector2(1.5, 4.0)
 ## A room_ambient probe's ambient energy on its palette colour.
 const ROOM_AMBIENT_ENERGY := 0.05
 ## How far a room_ambient probe's box stands proud of `size` on every side.
@@ -699,7 +729,7 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			ra.shadows_enabled = true
 			ar.rig = ra
 			return ar
-		"club_wash", "stage_light", "neon", "room_ambient":
+		"club_wash", "stage_light", "neon", "room_ambient", "back_bar":
 			return _club_rig(t, a, row)
 		_:
 			return null   # 'sun' is owned by the preset/SkyMint; others skipped
@@ -806,6 +836,19 @@ static func _godot_point(p: Variant) -> Vector3:
 ##                ALONG the wall (so _place gives it the area rigs' quarter
 ##                turn). The source stands AT the anchor: Deli Counter must put
 ##                it in free air, never inside a cabinet (roadmap 139).
+##   back_bar     a warm omni inside a club's back bar (0.39.0): the bulbs
+##                behind its glass shelves and the lit porthole in its centre
+##                bay, which Zoo paints as emissive materials and which light
+##                nothing on their own under GL Compatibility. `size` is the
+##                lit FACE [width, height] and `aisle` the working aisle Deli
+##                Counter measured behind the bar; range is half the face's
+##                diagonal plus that aisle, held to BACKBAR_RANGE, so the far
+##                corner of the shelves and a bartender standing in front of
+##                them are both inside it; energy puts CLUB_BACKBAR_LEVEL x
+##                the office value at half the range. Colour defaults to
+##                `tungsten`, not a hash pick. The source stands AT the
+##                anchor, so Deli Counter puts it in free air in front of the
+##                shelves and never inside the cabinet (roadmap 139).
 ##   room_ambient a ReflectionProbe the size of the room (`size` [x, y, z],
 ##                Deli Counter axes, centred on `pos`) plus ROOM_AMBIENT_MARGIN
 ##                a side, whose ambient replaces the environment's inside it.
@@ -831,11 +874,20 @@ static func _club_rig(t: String, a: Dictionary, row: Dictionary) -> Node3D:
 	var untinted := t == "room_ambient" and a.has("color") and a.get("color") == null
 	if t == "room_ambient" and not a.has("color"):
 		cname = "violet"
+	# a back bar with no colour named is a tungsten bulb, not a hash pick:
+	# it is a lamp with a real colour and not a stage effect
+	if t == "back_bar" and not a.has("color"):
+		cname = "tungsten"
 	if untinted:
 		cname = "violet"   # a valid name so the palette read below cannot fail; overridden
 	if cname == "":
+		# the PALETTE's names, not the ORDER's: `tungsten` is a valid colour
+		# that is deliberately outside the derived-pick order (0.39.0), and
+		# a refusal that does not list it sends the reader to the wrong list
+		var names := CLUB_PALETTE.keys()
+		names.sort()
 		push_warning("LuxLightLoader: %s '%s' names colour '%s', which is not one of %s -- not built"
-			% [t, id, String(a.get("color")), ", ".join(CLUB_COLOR_ORDER)])
+			% [t, id, String(a.get("color")), ", ".join(names)])
 		return null
 	var col: Color = CLUB_PALETTE[cname]
 	var drop := float(a.get("drop", 0.0))
@@ -879,6 +931,32 @@ static func _club_rig(t: String, a: Dictionary, row: Dictionary) -> Node3D:
 			rn.flicker_amount = 0.0
 			n.rig = rn
 			return n
+		"back_bar":
+			# THE RANGE IS THE GEOMETRY'S, not a number: the source sits at
+			# the middle of the unit's lit face, so the far corner of that
+			# face is half its diagonal away, and the bartender it has to
+			# light is standing a working aisle in front of it. `size` is
+			# [width, lit height] of the face, from Deli Counter.
+			var bb := LuxFluorescentRig.new()
+			bb.name = id
+			var rb := LuxLightRig.new()
+			rb.rig_name = &"Back Bar (baked)"
+			rb.light_color = col
+			var face := Vector2(2.0, 1.2)
+			if typeof(a.get("size")) == TYPE_ARRAY and (a.get("size") as Array).size() >= 2:
+				face = Vector2(absf(float(a.get("size")[0])), absf(float(a.get("size")[1])))
+			var reach := float(a.get("aisle", BACKBAR_AISLE))
+			rb.light_range = clampf(0.5 * face.length() + reach,
+				BACKBAR_RANGE.x, BACKBAR_RANGE.y)
+			rb.attenuation = 2.0
+			rb.energy = energy_for(CLUB_BACKBAR_LEVEL * office,
+				rb.light_range * 0.5, rb.light_range)
+			rb.count = int(row.get("count", 1))
+			rb.spacing = float(row.get("spacing", 0.0))
+			rb.mount_height = 0.0
+			rb.flicker_amount = 0.0
+			bb.rig = rb
+			return bb
 		"stage_light":
 			if typeof(a.get("target")) != TYPE_ARRAY or (a.get("target") as Array).size() < 3:
 				push_warning("LuxLightLoader: stage_light '%s' has no target [x, y, z] -- not built" % id)
@@ -1025,7 +1103,8 @@ static func _place(node: Node3D, a: Dictionary) -> void:
 	# A neon's rot_y is its sign's facing and its row runs along the wall, so
 	# it takes the area rigs' quarter turn: local +X (the row) lands on the
 	# wall, local +Z on the facing (0.37.0).
-	if node is LuxAreaLightRig or String(a.get("type", "")) == "neon":
+	if node is LuxAreaLightRig or String(a.get("type", "")) == "neon" \
+			or String(a.get("type", "")) == "back_bar":
 		yaw += 90.0
 	node.rotation = Vector3(0.0, deg_to_rad(yaw), 0.0)
 

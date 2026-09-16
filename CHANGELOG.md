@@ -7,6 +7,90 @@ All notable changes to Lux are documented here. The format follows
 While Lux is pre-1.0, minor versions may include breaking changes to resources
 and the API; these are called out under **Changed** / **Breaking**.
 
+## [0.39.0] - the one warm light in a club is the bar's
+
+The walker, 2026-09-15, with three photos of a lounge bar: a back bar of lit
+glass shelves and a round lit porthole in its centre bay. Zoo 0.92.0 builds
+the unit and paints its bulbs emissive (`M_BackBar_bulb_Face`,
+`M_BackBar_niche_Face`); a lit material lights nothing round it under GL
+Compatibility, which is the same finding the TV screen produced one release
+of Deli Counter ago. This is the spill.
+
+**A new club anchor type, `back_bar`.** A warm omni at the middle of the
+unit's lit face, in free air in front of the shelves -- Deli Counter 0.137.0
+writes one per unit, `_BACKBAR_OUT` 0.15 m proud of the slot's front, which
+is the neon's own number and is inside the bar's working aisle. Nothing else
+about the club set moves.
+
+**Every number is derived, as the other three are.** `size` is the lit face
+[width, height] -- the glass shelves between the lower run's worktop and the
+cornice -- and `aisle` is the working aisle Deli Counter measured behind
+that bar. The source sits at the middle of the face, so the far corner of it
+is half the diagonal away, and the bartender the lamp has to light is
+standing an aisle in front of it: `range = 0.5 * |face| + aisle`, held to
+`BACKBAR_RANGE` 1.5-4.0 m. Energy puts `CLUB_BACKBAR_LEVEL` x the office
+lamp's floor value at half that range, the same pricing as the wash, the
+stage and the neon. At Deli Counter's 3.0 x 1.24 m face and its 1.25 m
+aisle, that is a 2.87 m range.
+
+`CLUB_BACKBAR_LEVEL` is 2.5, between the neon's spill (1.5) and the stage's
+throw (3.0): the rooms it stands in are lit at 12 in POOLS with dark between
+them, and a bar has to put a bartender's face and the bottles in front of it
+above that darkness without becoming a second room light.
+
+**`tungsten`, and it is NOT in `CLUB_COLOR_ORDER`.** The palette's one
+unsaturated entry, `Color(1.0, 0.72, 0.42)` -- matched to the emissive
+colour Zoo paints on the bulbs, so the glow and the spill are the same
+light. The ORDER is the sequence a colourless anchor is hashed into, and
+appending to it moves every derived pick in every club already shipped; a
+palette entry outside the order is reachable by NAME and by nothing else,
+which is what a practical wants. A `back_bar` with no colour named is
+tungsten rather than a hash pick, the way a `room_ambient` with none is
+violet.
+
+A refusal now lists the PALETTE's names and not the ORDER's, for the same
+reason: a message that leaves `tungsten` out sends the reader to the wrong
+list.
+
+**TWO LISTS HAD TO AGREE and one of them was edited.** `CLUB_TYPES` says
+what a club bake takes from a manifest; the `match` inside `_rig_for` says
+what actually builds. The first version added `back_bar` to the first only,
+and every anchor came back null with no warning at all -- the `match`'s
+default arm returns null for `sun` and means nothing is wrong. Case K now
+walks `CLUB_TYPES` and asks `rig_for_anchor` for each one, so the two lists
+cannot drift again.
+
+`tools/club_light_selftest.gd` case K: the palette entry is there and the
+order is untouched and still seven long; a colourless back bar is tungsten;
+the range is half the face's diagonal plus the aisle and the value at half
+range is the level times the office; a wider bar and a deeper aisle each
+reach further; the fallbacks build with no `size` and no `aisle`; an unknown
+colour is refused here too; a named colour still wins. Every case fails on
+0.38.1, where the type does not exist and `rig_for_anchor` returns null.
+All seven selftests pass; both edited files pass `tools/gdcheck.py`.
+
+MEASURED, because `CLUB_BACKBAR_LEVEL` is a LOOK and 0.37.0's three levels
+were set the same way. A scratch copy of cold run 9059's walk, its club
+re-themed with Zoo 0.92.0 and Deli Counter 0.137.0, Heavy Rain, GL
+Compatibility, RTX 2060, 1600 x 900, `tools/look_shots.py` through given
+stations -- the same walk shot twice, once against each build:
+
+    station            before mean / p95      after mean / p95
+    bar_customer            25.4 /  40            33.6 /  91
+    bar_staff (the aisle)   20.3 /  34            44.2 / 149
+    back_bar_shelves        16.3 /  32            36.6 / 134
+    club_wide               31.0 /  55            31.2 /  55
+    overview / spawn / objective / extraction / elevations: unchanged
+
+So the practical carries the two stations a bartender occupies from
+near-black to readable and leaves the room's own exposure alone -- the wide
+shot moves 0.2 of a luma code, which is what a 3 m unit at the end of a
+36 m room should do. Nothing clips; the shelves' crushed share FALLS, 2.74%
+to 2.12%.
+
+A level tuned on a dark carpet will be loud on a light one, and the club
+floors it was tuned against are `carpet_club`.
+
 ## [0.38.1] - a null colour is no colour, so every room gets its probe
 
 Cold run 9057 (2026-09-14) is the first package with a generated strip club,

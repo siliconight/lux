@@ -279,6 +279,68 @@ func _main() -> void:
 	host.queue_free()
 	await process_frame
 
+	print("case K -- back_bar: the club set's one WARM practical (0.39.0)")
+	var bb_level: float = Loader.get("CLUB_BACKBAR_LEVEL")
+	var bb_win: Vector2 = Loader.get("BACKBAR_RANGE")
+	_check("tungsten is in the palette", palette.has("tungsten"), true)
+	_check("...and NOT in the derived-pick order, so no club's colours moved",
+		order.has("tungsten"), false)
+	_check("the order is still seven long", order.size(), 7)
+	var bb: Node3D = Loader.rig_for_anchor({"type": "back_bar", "id": "main_bar_niche",
+		"pos": [0, 0, 1.71], "size": [3.0, 1.24], "aisle": 1.25, "drop": 3.2,
+		"rot_y": 0.0, "row": {"count": 1, "spacing": 0.0}})
+	_check("back_bar builds", bb != null, true)
+	if bb == null:
+		_fails += 1
+	else:
+		var br: LuxLightRig = bb.get("rig")
+		_check("a colourless back bar is tungsten, not a hash pick",
+			br.light_color, palette["tungsten"])
+		# half the lit face's diagonal, plus the aisle it has to cross
+		var want_r := clampf(0.5 * Vector2(3.0, 1.24).length() + 1.25, bb_win.x, bb_win.y)
+		_near("range = half the face diagonal + the aisle", br.light_range, want_r, 1e-5)
+		_near("value at half range = level x office", _value(br.energy, want_r * 0.5, want_r),
+			bb_level * _office(3.2), 1e-5)
+		root.add_child(bb)
+		await process_frame
+		var bl := _lights_of(bb)
+		_check("one omni", bl.size() == 1 and bl[0] is OmniLight3D, true)
+		bb.queue_free()
+	# a WIDER bar reaches further, and a deeper aisle further still: the
+	# range follows the geometry rather than being a constant
+	# THE TWO LISTS THAT HAVE TO AGREE. `CLUB_TYPES` says what a club bake
+	# takes from a manifest; the `match` inside `_rig_for` says what builds.
+	# The first version of this added back_bar to the first list only, and
+	# every anchor came back null with no warning at all -- the `_` arm
+	# returns null for 'sun' and means nothing is wrong.
+	for t in Loader.get("CLUB_TYPES"):
+		_check("%s is reachable through rig_for_anchor" % t,
+			Loader.rig_for_anchor({"type": t, "id": "reach_%s" % t,
+				"pos": [0, 0, 3], "target": [0, 0, 0], "size": [4, 4, 3],
+				"drop": 3.0}) != null, true)
+	var bb_wide: Node3D = Loader.rig_for_anchor({"type": "back_bar", "id": "w",
+		"size": [5.0, 1.6], "aisle": 1.25, "drop": 3.2})
+	var bb_deep: Node3D = Loader.rig_for_anchor({"type": "back_bar", "id": "d",
+		"size": [3.0, 1.24], "aisle": 1.9, "drop": 3.2})
+	var bb_base: Node3D = Loader.rig_for_anchor({"type": "back_bar", "id": "b",
+		"size": [3.0, 1.24], "aisle": 1.25, "drop": 3.2})
+	_check("a wider bar reaches further",
+		bb_wide.get("rig").light_range > bb_base.get("rig").light_range, true)
+	_check("a deeper aisle reaches further",
+		bb_deep.get("rig").light_range > bb_base.get("rig").light_range, true)
+	_check("no size and no aisle still builds (the fallbacks)",
+		Loader.rig_for_anchor({"type": "back_bar", "id": "bare"}) != null, true)
+	var bb_bad: Variant = Loader.rig_for_anchor({"type": "back_bar", "id": "bad",
+		"color": "chartreuse", "size": [3.0, 1.2]})
+	_check("an unknown colour is refused here too", bb_bad == null, true)
+	var amber_bb: Node3D = Loader.rig_for_anchor({"type": "back_bar", "id": "a",
+		"color": "amber", "size": [3.0, 1.2]})
+	_check("a named colour still wins", amber_bb.get("rig").light_color, palette["amber"])
+	_check("back_bar is one of the types a club bake takes",
+		(Loader.get("CLUB_TYPES") as Array).has("back_bar"), true)
+	for n in [bb_wide, bb_deep, bb_base, amber_bb]:
+		n.free()
+
 	print("")
 	if _fails == 0:
 		print("  club light selftest ok: derived reach and energy, stable colours,")
