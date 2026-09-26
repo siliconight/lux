@@ -16,6 +16,9 @@ extends RefCounted
 ##   matching HARDWARE at the same anchors; LuxEmissiveBinder ties its lit
 ##   faces to set_fixtures_powered.
 ##   club_wash / neon -> LuxFluorescentRig in a coloured costume (0.37.0)
+##   canopy_wash -> LuxStreetlightRig, mercury vapour, a few under a fuel
+##                  canopy; `canopy_lights` is hardware and gets NO light
+##                  (DC light manifest v1.3, 0.41.0)
 ##   stage_light      -> LuxStageLightRig      room_ambient -> ReflectionProbe
 ##   (the club set: see CLUB_PALETTE and _club_rig below)
 ##
@@ -204,6 +207,22 @@ const CLUB_DEFAULT_DROP := 3.0
 ## (0.6% of the frame >= 40 chroma looking down the room, 1.3% at the stage)
 ## and the stage and neons already read at 3 and 1.5. So the wash level is
 ## 12. It is tuned to a dark floor; on a light one it will be loud.
+## A FUEL CANOPY'S WASH (DC light manifest v1.3). PROVISIONAL, and said so
+## rather than presented as derived: nobody has walked a lit forecourt yet.
+## What sets it is that the canopy's emissive lamp grid carries the APPARENT
+## brightness -- a player looking up sees lit fixtures whatever this is -- so
+## the wash only has to put a believable pool on the tarmac. Judge it on a
+## walk and write the measured value here.
+const CANOPY_WASH_LEVEL := 10.0
+## The pool one wash owns when the anchor names none, metres. DC always sends
+## `size`; this is the floor under a hand-authored anchor.
+const CANOPY_POOL_FALLBACK := 6.0
+## A canopy wash reaches no further than this however big its deck is. An
+## outdoor spot that overreaches claims a per-mesh light-budget slot on tiles
+## it barely lights, which is the same law the wall pack was trimmed to 5.5
+## for and the fluorescent before it.
+const CANOPY_RANGE_MAX := 12.0
+
 const CLUB_WASH_LEVEL := 12.0
 const CLUB_STAGE_LEVEL := 3.0
 const CLUB_NEON_LEVEL := 1.5
@@ -697,6 +716,56 @@ static func _rig_for(a: Dictionary) -> Node3D:
 				rs.flicker_speed = 7.0
 			s.rig = rs
 			return s
+		"canopy_lights":
+			# HARDWARE, AND DELIBERATELY NO LIGHT. Zoo's `canopy_lights`
+			# species builds the whole soffit grid at this anchor with
+			# emissive lenses; returning null here is the decision, not an
+			# omission. The caller skips a null rig silently, which is why
+			# this case exists at all rather than falling through to the
+			# default: a reader finding `canopy_lights` unhandled would
+			# reasonably add a light to it and break the 8-light budget on
+			# the forecourt ground.
+			return null
+		"canopy_wash":
+			# A few downward spots under a fuel canopy -- the streetlight rig
+			# with count 1, the same shape the wall pack uses, because that
+			# is what an outdoor downlight is.
+			var cw := LuxStreetlightRig.new()
+			cw.name = String(a.get("id", "canopy_wash"))
+			var rc := LuxLightRig.new()
+			rc.rig_name = &"Canopy Wash (baked)"
+			# MERCURY VAPOUR WITH THE GREEN CAST ON TOP, and the cast is the
+			# part that matters. `MERCURY_VAPOR` is commented "blue-green
+			# industrial/warehouse" in the colour table, but `kelvin()` is a
+			# BLACKBODY fit and a blackbody has no green spike -- measured by
+			# this type's own selftest, 5000K comes back warmer in red than in
+			# blue, which is the opposite of the reference. The spike is what
+			# `add_fluorescent_cast` exists for, and its own docstring calls
+			# the result the "convenience-store / office tint". Every night
+			# reference of a 1990s forecourt reads green-cyan; Zoo's lenses
+			# are emissive at (0.80, 0.95, 0.88) for the same reason.
+			rc.light_color = LuxColorTemp.add_fluorescent_cast(
+				LuxColorTemp.kelvin(LuxColorTemp.MERCURY_VAPOR), 0.09)
+			# THE RANGE IS THE GEOMETRY'S, not a number. The source hangs at
+			# the soffit, `drop` above the tarmac, and owns the pool DC sized
+			# for it -- so the far corner of that pool is half its diagonal
+			# out and `drop` down.
+			var drop_m := float(a.get("drop", 0.0))
+			if drop_m <= 0.0:
+				drop_m = CLUB_DEFAULT_DROP
+			var pool := Vector2(CANOPY_POOL_FALLBACK, CANOPY_POOL_FALLBACK)
+			if typeof(a.get("size")) == TYPE_ARRAY and (a.get("size") as Array).size() >= 2:
+				pool = Vector2(absf(float(a.get("size")[0])),
+					absf(float(a.get("size")[1])))
+			var reach := sqrt(drop_m * drop_m + pow(pool.length() * 0.5, 2.0))
+			rc.light_range = clampf(reach, 3.0, CANOPY_RANGE_MAX)
+			rc.attenuation = 2.0
+			rc.energy = energy_for(CANOPY_WASH_LEVEL, drop_m, rc.light_range)
+			rc.count = 1
+			rc.spacing = 0.0
+			rc.mount_height = 0.0
+			cw.rig = rc
+			return cw
 		"wall_pack":
 			# A wall pack is one downward warm spot — the streetlight rig
 			# with count 1 is exactly that. The anchor sits proud of the

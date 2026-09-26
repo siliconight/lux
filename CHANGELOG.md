@@ -1,5 +1,55 @@
 # Changelog
 
+## [0.41.0] - a fuel canopy's wash, and no light at all for its lamp grid
+
+Deli Counter 0.145.0 emits a forecourt pair (light manifest v1.3) and this
+reads both. Measured on cold run 9080's package first: the canopy is 22 x 13 m
+on six columns and every one of the 20 fixture holders within 45 m sat on the
+SHOP, between world x 58.7 and 81.3, while the canopy spanned 81 to 103. Lux
+lit what it was given and it was never given a canopy.
+
+    canopy_lights   builds NOTHING, deliberately. Zoo 1.4.0's species of that
+                    name lays the whole soffit grid at this anchor with
+                    emissive lenses, in two draw calls. A light per lamp would
+                    put 12-24 of them on the forecourt ground mesh against a
+                    max_lights_per_object of 8 -- the surface that fills the
+                    frame when a player stands under it. The case exists and
+                    returns null rather than falling through to the default,
+                    so a reader who finds it unhandled does not add a rig to
+                    it and break that budget.
+    canopy_wash     one downward spot per anchor -- the streetlight rig with
+                    count 1, the same shape the wall pack uses, because that
+                    is what an outdoor downlight is.
+
+THE RANGE IS THE GEOMETRY'S. The source hangs at the soffit, `drop` above the
+tarmac, and owns the pool Deli Counter sized for it, so its reach is the
+half-diagonal of that pool and the drop -- 7.99 m for the authored 24 x 10 deck
+with three washes. Capped at 12 m by the same per-mesh budget law the wall pack
+was trimmed to 5.5 for: an outdoor spot that overreaches claims a light-budget
+slot on tiles it barely lights.
+
+THE COLOUR IS THE GREEN SPIKE, NOT THE KELVIN, and the selftest is what
+established that. The first version used `kelvin(MERCURY_VAPOR)` on the
+strength of that constant's own comment, "blue-green industrial/warehouse", and
+`canopy_light_selftest.gd` FAILED it: `kelvin()` is a blackbody fit, every
+value below 6500K comes back redder than blue, and a spectral spike is exactly
+what a blackbody cannot have. `add_fluorescent_cast` is what puts it there --
+its own docstring calls the result the "convenience-store / office tint" -- so
+the rig is `add_fluorescent_cast(kelvin(MERCURY_VAPOR), 0.09)` and the test
+pins the CAST rather than the temperature. Every night reference of a 1990s
+forecourt reads green-cyan; Zoo's lenses are emissive at (0.80, 0.95, 0.88) for
+the same reason.
+
+`CANOPY_WASH_LEVEL` IS PROVISIONAL AND SAYS SO. Nobody has walked a lit
+forecourt yet. What sets it is that the emissive lamp grid carries the apparent
+brightness -- a player looking up sees lit fixtures whatever this value is --
+so the wash only has to put a believable pool on the tarmac. Judge it on a walk
+and write the measured value in.
+
+`tools/canopy_light_selftest.gd`: 13 cases, headless, exit 0 = every case
+behaved. It holds the contract with the manifest, not the look, which is a
+frame and a walk.
+
 All notable changes to Lux are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and Lux uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
