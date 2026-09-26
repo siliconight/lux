@@ -1,5 +1,59 @@
 # Changelog
 
+## [0.44.0] - the streetlights were never built, and `night` meant dusk
+
+THE WALKER on cold run 9083: "better on the canopy, still not great on the
+street lights. Also this sun angle is very hard for lighting in general." Both
+measurable, both true, and neither is one bug.
+
+STREETLIGHTS WERE NEVER BUILT AT ALL. The site manifest carries 10
+`streetlight` anchors, each a ROW of 8 lamps at 9.4 m spacing -- about 80
+lamps, the bulk of a site's lighting. `lux.applied.tscn` contained zero
+Streetlight rigs and no `Spawned_streetlight` markers. The cause is structural:
+Zoo's fixture pass runs per BUILDING (`zoo_fixtures_build.<archetype>`) and
+there is no `zoo_fixtures_build.site`, so a site-level anchor gets no hardware
+and therefore no emitter marker. The glowing lamp head in the walker's frame is
+Lot's streetlight PROP with an emissive lens; the light was never there.
+
+`streetlight` joins `MANIFEST_BAKE_TYPES` for the same reason `canopy_wash`
+did: nothing else is going to build it. The rig itself was already written --
+sodium vapour, a 14 m range, the row expanded from the anchor, and a buzzing
+ballast on every third pole keyed to its id. It had simply never run.
+
+AND ITS ENERGY WAS A CONSTANT, which is the other half of "still not great":
+
+    streetlight  energy 6.0 FLAT, pole 6.0 m, range 14.0  ->  0.156 at the road
+    canopy wash  energy 287.4 derived, drop 4.88, r 8.92  -> 10.000 at the tarmac
+
+64x. Every other outdoor light solves for what its geometry needs; this one did
+not. It now derives through `energy_for` at `STREETLIGHT_LEVEL`, which is
+`CANOPY_WASH_LEVEL * 0.5` -- a ratio rather than an independent number, so
+there is one value to tune and the relationship survives tuning it. A road is
+not a forecourt under a lit deck, and 2:1 is a decision somebody made:
+
+    streetlight now  energy 192.8  ->  5.000 at the road   (canopy 2.0x it)
+
+A streetlight anchor carries no `drop`, and the height is not guessed: Lot
+writes the POLE TOP at z = 6 and the pole runs to grade, which Zoo's
+`core/fixtures.py` states for the same anchor.
+
+`night` MEANT DUSK, AND THAT IS THE SUN ANGLE. Level Factory mapped both
+`night` and `evening` to `Blue Hour`, which describes itself as "Cool, quiet
+dusk just after sunset" and carries a sun at 4 degrees elevation, 0.9 energy,
+shadows on, over 0.9 ambient. That sun washes out every fixture in the level
+and casts the long hard shadows the walker was looking at.
+
+CORRECTION, BECAUSE THE FIRST DIAGNOSIS WAS WRONG. "The pipeline has no night"
+is false: `Gothic Street Night` and `PS1 Storm Night` both exist and both have
+the sun off. The bug was narrower and more embarrassing -- a `night` brief
+mapped to neither of them.
+
+So `Delco Night` is added for the theme, and ITS LIGHT LEVELS ARE NOT NEW.
+`sky_energy` 0.35 and `ambient_energy` 0.55 are `Gothic Street Night`'s, the
+one night preset here that has actually been tuned, copied rather than
+invented; only the palette and the ambient hue are Delco's. If it reads wrong,
+the tuned reference to move toward is that preset and not a guess.
+
 ## [0.43.0] - a slider's maximum had become a physical law, and every light was dim
 
 MEASURED ON COLD RUN 9082, the first NIGHT package this pipeline has produced,

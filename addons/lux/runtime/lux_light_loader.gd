@@ -154,7 +154,7 @@ const CLUB_HARDWARE_TYPES: Array[String] = ["club_wash", "stage_light"]
 ## reads that symbol by name, and a rename whose reader has no fallback is
 ## exactly how cold run 9081 shipped a forecourt with no light in it.
 const MANIFEST_BAKE_TYPES: Array[String] = ["club_wash", "stage_light", "neon",
-	"room_ambient", "back_bar", "canopy_wash"]
+	"room_ambient", "back_bar", "canopy_wash", "streetlight"]
 ## What Zoo names the meshes it builds for them. A prefix, because Blender
 ## dedupes repeats (`.001`) and Godot's importer swaps the dot for an
 ## underscore -- the same reason `LuxFixtureSpawner` matches markers by
@@ -233,6 +233,15 @@ const CLUB_DEFAULT_DROP := 3.0
 ## the wash only has to put a believable pool on the tarmac. Judge it on a
 ## walk and write the measured value here.
 const CANOPY_WASH_LEVEL := 10.0
+## A STREETLIGHT'S POOL ON THE ROAD, in the same unit as the canopy above so
+## the two are comparable at a glance. Half, because an open road is not a
+## forecourt under a lit deck -- a ratio, not an independent number, so there
+## is one value to tune and the relationship survives tuning it.
+##
+## It replaces a flat `energy = 6.0`, which delivered 0.156 at a 6 m pole
+## against the canopy's 10.0 -- 64x darker, which nobody chose. PROVISIONAL
+## like the canopy's: judge the pair on a walk and write the measured values in.
+const STREETLIGHT_LEVEL := CANOPY_WASH_LEVEL * 0.5
 ## The pool one wash owns when the anchor names none, metres. DC always sends
 ## `size`; this is the floor under a hand-authored anchor.
 const CANOPY_POOL_FALLBACK := 6.0
@@ -720,8 +729,24 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			var rs := LuxLightRig.new()
 			rs.rig_name = &"Streetlight (baked)"
 			rs.light_color = LuxColorTemp.kelvin(LuxColorTemp.SODIUM_VAPOR)
-			rs.energy = 6.0
 			rs.light_range = 14.0
+			# DERIVED, NOT FLAT. This was `energy = 6.0`, a constant, while
+			# every other outdoor light solves for what its geometry needs --
+			# and at a 6 m pole through a 14 m range that constant delivered
+			# 0.156 on the road against the canopy's 10.0.
+			#
+			# A streetlight anchor carries no `drop`: Lot writes the POLE TOP
+			# at z = 6 and the pole runs to grade, so the height above the
+			# road IS the anchor's own z. That is stated in Zoo's
+			# `core/fixtures.py` for the same anchor ("streetlight mounts
+			# BELOW -- pole top at pos, dropping to grade at z=0"), and it is
+			# the only sound reading: a `drop` of zero would mean a lamp lying
+			# on the tarmac.
+			var pole_h := 6.0
+			if typeof(a.get("pos")) == TYPE_ARRAY and (a.get("pos") as Array).size() >= 3:
+				pole_h = maxf(float(a.get("pos")[2]), 0.5)
+			rs.energy = energy_for(STREETLIGHT_LEVEL, pole_h, rs.light_range,
+				String(a.get("id", "streetlight")))
 			rs.count = int(row.get("count", 1))
 			rs.spacing = float(row.get("spacing", 8.0))
 			rs.mount_height = 0.0
