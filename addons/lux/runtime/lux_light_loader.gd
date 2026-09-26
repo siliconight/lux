@@ -779,7 +779,8 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			var reach := sqrt(drop_m * drop_m + pow(pool.length() * 0.5, 2.0))
 			rc.light_range = clampf(reach, 3.0, CANOPY_RANGE_MAX)
 			rc.attenuation = 2.0
-			rc.energy = energy_for(CANOPY_WASH_LEVEL, drop_m, rc.light_range)
+			rc.energy = energy_for(CANOPY_WASH_LEVEL, drop_m, rc.light_range,
+				String(a.get("id", "canopy_wash")))
 			rc.count = 1
 			rc.spacing = 0.0
 			rc.mount_height = 0.0
@@ -933,14 +934,51 @@ static func office_floor_value(drop: float) -> float:
 	return FLUORESCENT_ENERGY * range_window(h, fluorescent_range(drop)) / (h * h)
 
 
+## THE CEILING ON A DERIVED ENERGY, and it is not 16 any more.
+##
+## 0.42.0 and earlier clamped to 16.0, described in this file as "the 16
+## LuxLightRig.energy allows". That 16 is `@export_range(0.0, 16.0)` on the
+## rig -- an inspector slider. Godot's `light_energy` has no such limit, and
+## the required energy grows with d SQUARED, so the clamp bound at roughly
+## 1.2 m of drop and every light this pipeline emits shipped truncated.
+## Measured on cold run 9082, the first night package: all 125 non-directional
+## lights together moved the frame by 0.5%, and a spot built by hand with a
+## rig's exact numbers reproduced it while an omni at the same energy did not.
+##
+##     canopy_wash  drop 4.88 m   asks 331.4   was clipped 20.7x
+##     club_wash    drop 3.20 m   asks 171.0   was clipped 10.7x
+##
+## DERIVED, NOT PICKED. The clamp's real job is the pathological case, which is
+## `d` approaching `range`: the window term goes to zero and the demand goes to
+## infinity. That is a RANGE fault, and clamping energy hides it rather than
+## reporting it. So the ceiling sits where it cannot bind on geometry Deli
+## Counter emits -- the deepest drop in a shipped manifest is 4.88 m, and a
+## level-10 wash at a drop of 8 m through a 12 m range needs 995 -- and a bind
+## now says so out loud.
+const ENERGY_CEILING := 1024.0
+
+
 ## The energy that puts `value` at distance `d` from a light of range
-## `light_range` and attenuation 2, on a surface facing it. Capped at the 16
-## LuxLightRig.energy allows; 0 when `d` is at or past the range.
-static func energy_for(value: float, d: float, light_range: float) -> float:
+## `light_range` and attenuation 2, on a surface facing it. 0 when `d` is at or
+## past the range. `who` names the anchor in the warning if the ceiling binds.
+static func energy_for(value: float, d: float, light_range: float,
+		who: String = "") -> float:
 	var w := range_window(d, light_range)
 	if w <= 0.0:
 		return 0.0
-	return minf(value * d * d / w, 16.0)
+	var want := value * d * d / w
+	if want > ENERGY_CEILING:
+		# NEVER SILENTLY AGAIN. The previous clamp was a `minf` with no
+		# report, so a light could be short by a factor of twenty and look
+		# exactly like a light that was simply dim. If this fires, the
+		# geometry is past what the model can serve and the RANGE is the
+		# thing to look at, not this number.
+		push_warning(("LuxLightLoader: %s wants energy %.0f at %.2f m "
+			+ "(range %.2f) and the ceiling is %.0f -- it will be %.0fx too "
+			+ "dim. That is a range fault, not a brightness one.")
+			% [who if who != "" else "a light", want, d, light_range,
+				ENERGY_CEILING, want / ENERGY_CEILING])
+	return minf(want, ENERGY_CEILING)
 
 
 ## What a ROW of `count` unit-energy lamps, `spacing` apart and centred on the
@@ -1119,7 +1157,7 @@ static func _club_rig(t: String, a: Dictionary, row: Dictionary) -> Node3D:
 			var radius := clampf(float(a.get("radius", drop * CLUB_WASH_RADIUS_PER_DROP)), 1.5, 6.0)
 			rw.light_range = minf(sqrt(h * h + radius * radius), 7.5)
 			rw.attenuation = 2.0
-			rw.energy = energy_for(CLUB_WASH_LEVEL * office, h, rw.light_range)
+			rw.energy = energy_for(CLUB_WASH_LEVEL * office, h, rw.light_range, id)
 			rw.count = int(row.get("count", 1))
 			rw.spacing = float(row.get("spacing", 0.0))
 			rw.mount_height = FLUORESCENT_MOUNT

@@ -10,7 +10,14 @@ extends Resource
 
 @export_group("Emission")
 @export var light_color: Color = Color(1.0, 0.96, 0.88)
-@export_range(0.0, 16.0) var energy: float = 2.0
+## 0 to 16 until 0.43.0, and that slider maximum became a physical law:
+## `LuxLightLoader.energy_for` clamped every derived energy to it,
+## citing "the 16 LuxLightRig.energy allows". Required energy grows with
+## distance squared, so it bound at about 1.2 m of drop and every light
+## the pipeline emits shipped truncated -- measured on cold run 9082 as
+## 125 lights moving a night frame by 0.5%. The range is the derivation's
+## now, not the other way round.
+@export_range(0.0, 1024.0) var energy: float = 2.0
 ## For OmniLight/SpotLight rigs.
 @export_range(0.5, 60.0) var light_range: float = 12.0
 ## Distance-falloff exponent (Omni/Spot `*_attenuation`). 1.0 is the engine

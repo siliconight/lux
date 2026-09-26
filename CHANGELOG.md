@@ -1,5 +1,71 @@
 # Changelog
 
+## [0.43.0] - a slider's maximum had become a physical law, and every light was dim
+
+MEASURED ON COLD RUN 9082, the first NIGHT package this pipeline has produced,
+and the first that could show this at all. Every prior cold run was `afternoon`
+or `rain`, both of which resolve to a daylight preset where a directional sun
+dominates the frame.
+
+    every artificial light in the package -- all 125 -- moved the frame by 0.5%
+
+The walker: "it's a lit ceiling over black ground", and then, on the
+streetlights, "the lights aren't lighting past its immediate fixture".
+
+BISECTED WITH LIGHTS BUILT BY HAND in the running scene, because inspecting the
+existing ones could not tell a bad rig from a bad renderer:
+
+    fresh omni  e50  r40                  +183%    lights work here
+    fresh omni  e16  r8.9                  +9.8%   the energy is plenty for an omni
+    fresh spot, a wash's exact values      +0.5%   reproduces the fault exactly
+    fresh spot  e50  r40                   +2.7%
+
+A spot built by hand with a rig's numbers reproduced the fault, so the rigs
+were doing what they were told and what they were told was too dim.
+
+THE ARITHMETIC, and it is the whole bug. `energy_for` solves for the energy
+that delivers `value` at distance `d` and then clamped to 16.0 -- described in
+this file as "the 16 LuxLightRig.energy allows". That 16 was
+`@export_range(0.0, 16.0)`, an INSPECTOR SLIDER. Godot's `light_energy` has no
+such limit. Required energy grows with d SQUARED, so the clamp bound at roughly
+1.2 m of drop:
+
+    canopy_wash  drop 4.88 m   asks 331.4   was clipped 20.7x
+    club_wash    drop 3.20 m   asks 171.0   was clipped 10.7x
+
+Every anchor type the pipeline emits is past that break-even. Interiors still
+read because a small dark room is forgiving; a forecourt is not.
+
+FIXED AND MEASURED ON THE PACKAGE'S OWN LIGHTS, not on a light the probe
+invented -- the three shipped canopy washes, set to the energy the model
+actually asked for:
+
+    shipped washes @ e16      delta +0.00083   (+0.5%)   as shipped
+    shipped washes @ e331.4   delta +0.03645  (+22.8%)   what the model wanted
+
+44x more light, both readings taken twice with the light back on and refused if
+the two ON readings disagreed.
+
+THE CEILING IS DERIVED, NOT PICKED. The clamp's real job is the pathological
+case, which is `d` approaching `range`: the window term goes to zero and the
+demand goes to infinity. That is a RANGE fault, and clamping the energy hid it
+rather than reporting it. `ENERGY_CEILING` is 1024 because it must not bind on
+geometry Deli Counter emits -- the deepest drop in a shipped manifest is
+4.88 m, and a level-10 wash at 8 m through a 12 m range needs 995.
+
+AND A BIND IS NEVER SILENT AGAIN. The old clamp was a bare `minf` with no
+report, so a light short by a factor of twenty looked exactly like a light that
+was meant to be dim. `energy_for` now takes the anchor's id and warns with the
+number and the factor, and says the right thing to go and look at: the range,
+not the brightness.
+
+WHAT THIS DOES NOT CLAIM. The 22.8% above is a runtime override on a baked
+package, not a rebuilt one, and no cold run has yet shipped a level with the
+ceiling raised. Nor has anyone judged whether the derived energies look RIGHT
+-- a light close to a surface now gets what the inverse-square model says it
+needs, and that may blow out a fixture housing that was quietly flattered by
+the clamp. Both want a walk.
+
 ## [0.42.0] - the manifest bake was never only the club's
 
 Cold run 9081 shipped a forecourt with no light in it. Traced in the package:
