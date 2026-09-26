@@ -136,6 +136,25 @@ const CLUB_TYPES: Array[String] = ["club_wash", "stage_light", "neon", "room_amb
 ## two are the rows marked `marker: False`; if that file and this line
 ## disagree, that file is the one that builds geometry.
 const CLUB_HARDWARE_TYPES: Array[String] = ["club_wash", "stage_light"]
+
+## EVERY TYPE THE MANIFEST BAKE OWNS, which is no longer only the club's.
+##
+## `bake_club` was named for the only thing it did. What it actually is, and
+## always was, is "build these types from the WHOLE anchor instead of from a
+## marker" -- it calls the same `_rig_for` the marker path does, and the only
+## club-specific thing about it is the container's name.
+##
+## A type belongs here when its rig needs a field the marker payload does not
+## carry. `LuxFixtureSpawner` hands `rig_for_anchor` only {type, id, drop}, so
+## a `club_wash` would lose its zone colour and pool radius, a `stage_light`
+## its target, and a `canopy_wash` the POOL Deli Counter sized for it -- which
+## is the whole of its range derivation.
+##
+## `CLUB_TYPES` is deliberately left alone rather than renamed: Level Factory
+## reads that symbol by name, and a rename whose reader has no fallback is
+## exactly how cold run 9081 shipped a forecourt with no light in it.
+const MANIFEST_BAKE_TYPES: Array[String] = ["club_wash", "stage_light", "neon",
+	"room_ambient", "back_bar", "canopy_wash"]
 ## What Zoo names the meshes it builds for them. A prefix, because Blender
 ## dedupes repeats (`.001`) and Godot's importer swaps the dot for an
 ## underscore -- the same reason `LuxFixtureSpawner` matches markers by
@@ -359,7 +378,7 @@ static func bake_club(path: String, scene_root: Node) -> Dictionary:
 	for a in data["anchors"]:
 		if typeof(a) != TYPE_DICTIONARY:
 			continue
-		if not CLUB_TYPES.has(String(a.get("type", ""))):
+		if not MANIFEST_BAKE_TYPES.has(String(a.get("type", ""))):
 			continue
 		in_manifest += 1
 		var node := _rig_for(a)

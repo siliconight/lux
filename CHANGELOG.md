@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.42.0] - the manifest bake was never only the club's
+
+Cold run 9081 shipped a forecourt with no light in it. Traced in the package:
+`lux.applied.tscn` holds `Spawned_fluorescent`, `Spawned_pendant`,
+`Spawned_sign` and `Spawned_wall_pack` -- the MARKER path -- plus `LuxDaylight`
+and `LuxClub`, which are manifest bakes. `canopy_wash` was on neither.
+
+It cannot take the marker path. `LuxFixtureSpawner` hands `rig_for_anchor` only
+{type, id, drop}, and a canopy wash derives its whole range from the POOL Deli
+Counter sized for it -- the same reason the club set is on the manifest bake,
+and the same sentence Zoo's `fixtures.py` uses about widening the marker
+payload first.
+
+So `bake_club` filters on `MANIFEST_BAKE_TYPES` now, and the name says what the
+function always did: build these types from the WHOLE anchor rather than from a
+marker. It calls the same `_rig_for` the marker path does; the only
+club-specific thing about it was the container's name.
+
+`CLUB_TYPES` IS LEFT EXACTLY AS IT WAS, deliberately. Level Factory reads that
+symbol by name to decide whether to call the bake at all, and a rename whose
+reader has no fallback is precisely the shape of the defect 9081 shipped. The
+new name is additive; LF 0.120.0 prefers it and falls back.
+
 ## [0.41.0] - a fuel canopy's wash, and no light at all for its lamp grid
 
 Deli Counter 0.145.0 emits a forecourt pair (light manifest v1.3) and this
