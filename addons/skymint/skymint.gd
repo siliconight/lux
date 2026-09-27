@@ -195,7 +195,14 @@ func _ensure_built() -> void:
 	_sky = Sky.new()
 	_sky.sky_material = _mat
 	_sky.process_mode = Sky.PROCESS_MODE_REALTIME   # animated clouds in reflections
-	_sky.radiance_size = Sky.RADIANCE_SIZE_128
+	# 32, NOT 128. On GL Compatibility this map is rendered and filtered every
+	# frame and read by every lit surface as ambient and reflection, and it is
+	# where the whole cost of a custom sky lives: on cold run 9091's package a
+	# flat-colour sky shader cost what the full one cost, 128 -> 32 recovered
+	# 0.67 of the 1.3 ms, and flat ambient with reflections off recovered all
+	# of it (docs/DRAW_CALL_BUDGET.md, "The sky, priced"). The walker took the
+	# 32 on 2026-09-27: at night the map is a blur of a black sky with stars.
+	_sky.radiance_size = Sky.RADIANCE_SIZE_32
 	environment.sky = _sky
 
 	_built = true

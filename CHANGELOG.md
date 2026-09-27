@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.54.0] - the sky's radiance map at 32: where the custom sky's cost actually was
+
+SkyMint 1.2.0. `Sky.radiance_size` 128 -> 32, and nothing else.
+
+WHAT IT COST. Cold run 9090 priced the sky provider against Lux's own
+procedural sky, same package, same harness back to back: about 1.3 ms of
+GPU at every station at 1280x720, on identical draw counts. A per-pixel
+cost, or so it read.
+
+WHAT IT WAS NOT. Twelve copies of cold run 9091's package, one change each
+(`docs/cold_runs/cold_9091/perf_stations_*_ab.json`): the cloud block
+branched out at runtime, then at compile time; TIME made constant; the
+equirect path deleted; the tail reduced to the sun; QUALITY process mode;
+QUALITY with every uniform write proven off (counted: 0 in 120 frames);
+mipmaps on the cube faces; a valid sky of only the two cube fetches; a valid
+sky of a FLAT COLOUR and no fetch at all. Every one measured the same as the
+full shader, within 0.1 ms. Nothing in the shader was the cost.
+
+WHAT IT WAS. `radiance_size` 128 -> 32 on the flat-colour sky recovered
+0.67 ms; flat ambient plus `reflected_light_source` DISABLED recovered 1.23,
+all of it. The radiance cubemap -- rendered and filtered from the sky shader
+every frame on GL Compatibility, and read by every lit surface, because
+Delco Night's ambient is Sky-sourced at contribution 1.0 -- is the cost.
+The walker chose the 32 over flat ambient: half the saving, and at night
+the map is a blur of a black sky with stars, so the look should not move.
+To be confirmed on the next walk, not assumed.
+
+A RETRACTION ON THE WAY. Two copies with an early `return` in `sky()` read
+1.24 ms cheaper and were believed for an hour. `return` is illegal in a sky
+processor function; the shader never compiled; Godot drew no sky. The
+harness swallows engine stderr, so a windowed capture reading it
+(`tools/sky_look.gd` at the factory root) is now the compile check before
+any shader A/B is measured.
+
+OPEN. `process_mode` QUALITY with no uniform traffic did not help. Either
+Compatibility re-renders the radiance every frame whatever the mode, or
+something not counted still dirties the sky. Not separated; the next
+question if 0.67 ms turns out to matter on the low-end target.
+
 ## [0.53.0] - Delco Night ships the starfield at the walker's brightness
 
 `delco_night` now names `empty_space` (12) for both `day_sky` and `night_sky`,
