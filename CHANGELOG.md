@@ -1,5 +1,50 @@
 # Changelog
 
+## [0.51.0] - a preset can hand the sky to a provider, and a package carries it
+
+Lux 0.49.0 put the moon disc back in a provider's sky and 0.50.0 cut the
+shadow reach, and neither was reachable: nothing ever placed a provider node,
+so cold run 9089's package shipped `runtime/lux` and no sky at all beyond the
+procedural one. The walker, walking it: "skymint was missing". This is the
+wiring those two releases assumed.
+
+`LuxPreset` gains `sky_provider_script` and `sky_provider_properties`.
+LuxRoot instantiates the script as its OWN CHILD before building
+`LuxEnvironment`, which matters more than it looks: `ensure_world_environment`
+checks the parent's children before searching the scene, so adoption no
+longer depends on `get_tree().current_scene` -- and that is not assigned
+until after `_ready` during a main-scene load. Several probes in the
+2026-09-27 investigation drew wrong conclusions from exactly that.
+
+DUCK-TYPED THROUGHOUT. The script is loaded by path, never preloaded; the
+node is whatever it extends; properties are set by name and skipped when the
+node has none; a provider that is not a WorldEnvironment is refused with a
+warning. Lux names no provider class and imports no provider type, so a
+project that has never heard of the addon loses a sky and nothing else.
+
+`delco_night` names SkyMint and carries the walker's runtime calls:
+`cloud_density` 1.0 -- clouds OFF, "yeah clouds off just looks better", and
+the cheapest option since the mask resolves to zero -- `paused` true,
+`time_of_day` 0, `brightness` 3.0. The panorama is `sinister` (16), not the
+`moody` the prototype used: measured zenith contrast 0.016 against 0.082, and
+`docs/proposals/SKY_PROVIDER.md` records that the engine's +Y cubemap-face
+artefact scales with exactly that number. The prototype's choice was among the
+worst in the set for it.
+
+Verified in a pipeline-built package, no hand editing:
+
+    WorldEnvironment node(s): 1
+      LuxSkyProviderNode (SkyMint)  ambient 0.55  exposure 1.05  sky ShaderMaterial  LIVE
+    sun link bearing (-0.682, 0.616, 0.394)
+    disc bearing     (-0.682, 0.616, 0.394)   angle 0.00 deg, elevation 38.0
+
+NO ADDON PATH IS SPELT OUT IN ANY .gd IN THIS REPO, and `lux_preset.gd` says
+why in place. The export closure scanner reads shipped scripts for
+engine-scheme addon references and cannot tell a comment from a reference.
+An example path in that docstring failed the export gate twice -- once as
+itself, and once inside the sentence explaining the first failure. The value
+belongs in a preset, where it is data the localizer rewrites.
+
 ## [0.50.0] - Delco Night's sun shadow reaches 30 m, not 60
 
 MEASURED, not chosen. `level_factory/tools/draw_attrib.gd` attributed cold

@@ -45,6 +45,42 @@ signal blend_finished(preset_name: StringName)
 			apply_preset(_current)
 
 
+## Instantiates the preset's sky provider, if it names one, as a child of
+## this node. Duck-typed throughout: the script is loaded by path, the node
+## is whatever that script extends, and properties are set by name only when
+## the node has them. Lux names no provider class and imports none, so a
+## project without the addon loses a sky and nothing else.
+func _spawn_sky_provider() -> void:
+	var preset: LuxPreset = local_override if local_override != null \
+		else active_preset
+	if preset == null or String(preset.sky_provider_script).is_empty():
+		return
+	var path := String(preset.sky_provider_script)
+	if not ResourceLoader.exists(path):
+		push_warning("Lux: sky provider '%s' is not in this project; " % path
+			+ "authoring the sky instead.")
+		return
+	var scr: Script = load(path) as Script
+	if scr == null:
+		push_warning("Lux: sky provider '%s' did not load as a Script." % path)
+		return
+	var node: Object = scr.new()
+	var we: WorldEnvironment = node as WorldEnvironment
+	if we == null:
+		push_warning("Lux: sky provider '%s' is not a WorldEnvironment; " % path
+			+ "a provider has to own an Environment to own a sky.")
+		if node is Node:
+			(node as Node).free()
+		return
+	we.name = &"LuxSkyProviderNode"
+	for key in preset.sky_provider_properties:
+		var k := String(key)
+		if k in we:
+			we.set(k, preset.sky_provider_properties[key])
+	add_child(we)
+	_sky_provider_node = we
+
+
 func _apply_shadow_override() -> void:
 	if _quality != null and shadow_caster_budget >= 0:
 		_quality.max_shadow_casters = shadow_caster_budget
@@ -170,6 +206,7 @@ func _apply_shadow_override() -> void:
 # Modules
 var _env: LuxEnvironment
 var _sky_provider: LuxSkyProvider = null
+var _sky_provider_node: WorldEnvironment = null
 var _lighting: LuxLighting
 var _post: LuxPostFX
 ## Present only while the applied preset's weather has rain (0.35.0).
@@ -307,12 +344,20 @@ func _build_modules() -> void:
 		if child is DirectionalLight3D or child is CanvasLayer \
 				or child is WorldEnvironment or child is LuxEnvironment \
 				or child is LuxLighting or child is LuxPostFX \
-				or child is LuxRain or child is LuxSkyProvider:
+				or child is LuxRain or child is LuxSkyProvider \
+			or child == _sky_provider_node:
 			remove_child(child)
 			child.queue_free()
 	_rain = null
 	# or an editor reload leaves two of these writing the same parameters
 	_sky_provider = null
+	_sky_provider_node = null
+
+	# THE SKY PROVIDER GOES IN FIRST, as a child of this node, so that
+	# `ensure_world_environment` finds it among the parent's children rather
+	# than by searching `get_tree().current_scene` -- which is not assigned
+	# until after `_ready` during a main-scene load.
+	_spawn_sky_provider()
 
 	_env = LuxEnvironment.new()
 	_env.name = &"LuxEnvironment"

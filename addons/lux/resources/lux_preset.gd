@@ -70,6 +70,37 @@ extends Resource
 ## which is out of sight at that range, and is the trade the number buys.
 @export_range(0.0, 500.0) var sun_shadow_max_distance: float = 0.0
 
+@export_group("Sky provider")
+## HAND THE SKY TO SOMEBODY ELSE. A script path -- typically SkyMint's
+## `skymint.gd` under `addons/` -- whose node is a WorldEnvironment that
+## authors its own sky: a panorama, clouds, a day/night cycle. Empty means
+##
+## NO ADDON PATH IS SPELT OUT IN THIS FILE, deliberately. The export closure
+## scanner reads every shipped .gd for engine-scheme addon references and
+## cannot tell a comment from a reference -- rightly, since its job is to
+## find things that will not resolve in a clean project. An example path in
+## this docstring failed the gate twice: once as itself, and once inside the
+## sentence explaining the first failure. Write the value in a PRESET, where
+## it is data the localizer rewrites, never in prose.
+## Lux authors the sky itself, which is what every preset did before 0.51.0
+## and what all of them still do except Delco Night.
+##
+## LuxRoot instantiates it as its OWN CHILD, which matters: `LuxEnvironment`
+## looks at the parent's children before it searches the scene, so adoption
+## does not depend on `get_tree().current_scene` being assigned. That
+## assignment is not made until after `_ready` during a main-scene load, and
+## probes that assumed otherwise misled this project for most of a day.
+##
+## NO HARD DEPENDENCY. The path is loaded, not preloaded, and a failure to
+## load is a warning and a procedural sky -- Lux must still run in a project
+## that has never heard of the addon.
+@export var sky_provider_script: String = ""
+## Properties to set on the provider once it exists, by name. Applied
+## duck-typed: a name the node does not have is skipped, not an error, so a
+## preset written for one provider does not break on another. Lux never
+## names a provider's class or imports its types.
+@export var sky_provider_properties: Dictionary = {}
+
 @export_group("Ambient")
 ## Sky = gather ambient from the sky (softer, modern). Flat Color = a single
 ## uniform ambient fill with no directional/GI cues — the honest PS2-era look,
