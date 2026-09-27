@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.49.0] - a provider's sky gets the level's own moon back
+
+When a sky provider owns the sky, Lux defers to it and stops drawing its own
+`ProceduralSkyMaterial` -- and with it the sun or moon that material drew from
+the `DirectionalLight3D`. SkyMint's default profile then leaves a night sky
+empty: its `night_blend` is 1.0 only for t <= 0.20 and t >= 0.80 while its
+`sun_intensity` is 0.0 outside t in [0.23, 0.77], and those windows never
+overlap, so a night panorama cannot carry a disc at all. The walker had
+praised that moon two days earlier -- "definitely reads as night and the moons
+light is actually great now" -- and adopting a provider took it away while
+leaving its light on the level.
+
+`runtime/lux_sky_provider.gd` puts it back. LuxRoot builds one only when a
+provider is present, so a level without one gains nothing to run.
+
+THE BEARING COMES FROM THE LIGHT, not from the provider's time-of-day arc. A
+DirectionalLight3D casts along -basis.z, so the body it stands for lies along
++basis.z from the viewer; the disc then sits exactly where the light comes
+from, which is the rule the fixtures already follow and which lets a level
+keep a tuned moon angle while the sky does whatever it likes. Measured on cold
+run 9088's package with the prototype's own script removed:
+
+    sun link bearing (-0.682, 0.616, 0.394)
+    disc bearing     (-0.682, 0.616, 0.394)   angle 0.00 deg
+    elevation of the disc: 38.0 deg           (delco_night wants 38)
+
+NO HARD DEPENDENCY, kept. It never names SkyMint, loads none of its classes
+and reads none of its exports. It writes two shader parameters and only after
+reading the shader's own uniform list to see whether they are declared --
+`set_shader_parameter` on a name a shader does not declare is silently
+ignored, so a hopeful write is indistinguishable from a working one. An
+unrelated sky shader is warned about once and left alone.
+
+`sky_disc_intensity` defaults to 4.0 and `sky_disc_size` to 0.004. NOT TUNED:
+they are where the prototype's keys were left on 2026-09-27 and the walker has
+not settled them at runtime. Zero disables the disc, which is right for a
+daylight preset whose provider already draws a sun.
+
+Cost: two `set_shader_parameter` calls per frame, constant, independent of
+prop count and player count. `process_priority` is raised to 100 because the
+provider rewrites the same parameters from its own profile every frame.
+
+WHAT THIS RELEASE DOES NOT CONTAIN, because the defect turned out not to
+exist. `docs/proposals/SKY_PROVIDER.md` claimed Lux fails to write its grade
+onto an adopted provider Environment. It does write it: measured with
+`change_scene_to_packed`, one WorldEnvironment carrying ambient 0.55 and
+exposure 1.05. Every reading that said otherwise came from a `--script` probe
+that instantiated the scene without setting `current_scene`, so
+`_find_world_environment` could not see the provider and Lux graded an
+environment of its own. The claim is retracted in that file.
+
 ## [0.48.1] - what `pos[2]` is on a streetlight anchor, restated
 
 Comment only. The streetlight rig's energy derivation reads the anchor's z as

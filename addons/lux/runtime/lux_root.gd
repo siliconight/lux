@@ -75,6 +75,30 @@ func _apply_shadow_override() -> void:
 ## isn't present, Lux falls back to the preset sun.
 @export var auto_find_skymint: bool = true
 
+## THE DISC IN A PROVIDER'S SKY. When a sky provider owns the sky, Lux's own
+## ProceduralSkyMaterial is not drawn and neither is the sun or moon it would
+## have put there -- SkyMint's default profile, for one, holds sun_intensity
+## at 0 across the whole window in which it shows a night panorama, so a
+## night sky comes out empty above a level its DirectionalLight3D is still
+## lighting. Above zero, LuxSkyProvider draws the disc at the sun link's own
+## bearing. Zero leaves the provider's sky exactly as it authored it, which
+## is right for a daylight preset that already draws a sun.
+##
+## NOT A TUNED VALUE. 4.0 and 0.004 are where the prototype's keys were left
+## on 2026-09-27 and the walker has not settled them at runtime yet.
+@export var sky_disc_intensity: float = 4.0:
+	set(value):
+		sky_disc_intensity = value
+		if _sky_provider != null:
+			_sky_provider.disc_intensity = value
+## Angular size of that disc. Godot's reference figure for the real moon is
+## about half a degree; this is a look dial, not an astronomical one.
+@export var sky_disc_size: float = 0.004:
+	set(value):
+		sky_disc_size = value
+		if _sky_provider != null:
+			_sky_provider.disc_size = value
+
 @export_group("Optional Rendering Features")
 ## Global film emulsion switch -- the player-facing key of TDD section 10.
 ## Defaults ON so a preset that asks for film gets it; presets ship with
@@ -145,6 +169,7 @@ func _apply_shadow_override() -> void:
 
 # Modules
 var _env: LuxEnvironment
+var _sky_provider: LuxSkyProvider = null
 var _lighting: LuxLighting
 var _post: LuxPostFX
 ## Present only while the applied preset's weather has rain (0.35.0).
@@ -282,10 +307,12 @@ func _build_modules() -> void:
 		if child is DirectionalLight3D or child is CanvasLayer \
 				or child is WorldEnvironment or child is LuxEnvironment \
 				or child is LuxLighting or child is LuxPostFX \
-				or child is LuxRain:
+				or child is LuxRain or child is LuxSkyProvider:
 			remove_child(child)
 			child.queue_free()
 	_rain = null
+	# or an editor reload leaves two of these writing the same parameters
+	_sky_provider = null
 
 	_env = LuxEnvironment.new()
 	_env.name = &"LuxEnvironment"
@@ -297,6 +324,19 @@ func _build_modules() -> void:
 	if auto_find_skymint and _env.world_env != null \
 			and "sun_light" in _env.world_env:
 		_env.defer_sky = true
+		# AND PUT THE DISC BACK. Deferring the sky also defers the sun or
+		# moon Lux would have drawn in it, which leaves a night panorama
+		# empty above a level the DirectionalLight3D is still lighting.
+		# LuxSkyProvider writes it at the sun link's own bearing, so the
+		# disc sits where the light actually comes from. It names no addon
+		# and writes only shader parameters the shader declares.
+		_sky_provider = LuxSkyProvider.new()
+		_sky_provider.name = &"LuxSkyProvider"
+		_sky_provider.provider = _env.world_env
+		_sky_provider.sun = sun_light
+		_sky_provider.disc_intensity = sky_disc_intensity
+		_sky_provider.disc_size = sky_disc_size
+		add_child(_sky_provider)
 
 	_lighting = LuxLighting.new()
 	_lighting.name = &"LuxLighting"
@@ -311,6 +351,15 @@ func _build_modules() -> void:
 	if sun_light != null:
 		_lighting.sun = sun_light
 	_lighting.ensure_sun(self)
+	# THE SUN THE SKY DISC STANDS FOR is whatever `_lighting` ended up
+	# holding -- the linked light, or the LuxSun it has just manufactured.
+	# Assigned HERE and not where `_sky_provider` is built, because that
+	# runs some fifty lines earlier and `sun_light` is null whenever Lux
+	# makes its own sun. Measured with the wiring in the wrong place: the
+	# disc sat at 70.7 deg elevation, the provider's own time-of-day arc,
+	# instead of delco_night's 38.
+	if _sky_provider != null:
+		_sky_provider.sun = _lighting.sun
 
 	_post = LuxPostFX.new()
 	_post.name = &"LuxPostFX"
