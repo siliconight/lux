@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.46.0] - an instrument that can tell a lit pool from a blown one
+
+0.43.0 reported a canopy's washes moving a frame's mean luminance by +20.6%
+and called it the fix working. It was measuring an overexposure. Mean rises
+either way, and nothing in that measurement could tell the two apart -- the
+walker could, in one frame.
+
+`tools/pool_exposure.gd` reports the SHAPE of the exposure instead of its
+average: the fraction of pixels clipped, the fraction at black, and p50/p99 so
+a long bright tail is visible rather than averaged away.
+
+Run against cold run 9084's package -- the blown one, built before 0.45.0
+fixed the units:
+
+    station            mean   clipped    black      p50      p99
+    forecourt        0.1513      0.9%    73.8%   0.0039   0.9037
+    under_canopy     0.2435      1.5%    46.6%   0.0479   0.9446
+    street_pool      0.1267      1.1%    84.1%   0.0000   0.8900
+
+THE SIGNATURE IS p50 AGAINST p99, not the clip count. Only about 1% of pixels
+are clipped, because blown discs are small in frame -- a clip-fraction gate
+would have passed this. What names it is a median pixel at 0.000-0.004 beside
+a 99th percentile at 0.89-0.94: almost the whole image is black and the rest
+is at the top of the range.
+
+It prints no verdict. Whether a Delco street should read at 40% black or 70%
+is the walker's call, and this gives them the histogram to make it with.
 ## [0.45.0] - the two outdoor levels were raw numbers in a normalised file
 
 THE WALKER on cold run 9084, the first package with the sun off and the
