@@ -760,13 +760,19 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			# and at a 6 m pole through a 14 m range that constant delivered
 			# 0.156 on the road against the canopy's 10.0.
 			#
-			# A streetlight anchor carries no `drop`: Lot writes the POLE TOP
-			# at z = 6 and the pole runs to grade, so the height above the
-			# road IS the anchor's own z. That is stated in Zoo's
-			# `core/fixtures.py` for the same anchor ("streetlight mounts
-			# BELOW -- pole top at pos, dropping to grade at z=0"), and it is
-			# the only sound reading: a `drop` of zero would mean a lamp lying
-			# on the tarmac.
+			# A streetlight anchor carries no `drop`: the pole runs to
+			# grade, so the height above the road IS the anchor's own z, and
+			# a `drop` of zero would mean a lamp lying on the tarmac.
+			#
+			# WHAT THAT Z IS CHANGED IN LOT 0.79.0, and the number barely
+			# did. It was the POLE TOP at a flat 6.0 on a light derived from
+			# the path graph; it is now the LENS of a pole the site actually
+			# stands -- sidewalk height plus the module height less the
+			# 0.175 m the lens sits below the module's top -- which on the
+			# shipped kerb line is 5.922. Zoo's `core/fixtures.py` still
+			# mounts hardware BELOW this point for a manifest that asks for
+			# it; a Lot site now tags the anchor `hardware` instead, because
+			# its pole is already standing.
 			var pole_h := 6.0
 			if typeof(a.get("pos")) == TYPE_ARRAY and (a.get("pos") as Array).size() >= 3:
 				pole_h = maxf(float(a.get("pos")[2]), 0.5)

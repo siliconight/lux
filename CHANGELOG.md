@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.48.1] - what `pos[2]` is on a streetlight anchor, restated
+
+Comment only. The streetlight rig's energy derivation reads the anchor's z as
+the lamp's height above the road, and the note beside it said that z was "the
+POLE TOP at z = 6" that Lot writes. As of Lot 0.79.0 it is the LENS of a pole
+the site actually stands -- sidewalk height plus the module height less the
+0.175 m the lens sits below the module's top, which is 5.922 on the shipped
+kerb line. The reading is unchanged and the energy moves by nothing worth
+measuring; the sentence describing where the number comes from was wrong, and
+a wrong comment beside a derivation is how the next person derives something
+else.
+
 ## [0.48.0] - the moon, five times over
 
 Cold run 9086 put the moon in at 0.15 and measured it as doing nothing: black
