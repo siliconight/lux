@@ -1,5 +1,58 @@
 # Changelog
 
+## [0.50.0] - Delco Night's sun shadow reaches 30 m, not 60
+
+MEASURED, not chosen. `level_factory/tools/draw_attrib.gd` attributed cold
+run 9088's frame and found the sun's shadow pass is about 44% of every draw
+call -- 1,712 of 4,008 at one station, 2,217 of 5,071 at another, with the
+model closing to within 0.07% of the engine's counter once both shadow
+passes are accounted for. One DirectionalLight3D resubmitting every caster
+was the largest line in the budget, larger than all the geometry a player
+can see.
+
+`sun_shadow_mode` is already 0 (Orthogonal, one split), so distance was the
+dial. Swept at three stations on 9088's package, RTX 2060, GL Compatibility,
+1280x720, vsync off, 60 frames per row after a 20-frame settle, with a
+restore-to-60 control on every station:
+
+    camera_socket_1        draws    d draws   p95 ms     luma
+      60 m (shipped)        3124          0     9.04   0.0128
+      45 m                  2945       -179     9.04   0.0128
+      30 m                  2024      -1100     7.34   0.0130
+      20 m                  1613      -1511     7.65   0.0131
+      12 m                  1200      -1924     6.35   0.0134
+      restore 60 m          3124          0     8.47   0.0127
+
+    crew_spawn_2           draws    d draws   p95 ms     luma
+      60 m (shipped)        2755          0     7.10   0.1021
+      45 m                  2594       -161     7.11   0.1021
+      30 m                  1953       -802     6.82   0.1021
+      20 m                  1419      -1336     6.31   0.1016
+      12 m                  1145      -1610     5.44   0.1044
+      restore 60 m          2755          0     8.32   0.1012
+
+30 m is the knee: 60 to 45 buys about 170 draws, 45 to 30 buys 800-1,100.
+Roughly a third of the frame's submissions for no measurable change in
+brightness -- luma moves 0.0003 on a 0.0128 base and 0.0001 on a 0.1021 one.
+
+THE THIRD STATION IS NOT IN THAT TABLE. `camera_socket_0` restored to 2,351
+draws against the 4,008 it started at, and its first row read luma 0.0000 --
+a black frame, which is the known first-read-of-a-run trap. Its deltas looked
+the largest of the three and are discarded entirely. That is what the control
+is for.
+
+WHY THE BRIGHTNESS WARNING IN `lux_preset.gd` DOES NOT BITE HERE, since it
+says plainly that an unshadowed sun leaves rooms at luma 47-65 where a
+shadowed one leaves them at 20-38. That was measured on DAYTIME presets. At
+night the sun is the moon at energy 0.75, and the light its shadow withholds
+is nearly nothing -- which the luma column above confirms rather than
+assumes.
+
+SO THIS CHANGES ONE PRESET AND NO OTHERS. Blue Hour, Delco Summer Afternoon
+and the rest keep 60 m: the same cut on a daytime preset would relight
+interiors past the shadow distance and nobody has measured it. The dial is
+per-preset for exactly this reason.
+
 ## [0.49.0] - a provider's sky gets the level's own moon back
 
 When a sky provider owns the sky, Lux defers to it and stops drawing its own
