@@ -30,10 +30,10 @@ sun_shadow_mode = 0
 sun_shadow_max_distance = 30.0
 sky_provider_script = "res://addons/skymint/skymint.gd"
 sky_provider_properties = {
-"brightness": 3.0,
+"brightness": 8.0,
 "cloud_density": 1.0,
-"day_sky": 16,
-"night_sky": 16,
+"day_sky": 12,
+"night_sky": 12,
 "paused": true,
 "time_of_day": 0.0
 }

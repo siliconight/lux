@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.53.0] - Delco Night ships the starfield at the walker's brightness
+
+`delco_night` now names `empty_space` (12) for both `day_sky` and `night_sky`,
+at `brightness` 8.0. Both values are the walker's, set at runtime with the
+cycler on cold run 9089's walk copy: "brightness 8, yes ship empty_space".
+
+The 3.0 that shipped in 0.51.0 was a guess carried over from a prototype and
+was never a tuned value; the changelog said so at the time. At 3.0 the night
+profile's sky_exposure 0.30 and cool tint put a full-white star near 0.36 and
+the sky read as lost. Measured before changing anything: the cube path and the
+old equirect draw the starfield identically at equal brightness (96,344
+against 96,304 bright pixels, mean 0.0923 against 0.0922), so brightness was
+the whole difference and nothing about the cube change needed revisiting.
+
+`sinister` was chosen in 0.51.0 only because it hid the pole square best. The
+square is gone as of 0.52.0, so that reason no longer exists and the choice is
+a look call, which is not this repo's to make.
+
 ## [0.52.0] - SkyMint 1.1: the sky is sampled from the source cubes, and the square is gone
 
 THE SQUARE, FINALLY. A hard-edged 90-degree square at the zenith of every
