@@ -1,5 +1,62 @@
 # Changelog
 
+## [0.47.0] - Delco Night gets the layer it was missing
+
+From the walker's *Making Night Scenes Readable in Godot*, which names four
+layers and caught this preset shipping three:
+
+    Use ambient light to preserve basic readability. Use moonlight to SHAPE
+    the scene. Use local lights to direct attention. Keep the sky dark enough
+    to sell the time of day.
+
+0.44.0 set `sun_enabled = false`, and cold run 9084's first falsification
+check read "DirectionalLight3D nodes in the applied scene: 0" -- which was
+written up as the check PASSING. Deleting `Blue Hour`'s 4-degree, 0.9-energy
+sun was right; it is the "daylight painted blue" the doc warns against.
+Replacing it with nothing removed the layer that gives every surface in a
+scene a direction.
+
+THE INSTRUMENT HAD ALREADY SAID SO and it was read as one fault instead of
+two. `pool_exposure.gd` across the last two packages:
+
+    station         9084 black   9085 black      (9085 = the unit fix alone)
+    forecourt          73.8%        83.1%
+    under_canopy       46.6%        76.4%
+    street_pool        84.1%        84.8%
+
+Fixing the outdoor levels in 0.45.0 made the image DARKER, not more readable:
+the blown discs were the unit error and the black was always something else.
+p50 sits at 0.0000 on two of the three stations -- the median pixel in a night
+frame is pure black, which is the doc's "shadows collapse into featureless
+black".
+
+    sun_enabled    false -> true
+    sun_elevation  -12.0 -> 38.0     high enough to describe a roofline
+    sun_azimuth    250.0 -> 300.0    off the streetlights' own axis, so the
+                                     two cross rather than stack
+    sun_color      (0.60,0.66,1.00) -> (0.66,0.72,0.95)   cool, not a filter
+    sun_energy     0.0   -> 0.15
+    sun_shadows    false -> true     shape needs a direction
+    exposure       1.15  -> 1.05
+
+EXPOSURE WAS THE WRONG LEVER AND THIS PRESET REACHED FOR IT. 1.15 was raised
+from Blue Hour's 1.05 in the same edit that wrote everything else. The doc:
+"Avoid fixing every problem by raising camera exposure: that brightens the
+whole image and can flatten the scene."
+
+THE MOON ENERGY IS THE ONE INVENTED NUMBER, and the preset's own description
+says so. No preset in this library had a moon to copy, so there is nothing
+tuned to anchor to; 0.15 is about a quarter of the 0.55 ambient beside it,
+which is the ratio at which a light shapes rather than lights. Judge it
+against the black fraction and p50 above.
+
+TWO FIELDS, AND ONLY TWO. Ambient stays at Gothic Street Night's tuned 0.55,
+the sky stays at 0.35, the local lights stay where 0.45.0 put them. The doc's
+other instruction is the one this work has broken most often -- "tune in the
+running game, one lighting layer at a time" -- and cold run 9084 changed a
+preset, built eighty streetlights that had never existed, and derived their
+energy in a single run, after which nothing could attribute the wrongness.
+
 ## [0.46.0] - an instrument that can tell a lit pool from a blown one
 
 0.43.0 reported a canopy's washes moving a frame's mean luminance by +20.6%
