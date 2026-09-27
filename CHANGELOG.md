@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.45.0] - the two outdoor levels were raw numbers in a normalised file
+
+THE WALKER on cold run 9084, the first package with the sun off and the
+streetlights built: "so dark now" -- over a frame of saturated sodium discs on
+black ground. Both halves of that are one mistake.
+
+EVERY LEVEL CONSTANT IN THIS FILE IS IN ONE UNIT, and the two I added were
+not. `office_floor_value` normalises a level into what its own comment calls
+"the unit every club level is in", and every caller multiplies by it. A
+`club_wash` on a 3.2 m ceiling therefore delivers 12.0 * 0.0570 = 0.684 on the
+floor -- the only pool in this file anybody has tuned and walked.
+
+`CANOPY_WASH_LEVEL = 10.0` and `STREETLIGHT_LEVEL = 5.0` passed RAW values:
+
+    club wash  (tuned)   delivers 0.684
+    canopy wash (mine)   delivers 10.000    15x
+    streetlight (mine)   delivers  5.000     7x
+
+That is the blown forecourt, and it is also why 0.44.0's "the canopy is 64x
+the road" read as a defensible ratio: both numbers were in the wrong unit
+together, so the ratio between them looked sane while both were wrong.
+
+BOTH ARE NOW MULTIPLES OF THE TUNED ONE, and the multiples are the only thing
+invented -- a forecourt under a lit deck is brighter than a club floor, an open
+road is darker than one:
+
+    REFERENCE_POOL       0.684    CLUB_WASH_LEVEL * office_floor_value(3.2)
+    CANOPY_WASH_LEVEL    x1.50 -> delivers 1.026 -> energy 29.5  (was 287.4)
+    STREETLIGHT_LEVEL    x0.75 -> delivers 0.513 -> energy 19.8  (was 192.8)
+
+Two ratios to argue with instead of two magnitudes to guess at.
+
+AND IT RETRACTS A MEASUREMENT. 0.43.0 reported the canopy washes moving a
+frame by +20.6% at energy 287.4 and treated that as the fix working. It was
+measuring an overexposure: 287.4 is what a raw-unit level asks for, and the
+frame moved because the pool was blown, not because it was right. What
+survives is the narrower claim it was bisected from -- an energy of 16 put
+0.5% on the frame and could not light a forecourt at any exposure, because the
+ceiling was clamping a derivation it had no business clamping.
+
 ## [0.44.0] - the streetlights were never built, and `night` meant dusk
 
 THE WALKER on cold run 9083: "better on the canopy, still not great on the

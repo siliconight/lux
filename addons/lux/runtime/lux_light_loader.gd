@@ -232,7 +232,29 @@ const CLUB_DEFAULT_DROP := 3.0
 ## brightness -- a player looking up sees lit fixtures whatever this is -- so
 ## the wash only has to put a believable pool on the tarmac. Judge it on a
 ## walk and write the measured value here.
-const CANOPY_WASH_LEVEL := 10.0
+## THE ONE POOL IN THIS FILE ANYBODY HAS TUNED AND WALKED, and therefore the
+## unit the two outdoor levels below are written in.
+##
+## A `club_wash` on a 3.2 m ceiling delivers `CLUB_WASH_LEVEL *
+## office_floor_value(3.2)` = 12.0 * 0.0570 = 0.684 on the floor. Every level
+## constant in this file except the two below passes a value already
+## multiplied by `office_floor_value`, which is what the comment on that
+## function means by "the unit every club level is in".
+##
+## THE TWO BELOW DID NOT, AND THAT IS WHY A FORECOURT BLEW OUT. Written as raw
+## 10.0 and 5.0, they delivered 15x and 7x a tuned club wash -- measured on
+## cold run 9084 as saturated sodium discs on black ground, the walker: "so
+## dark now". Neither number was ever judged against anything; they were
+## invented.
+##
+## So both are now multiples of the tuned one, and the multiples are the only
+## thing invented: a forecourt under a lit deck is brighter than a club floor,
+## an open road is darker than one. Two ratios to argue with instead of two
+## magnitudes to guess at.
+const REFERENCE_POOL := 0.684
+
+## A forecourt under a lit canopy: half again a club floor.
+const CANOPY_WASH_LEVEL := REFERENCE_POOL * 1.5
 ## A STREETLIGHT'S POOL ON THE ROAD, in the same unit as the canopy above so
 ## the two are comparable at a glance. Half, because an open road is not a
 ## forecourt under a lit deck -- a ratio, not an independent number, so there
@@ -241,7 +263,10 @@ const CANOPY_WASH_LEVEL := 10.0
 ## It replaces a flat `energy = 6.0`, which delivered 0.156 at a 6 m pole
 ## against the canopy's 10.0 -- 64x darker, which nobody chose. PROVISIONAL
 ## like the canopy's: judge the pair on a walk and write the measured values in.
-const STREETLIGHT_LEVEL := CANOPY_WASH_LEVEL * 0.5
+## An open road under sodium: three quarters of a club floor, half the
+## forecourt. It replaces a flat `energy = 6.0` that delivered 0.156 -- and
+## then, briefly, a raw 5.0 that delivered thirty times that.
+const STREETLIGHT_LEVEL := REFERENCE_POOL * 0.75
 ## The pool one wash owns when the anchor names none, metres. DC always sends
 ## `size`; this is the floor under a hand-authored anchor.
 const CANOPY_POOL_FALLBACK := 6.0
