@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.48.0] - the moon, five times over
+
+Cold run 9086 put the moon in at 0.15 and measured it as doing nothing: black
+moved about one point per station and the median pixel stayed at zero.
+
+    station         9085 (no moon)      9086 (moon 0.15)
+    forecourt       83.1%  p50 0.0000   82.3%  p50 0.0031
+    under_canopy    76.4%  p50 0.0039   76.7%  p50 0.0039
+    street_pool     84.8%  p50 0.0000   83.0%  p50 0.0000
+
+The reasoning behind 0.15 -- "about a quarter of the ambient, which shapes
+rather than lights" -- produced a light that did neither. The walker, from the
+frame: "lets try your moon x5". 0.75.
+
+AND A CHECK THAT COULD NOT SEE IT. Cold run 9086's first falsification check
+grepped `lux.applied.tscn` for `DirectionalLight3D` and read 0, which was
+reported as the moon failing to appear. The sun is created AT RUNTIME by
+LuxRoot from the preset and has never been in that file: the same grep returns
+0 for `Blue Hour`, whose 0.9-energy sun visibly casts long shadows across a
+package. A probe of the running scene finds
+`{ DirectionalLight3D: 1, SpotLight3D: 166, OmniLight3D: 13 }`. The check gave
+one answer in three states that differ, which is the definition of having
+learned nothing, and it had also been used to report 9084's sun-off preset as
+PASSING.
+
 ## [0.47.0] - Delco Night gets the layer it was missing
 
 From the walker's *Making Night Scenes Readable in Godot*, which names four
