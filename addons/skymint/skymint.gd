@@ -35,6 +35,16 @@ const _SLUGS := [
 	"sinister", "sinister_land", "sinister_ocean", "sunshine",
 ]
 const _PANO_DIR := "res://addons/skymint/panoramas/"
+## The source cube faces, six 512x512 PNGs per skybox. Preferred over
+## the panorama when all six exist: the panoramas were baked from these
+## and the bake put a hard seam into the pole rows (a 90-degree square
+## at the zenith). The faces sampled as a cubemap have no seam.
+const _CUBE_DIR := "res://addons/skymint/cubes/"
+## +X, -X, +Y, -Y, +Z, -Z -- the order Cubemap.create_from_images wants,
+## and which of the pack's faces lands where, settled by looking at a
+## rendered horizon rather than by reading a convention.
+const _CUBE_FACES := ["right", "left", "up", "down", "front", "back"]
+var _cube_cache: Dictionary = {}
 const _SHADER_PATH := "res://addons/skymint/skymint_sky.gdshader"
 
 # ---------------------------------------------------------------------
@@ -193,9 +203,51 @@ func _ensure_built() -> void:
 
 
 func _assign_textures() -> void:
-	_mat.set_shader_parameter("base_sky_texture", _load_pano(day_sky))
-	_mat.set_shader_parameter("base_sky_texture_2", _load_pano(night_sky))
+	var c1: Cubemap = _load_cube(day_sky)
+	var c2: Cubemap = _load_cube(night_sky)
+	if c1 != null and c2 != null:
+		_mat.set_shader_parameter("base_sky_cube", c1)
+		_mat.set_shader_parameter("base_sky_cube_2", c2)
+		_mat.set_shader_parameter("use_cube", true)
+	else:
+		# no faces on disk for one of the two: the baked panorama, with
+		# its seam, rather than no sky
+		_mat.set_shader_parameter("base_sky_texture", _load_pano(day_sky))
+		_mat.set_shader_parameter("base_sky_texture_2", _load_pano(night_sky))
+		_mat.set_shader_parameter("use_cube", false)
 	_textures_dirty = false
+
+
+## The six faces of one skybox as a Cubemap, built at runtime and cached
+## per slug. Returns null unless ALL six load -- five faces and a hole is
+## worse than the panorama. Built from Images rather than through the
+## cubemap importer because a package ships sidecars, not a cache, and a
+## hand-written cubemap .import was not honoured in testing.
+func _load_cube(s: SkyBox) -> Cubemap:
+	var slug: String = _SLUGS[int(s)]
+	if _cube_cache.has(slug):
+		return _cube_cache[slug]
+	var imgs: Array[Image] = []
+	# TYPED, both of them. `_CUBE_FACES` is an untyped const Array, so `f`
+	# is a Variant and `:=` cannot infer from it -- Godot refuses the whole
+	# script at load, and gdcheck does not see this shape (CLAUDE.md,
+	# GDScript section, "two round-trips"). Three now.
+	for f: String in _CUBE_FACES:
+		var path: String = _CUBE_DIR + slug + "/" + f + ".png"
+		if not ResourceLoader.exists(path):
+			return null
+		var t: Texture2D = load(path) as Texture2D
+		if t == null:
+			return null
+		var im: Image = t.get_image()
+		if im == null:
+			return null
+		im.convert(Image.FORMAT_RGB8)
+		imgs.append(im)
+	var c := Cubemap.new()
+	c.create_from_images(imgs)
+	_cube_cache[slug] = c
+	return c
 
 
 func _load_pano(s: SkyBox) -> Texture2D:

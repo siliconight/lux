@@ -21,6 +21,14 @@ shader_type sky;
 
 uniform sampler2D base_sky_texture   : source_color;   // "day"   panorama (equirect)
 uniform sampler2D base_sky_texture_2 : source_color;   // "night" panorama (equirect)
+// THE SOURCE CUBES, sampled directly. The retro skyboxes are six 512x512
+// faces; the equirect panoramas above were baked from them, and the bake
+// carried the cube's seam into the pole rows as a hard step that read as a
+// 90-degree square at the zenith. Sampling the faces as a cubemap shows the
+// same sky with no seam. skymint.gd sets use_cube when all six faces exist.
+uniform samplerCube base_sky_cube   : source_color;
+uniform samplerCube base_sky_cube_2 : source_color;
+uniform bool use_cube = false;
 uniform sampler2D cloud_noise_texture : source_color;  // seamless noise (built at runtime)
 
 // blends base_sky_texture (0.0) -> base_sky_texture_2 (1.0)
@@ -98,17 +106,27 @@ uniform float random_light_scale = 0.7;
 
 void sky() {
 
-    vec2 uv = SKY_COORDS;
+    vec3 dir = normalize(EYEDIR);
 
     // ---- BASE SKY (day <-> night crossfade) ----
-    vec3 base_sky = mix(
-        texture(base_sky_texture, uv).rgb,
-        texture(base_sky_texture_2, uv).rgb,
-        base_sky_blend
-    );
+    // cube when the faces are there, equirect otherwise; one fetch per
+    // source either way
+    vec3 base_sky;
+    if (use_cube) {
+        base_sky = mix(
+            texture(base_sky_cube, dir).rgb,
+            texture(base_sky_cube_2, dir).rgb,
+            base_sky_blend
+        );
+    } else {
+        vec2 uv = SKY_COORDS;
+        base_sky = mix(
+            texture(base_sky_texture, uv).rgb,
+            texture(base_sky_texture_2, uv).rgb,
+            base_sky_blend
+        );
+    }
     base_sky *= sky_tint * sky_exposure;
-
-    vec3 dir = normalize(EYEDIR);
 
     // ---- CLOUD PROJECTION ----
     vec2 cloud_uv = dir.xz;

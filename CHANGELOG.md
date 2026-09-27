@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.52.0] - SkyMint 1.1: the sky is sampled from the source cubes, and the square is gone
+
+THE SQUARE, FINALLY. A hard-edged 90-degree square at the zenith of every
+panorama-backed sky, raised by the walker twice on 2026-09-27 and chased
+through eight refuted causes before the real one:
+
+    engine (Compatibility)      present in Forward+ too
+    cubemap face resolution     edge step 0.5895 at radiance 32, 256, 2048
+    filtering                   nearest, 512x256, anisotropy 0, textureLod(0): identical
+    SKY_COORDS approximations   exact atan/acos from EYEDIR: identical
+    the art                     the up face IS painted soft (moody 0.148 vs 0.467)
+                                -- but the source cube shows no seam
+
+It was SkyMint's cube-to-equirect BAKE. Vladislav Zhukov's retro skyboxes
+are six 512x512 faces; SkyMint had baked them into 2048x1024 equirects and
+the bake carried the cube's seam into the pole rows as a hard step, which
+the pole stretch turned into a square. The same six faces built into a
+`Cubemap` at runtime and sampled with `EYEDIR` show the same clouds with no
+edge: top-edge step 0.0001 against the equirect's 0.5895, original faces,
+no feathering.
+
+SO SKYMINT SAMPLES THE CUBES. `cubes/<slug>/{right,left,up,down,front,back}.png`
+carries the 120 source faces (CC0, credited in README). `skymint.gd` builds a
+`Cubemap` from them with `create_from_images` -- no importer, because a
+package ships sidecars and a hand-written cubemap .import was not honoured --
+caches it per slug, and sets `use_cube`. The shader keeps the equirect path
+behind that flag as the fallback for a skybox with no faces on disk.
+
+Verified in a pipeline-shaped package (the localizer's rewrite applied to
+the script, faces mirrored to runtime/skymint/cubes/), zenith, no geometry,
+inside the old square against outside:
+
+    sinister (shipped)    use_cube=true   ratio 0.982
+    moody (worst case)    use_cube=true   ratio 1.065    (equirect: 0.069)
+
+The zenith-contrast rule in docs/proposals/SKY_PROVIDER.md is retired. It
+ranked bakes by how badly they showed a defect the bake introduced; there is
+no longer a reason to prefer one skybox over another for the pole.
+
+Two traps on the way, both already in CLAUDE.md and both stepped in again:
+`var path := ... + f + ...` with `f` from an untyped const Array is a Variant
+and refuses the whole script at load (gdcheck does not see it -- typed now);
+and a probe that settles a fixed count of frames and reads captured an empty
+frame, no sky and no HUD, and reported the cube as black. Poll for a lit
+frame.
+
+OPEN: a package now carries both cubes (21.4 MB) and panoramas (21.2 MB) for
+all twenty skyboxes, because the localizer copytree's the directories the
+script names. One skybox is used. Narrowing what ships is an exporter change
+and is not in this release.
+
 ## [0.51.0] - a preset can hand the sky to a provider, and a package carries it
 
 Lux 0.49.0 put the moon disc back in a provider's sky and 0.50.0 cut the
