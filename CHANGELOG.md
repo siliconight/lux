@@ -31,6 +31,23 @@ and PS1 Storm Night 6.0; Gas Station Fluorescent 5.7; Mission Goes Hot 5.0;
 Heavy Rain 4.3; Blue Hour 3.7; SoF PC2000 1.7; the afternoon and the arcade
 1.0.
 
+CORRECTION, cold run 9103 (kept above the figures it corrects): THE TABLE
+BELOW IS PRE-GRADE. The probe that produced it hid every CanvasLayer to drop
+the HUD, and Lux's post stack rides on one, so it measured the image before
+the night grade. `tools/look_shots.py`, which hides only the HUD and reads
+what reaches the swap chain, on 9103's shipped package, scale 1.0 against the
+shipped 6.0, one build:
+
+    inside the sales floor     mean 6.5 -> 8.9    p95 13 -> 29
+    outside, through the glass mean 5.6 -> 6.2    p95 27 -> 31
+    the storefront from 15 m   mean 4.2 -> 4.2
+    the office's bare bulbs    mean 20.3 -> 21.4  (neighbours' spill only)
+
+The fluorescents do brighten the room a player sees -- its bright end more
+than doubles -- but the night grade compresses most of it, and from the
+street the store is not yet a beacon. Two instruments disagreed; this one is
+the player's.
+
 MEASURED ON THE WALK COPY, in frames, and the null results kept because they
 cost a round each: the first two sweeps showed nothing at any scale -- one
 camera stood inside the sales floor's partition (Godot z 2 is plan y -2, and
