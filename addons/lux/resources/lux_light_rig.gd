@@ -54,6 +54,13 @@ extends Resource
 ## falloff from the axis; 0.125 holds the full omni value to 60 degrees off
 ## axis and fades over the last ~20.
 @export_range(0.01, 4.0) var downlight_rim: float = 1.0
+## How far each downlight is TILTED off straight down toward the rig's local
+## +X, degrees (0.57.0) -- the axis `LuxLightLoader._place` turns onto the
+## anchor's facing, so +X is OUT of the wall for a facade anchor. 0 is
+## straight down, every rig before 0.57.0 and every ceiling row. The
+## storefront spill sets it: its lamp throws out through the glass and down
+## onto the pavement, the window's opening turned around.
+@export_range(0.0, 89.0) var downlight_tilt_deg: float = 0.0
 
 @export_group("Flicker")
 ## Subtle instability for fluorescents / failing bulbs. 0 = steady.

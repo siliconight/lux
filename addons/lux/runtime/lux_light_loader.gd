@@ -153,8 +153,13 @@ const CLUB_HARDWARE_TYPES: Array[String] = ["club_wash", "stage_light"]
 ## `CLUB_TYPES` is deliberately left alone rather than renamed: Level Factory
 ## reads that symbol by name, and a rename whose reader has no fallback is
 ## exactly how cold run 9081 shipped a forecourt with no light in it.
+##
+## `storefront_spill` (0.57.0) for the same reason as the canopy wash: its
+## level is derived from the ROOM's row (`drop`, `reach`) and its throw from
+## `head`, and none of the three is in the marker payload. It has no
+## hardware either -- the light is the store's.
 const MANIFEST_BAKE_TYPES: Array[String] = ["club_wash", "stage_light", "neon",
-	"room_ambient", "back_bar", "canopy_wash", "streetlight"]
+	"room_ambient", "back_bar", "canopy_wash", "streetlight", "storefront_spill"]
 ## What Zoo names the meshes it builds for them. A prefix, because Blender
 ## dedupes repeats (`.001`) and Godot's importer swaps the dot for an
 ## underscore -- the same reason `LuxFixtureSpawner` matches markers by
@@ -275,6 +280,32 @@ const CANOPY_POOL_FALLBACK := 6.0
 ## it barely lights, which is the same law the wall pack was trimmed to 5.5
 ## for and the fluorescent before it.
 const CANOPY_RANGE_MAX := 12.0
+
+## THE STOREFRONT SPILL (0.57.0). The walker, 2026-09-29: "do the outward
+## spill next" -- the lit store throwing its light out through the glass onto
+## the pavement, the fourth lever in docs/proposals/INTERIOR_EXTERIOR_
+## BALANCE.md. The rule: the pavement just outside the glass reads as the lit
+## floor inside it does, less the glass.
+##
+## What clear float glass passes (Zoo 1.20.0's storefront, 1 - 0.12).
+const SPILL_GLASS_T := 0.88
+## THE ONE MEASURED NUMBER, and why the rule above could not be met without
+## it. The physical reading -- the floor under a sales-floor lamp, less the
+## glass, 0.378 at Delco Night -- was stood outside gas_station_a02 on cold
+## run 9104's walk copy and did not register at all: the pavement in front of
+## the glass read luma 0.8 with it and without it. The room's floor is lifted
+## by its reflection probe's ambient and a carpet's albedo; the pavement has
+## neither, and the night grade crushes its toe. So the level was matched in
+## FRAMES: pavement luma against the carpet seen through the same glass
+## (20.0, so 17.6 wanted), over three lamps at x1 / x5 / x10 / x20 the
+## physical level -- 0.8 / 8.8 / 21.9 / 44.0, linear above the toe -- which
+## crosses 17.6 at x8.4. Measured at Delco Night, on delco_1997's forecourt
+## pad, with the room probes of Lux 0.56.0: when any of the three moves, so
+## does this, and the frame match is the thing to repeat.
+const SPILL_FRAME_MATCH := 8.4
+## The source's height over the pavement when an anchor names none: the top
+## of Zoo's storefront glass (`arch.SF_GLASS_TOP`).
+const SPILL_HEAD_FALLBACK := 3.0
 
 const CLUB_WASH_LEVEL := 12.0
 const CLUB_STAGE_LEVEL := 3.0
@@ -870,6 +901,42 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			rw.mount_height = 0.0
 			wp.rig = rw
 			return wp
+		"storefront_spill":
+			# THE STORE'S LIGHT ON THE PAVEMENT (0.57.0). A fluorescent rig of
+			# one lamp, so the preset scales it with the room it comes from
+			# (`scales_with_preset` reads "fluorescent" in the rig's name) and
+			# a power cut kills it with the rest of the building. The lamp is
+			# the window's opening turned around: light leaving through a
+			# vertical pane from a ceiling above it arrives on the ground
+			# between straight down at the glass and level with the glass
+			# head, so a 45-degree cone on an axis 45 degrees below the
+			# facing -- `downlight_tilt_deg` toward local +X, which `_place`
+			# turns onto rot_y, the wall's outward facing.
+			var sp := LuxFluorescentRig.new()
+			sp.name = String(a.get("id", "storefront_spill"))
+			var rsp := LuxLightRig.new()
+			rsp.rig_name = &"Storefront Spill (fluorescent)"
+			rsp.light_color = LuxColorTemp.cool_fluorescent()
+			var head := float(a.get("head", 0.0))
+			if head <= 0.0:
+				head = SPILL_HEAD_FALLBACK
+			# The pavement is lit out to twice the head's height from the
+			# glass: the sphere reaches the ground at 2 x head, so its range
+			# is hypot(2 head, head). The axis lands `head` out, sqrt(2) head
+			# along it, and the level is solved there.
+			rsp.light_range = head * sqrt(5.0)
+			rsp.attenuation = 2.0
+			rsp.downlight_angle_deg = WINDOW_CONE_HALF_ANGLE_DEG
+			rsp.downlight_rim = 1.0
+			rsp.downlight_tilt_deg = WINDOW_CONE_HALF_ANGLE_DEG
+			rsp.energy = energy_for(
+				storefront_spill_level(float(a.get("drop", 0.0)), float(a.get("reach", 0.0))),
+				head * sqrt(2.0), rsp.light_range, String(a.get("id", "storefront_spill")))
+			rsp.count = 1
+			rsp.spacing = 0.0
+			rsp.mount_height = 0.0
+			sp.rig = rsp
+			return sp
 		"window", "sign":
 			var ar := LuxAreaLightRig.new()
 			ar.name = String(a.get("id", "window"))
@@ -1010,9 +1077,21 @@ static func range_window(d: float, light_range: float) -> float:
 ## below it at a room drop of `drop` metres: energy 1, attenuation 2, hung a
 ## hand's width under its anchor, range from `fluorescent_range`. At the
 ## strip clubs' 3.2 m that is 0.0570. The unit every club level is in.
-static func office_floor_value(drop: float) -> float:
+## `reach` (0.57.0) is the row's own, so a storefront row -- whose range
+## `reach` lengthens -- is priced at the range it actually has; 0 is the rule
+## every caller before it used.
+static func office_floor_value(drop: float, reach: float = 0.0) -> float:
 	var h := maxf(drop + FLUORESCENT_MOUNT, 0.25)
-	return FLUORESCENT_ENERGY * range_window(h, fluorescent_range(drop)) / (h * h)
+	return FLUORESCENT_ENERGY * range_window(h, fluorescent_range(drop, reach)) / (h * h)
+
+
+## What a storefront spill puts on the pavement where its axis lands, at a
+## preset scale of 1 (the preset's `fluorescent_energy_scale` multiplies it
+## exactly as it does the room's lamps): the room's lit floor, less the glass,
+## at the frame match. See SPILL_FRAME_MATCH. 0.529 for gas_station_a02's
+## sales floor (drop 3.8, reach 6.0), 3.18 at Delco Night's 6.0.
+static func storefront_spill_level(drop: float, reach: float) -> float:
+	return SPILL_FRAME_MATCH * SPILL_GLASS_T * office_floor_value(drop, reach)
 
 
 ## THE CEILING ON A DERIVED ENERGY, and it is not 16 any more.

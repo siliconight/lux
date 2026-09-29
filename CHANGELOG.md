@@ -1,5 +1,61 @@
 # Changelog
 
+## [0.57.0] - the lit store spills out through its storefront
+
+The walker, 2026-09-29: "do the outward spill next" -- the fourth lever in
+docs/proposals/INTERIOR_EXTERIOR_BALANCE.md: no light left the store onto
+the pavement, so a lit shop at night stood behind a black apron.
+
+THE CHANGE: a new manifest-bake type, `storefront_spill`, which Deli Counter
+(>= 0.156.0) derives along a storefront wall whose room's ceiling row
+reaches the glass. Its rig is a LuxFluorescentRig of one lamp, so the
+preset's `fluorescent_energy_scale` brightens it at night with the room it
+comes from and a power cut kills it with the building. The lamp is the
+window's opening turned around -- a 45-degree cone on an axis 45 degrees
+below the wall's outward facing -- which needed one new field on the rig:
+`LuxLightRig.downlight_tilt_deg`, a downlight's tilt off straight down toward
+the rig's local +X (the anchor's facing, once `_place` turns it). 0, every
+rig before this one, is straight down and the rotation it always had. The
+range reaches the ground twice the source's height from the glass. It is on
+the manifest bake (`MANIFEST_BAKE_TYPES`) because its level needs the room
+row's `drop` and `reach` and its throw the `head`, and the marker payload
+carries none of them. `office_floor_value(drop, reach)` prices a storefront
+row at the range it now has; without `reach` it is the old rule.
+
+THE LEVEL: the pavement just outside reads as the lit floor inside does,
+less the glass -- `SPILL_FRAME_MATCH x SPILL_GLASS_T (0.88) x
+office_floor_value(drop, reach)`, 0.529 at a preset scale of 1 for
+gas_station_a02's sales floor, 3.18 at Delco Night.
+
+MEASURED FIRST, and the first answer was nothing. On cold run 9104's walk
+copy, three spots injected at runtime outside the storefront at the physical
+level (the floor less the glass, 0.378 at night) left the pavement in front
+of the glass at luma 0.8, as without them. The dial was confirmed live (x20
+lit three pools, 9.3 -> 33.2 from 8 m); the forecourt pad's 32 range-sphere
+claimants were not the cause (the engine read a raised
+`max_lights_per_object` of 64 and neither frame moved). The cause is that
+the room's floor is lifted by its reflection probe's ambient and a carpet's
+albedo and the pavement by neither, under a night grade that crushes its toe.
+So the match was made in frames: pavement luma against the carpet through
+the same glass (20.0; 17.6 wanted) over x1 / x5 / x10 / x20 -- 0.8 / 8.8 /
+21.9 / 44.0 -- crossing at x8.4. That number is measured, not derived, at
+Delco Night on delco_1997's pad with 0.56.0's probes; it is written down
+with its settings in `SPILL_FRAME_MATCH`.
+
+`tools/storefront_spill_selftest.gd`: the level; one 45-degree spot with the
+derived range and energy, thrown out along +X and down in the rig; after
+`_place`, a spill facing Deli Counter +X lands on Godot +X and one facing +Y
+on Godot -Z, both down; the preset scales it (x6 at Delco Night); a power
+cut hides it and power restores it; and the control, a ceiling row's lamp,
+still points straight down with its old rotation. Without the change it does
+not pass (a script error on `office_floor_value`'s second argument; it hangs
+to the timeout). Storefront-reach, fluorescent-scale, canopy, club,
+colocation, light-leak, room-ambient, window-glass and rain selftests
+unchanged.
+
+NOT PRICED HERE: the cold run that ships it measures draws, frame time and
+the per-mesh census against 9104.
+
 ## [0.56.0] - a row that faces a storefront reaches the glass
 
 The walker, 2026-09-28: "yes, do the glass first then the troffer reach",

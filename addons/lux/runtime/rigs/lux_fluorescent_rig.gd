@@ -73,7 +73,12 @@ func _rebuild() -> void:
 			spot.spot_attenuation = r.attenuation
 			spot.spot_angle = minf(r.downlight_angle_deg, 89.0)
 			spot.spot_angle_attenuation = r.downlight_rim
-			spot.rotation_degrees = Vector3(-90.0, 0.0, 0.0)  # straight down
+			if r.downlight_tilt_deg > 0.0:
+				# Tilted toward local +X (0.57.0): the yaw turns -Z onto +X,
+				# then the pitch lowers it to `tilt` off straight down.
+				spot.rotation_degrees = Vector3(-(90.0 - r.downlight_tilt_deg), -90.0, 0.0)
+			else:
+				spot.rotation_degrees = Vector3(-90.0, 0.0, 0.0)  # straight down
 			lamp = spot
 		else:
 			var omni := OmniLight3D.new()
