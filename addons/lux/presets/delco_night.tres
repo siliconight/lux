@@ -39,6 +39,7 @@ sky_provider_properties = {
 }
 ambient_color = Color(0.16, 0.19, 0.3, 1)
 ambient_energy = 0.55
+fluorescent_energy_scale = 6.0
 room_probes_replace_ambient = true
 tonemap_mode = 3
 exposure = 1.05

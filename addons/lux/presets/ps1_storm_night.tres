@@ -29,6 +29,7 @@ sun_shadows = false
 ambient_mode = 1
 ambient_color = Color(0.106, 0.165, 0.2, 1)
 ambient_energy = 0.5
+fluorescent_energy_scale = 6.0
 ambient_sky_contribution = 0.4
 tonemap_mode = 0
 exposure = 1.0

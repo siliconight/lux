@@ -13,6 +13,24 @@ extends Node3D
 
 var _lights: Array[Light3D] = []
 var _flicker_phase: float = 0.0
+## The preset's `fluorescent_energy_scale`, handed in by LuxLighting (0.55.0):
+## every lamp is `rig.energy * energy_scale`, flicker included. 1.0 until a
+## preset says otherwise, and only for a rig that `scales_with_preset`.
+var energy_scale: float = 1.0
+
+
+## A fluorescent row scales with the preset; a bare bulb -- the same class,
+## wearing an incandescent costume -- does not (the walker, 2026-09-28).
+func scales_with_preset() -> bool:
+	return rig != null and String(rig.rig_name).to_lower().contains("fluorescent")
+
+
+func set_energy_scale(s: float) -> void:
+	energy_scale = s if scales_with_preset() else 1.0
+	var r := rig if rig != null else _default_rig()
+	for l in _lights:
+		if is_instance_valid(l):
+			l.light_energy = r.energy * energy_scale
 
 
 func _ready() -> void:
@@ -64,7 +82,7 @@ func _rebuild() -> void:
 			lamp = omni
 		lamp.name = &"Fluoro_%d" % i
 		lamp.light_color = r.light_color
-		lamp.light_energy = r.energy
+		lamp.light_energy = r.energy * energy_scale
 		lamp.shadow_enabled = r.shadows_enabled
 		lamp.position = Vector3(start + i * r.spacing, r.mount_height, 0.0)
 		r.apply_bake_mode(lamp)
@@ -84,7 +102,7 @@ func _process(delta: float) -> void:
 	var flick := 1.0 - maxf(0.0, n) * r.flicker_amount * 0.5
 	for l in _lights:
 		if is_instance_valid(l):
-			l.light_energy = r.energy * flick
+			l.light_energy = r.energy * energy_scale * flick
 
 
 func _default_rig() -> LuxLightRig:

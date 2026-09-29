@@ -28,6 +28,7 @@ sun_energy = 1.7
 sun_shadows = true
 ambient_color = Color(0.58, 0.62, 0.68, 1)
 ambient_energy = 1.05
+fluorescent_energy_scale = 1.0
 tonemap_mode = 2
 exposure = 1.15
 tonemap_white = 6.0

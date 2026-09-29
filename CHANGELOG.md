@@ -1,5 +1,61 @@
 # Changelog
 
+## [0.55.0] - the fluorescents brighten at night; the bare bulbs do not
+
+The walker, 2026-09-28, after cold run 9102 shipped a see-through storefront
+that did not glow: "yes, brighten fluorescents at night, keep pendants
+moody".
+
+MEASURED FIRST (docs/proposals/INTERIOR_EXTERIOR_BALANCE.md, "Measured"):
+gas_station_a02's sales floor read mean 42 at noon and 8.4 at night with its
+fixtures unchanged, and its storefront 4.2 from the street -- every interior
+lamp was one constant in every preset, so an interior followed the sky and
+a lit window could never be the beacon a night street has.
+
+THE CHANGE: `LuxPreset.fluorescent_energy_scale` (default 1.0) multiplies
+every FLUORESCENT rig's lamps, flicker included (`LuxFluorescentRig
+.energy_scale`, `set_energy_scale`); `LuxLighting.apply` hands the preset's
+scale to every registered rig, and `register_light` scales a rig that
+registers after the preset did; `_lerp_preset` interpolates it, so a blend
+brightens a store gradually. A BARE BULB -- the same rig class wearing an
+incandescent costume, `rig_name` "Bare Bulb (baked)" -- refuses the scale:
+`scales_with_preset` is the rig's name containing "fluorescent". Vaults,
+cellars and safe rooms keep their pools. `FLUORESCENT_ENERGY` stays 1.0: it
+is the unit every other derived energy is solved in (street, canopy, club),
+and none of them move.
+
+THE VALUES ARE DERIVED, not chosen: 1.0 at the afternoon's sky 1.1, 6.0 at
+the night's 0.35 -- the balance proposal's "about six fluorescents' worth"
+at Delco Night -- linear between, clamped. Delco Night, Gothic Street Night
+and PS1 Storm Night 6.0; Gas Station Fluorescent 5.7; Mission Goes Hot 5.0;
+Heavy Rain 4.3; Blue Hour 3.7; SoF PC2000 1.7; the afternoon and the arcade
+1.0.
+
+MEASURED ON THE WALK COPY, in frames, and the null results kept because they
+cost a round each: the first two sweeps showed nothing at any scale -- one
+camera stood inside the sales floor's partition (Godot z 2 is plan y -2, and
+the room is plan y -26..-3) and one framed the room's west wall, outside
+every troffer's 4.55 m reach. A headless probe confirmed the dial (54
+fluorescent rigs at 9.9, 26 bulbs untouched) before the frames were
+believed. From inside the room, one windowed probe, one camera:
+
+    scale          1.0     4.0     6.0    10.0
+    inside        1.9    14.5    15.7    17.9     (mean luma, 0-255)
+    outside       6.2     6.9     7.3     7.9     (through the glass)
+
+and hiding every OTHER light at scale 10 moved the inside frame 0.9: the
+fluorescents carry it, and the per-mesh light cap is not what darkened it.
+Through the glass the gain is small -- the pane's 0.38 opacity with its tint
+takes a third of what is behind it, and the camera there sees little of the
+floor's pools; that is the next thing to look at, not this release's claim.
+
+COST: none in draws or lights -- the same lamps at a different energy.
+`tools/fluorescent_scale_selftest.gd`: every preset at its derived scale, a
+fluorescent takes it and a bulb refuses it, the preset path scales a rig in
+either order. Without the change the test does not pass (a script error on
+the missing field; it hangs to the timeout). Canopy, club and colocation
+selftests unchanged.
+
 ## [0.54.0] - the sky's radiance map at 32: where the custom sky's cost actually was
 
 SkyMint 1.2.0. `Sky.radiance_size` 128 -> 32, and nothing else.

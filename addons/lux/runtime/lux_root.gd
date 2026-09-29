@@ -903,6 +903,8 @@ func _lerp_preset(a: LuxPreset, b: LuxPreset, k: float) -> LuxPreset:
 	p.ambient_sky_contribution = lerpf(a.ambient_sky_contribution, b.ambient_sky_contribution, k)
 	p.room_probes_replace_ambient = (b.room_probes_replace_ambient if k >= 0.5
 		else a.room_probes_replace_ambient)
+	# the practicals' scale interpolates, so dusk brightens a store gradually
+	p.fluorescent_energy_scale = lerpf(a.fluorescent_energy_scale, b.fluorescent_energy_scale, k)
 
 	p.tonemap_mode = b.tonemap_mode if k >= 0.5 else a.tonemap_mode
 	p.exposure = lerpf(a.exposure, b.exposure, k)

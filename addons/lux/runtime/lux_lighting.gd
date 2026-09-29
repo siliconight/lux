@@ -31,6 +31,11 @@ func ensure_sun(parent: Node) -> void:
 
 
 func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
+	# the practicals first: a scene with no sun still has its fluorescents
+	if preset != null:
+		_fluorescent_scale = preset.fluorescent_energy_scale
+		for n in _registered:
+			_scale_practical(n)
 	if preset == null or sun == null:
 		return
 	sun.visible = preset.sun_enabled
@@ -67,9 +72,24 @@ static func _shadow_mode(mode: int) -> int:
 			return DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
 
 
+## The preset's `fluorescent_energy_scale` (0.55.0), and handing it to one
+## registered lamp's rig. A rig registers from its own _ready, which can come
+## after the preset was applied, so registration scales it too.
+var _fluorescent_scale: float = 1.0
+
+
+func _scale_practical(light: Node) -> void:
+	if not is_instance_valid(light):
+		return
+	var rig_node := light.get_parent()
+	if rig_node is LuxFluorescentRig:
+		(rig_node as LuxFluorescentRig).set_energy_scale(_fluorescent_scale)
+
+
 func register_light(light: Node3D) -> void:
 	if light != null and not _registered.has(light):
 		_registered.append(light)
+		_scale_practical(light)
 		# A rig registers from its own _ready, which can come AFTER the
 		# preset was applied (LuxRoot is an earlier sibling in a packed
 		# scene), so the policy is re-run once the frame settles.

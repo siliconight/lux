@@ -138,6 +138,20 @@ extends Resource
 ## is NOT that lever: at contribution 1.0 under GL Compatibility raising it
 ## 30% moved the frame 0.1, a null result recorded so nobody turns it twice.
 @export var room_probes_replace_ambient: bool = false
+## THE FLUORESCENT PRACTICALS, SCALED BY THE TIME OF DAY (0.55.0). Every
+## interior lamp was one constant in every preset, so an interior followed
+## the sky: MEASURED on cold run 9102's store (docs/proposals/
+## INTERIOR_EXTERIOR_BALANCE.md), its sales floor read mean 42 at noon and
+## 8.4 at night with its fixtures unchanged, and its see-through storefront
+## 4.2 from the street -- a lit shop window that could never be a beacon.
+## A multiplier on every FLUORESCENT rig's energy (`LuxFluorescentRig`,
+## `rig_name` containing "fluorescent"): 1.0 is every preset as it shipped,
+## and a night preset raises it so an interior out-shines the dark it is
+## seen against. BARE BULBS ARE NOT FLUORESCENTS and keep their energy, the
+## walker's call (2026-09-28): "brighten fluorescents at night, keep
+## pendants moody". It moves no derived energy: `FLUORESCENT_ENERGY` is the
+## unit the loader solves every other light in, and stays 1.0.
+@export_range(0.0, 16.0) var fluorescent_energy_scale: float = 1.0
 
 @export_group("Tonemap & Grade")
 @export_enum("Linear", "Reinhard", "Filmic", "ACES") var tonemap_mode: int = 2
