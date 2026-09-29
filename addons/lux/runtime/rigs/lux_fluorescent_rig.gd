@@ -22,7 +22,8 @@ var energy_scale: float = 1.0
 ## A fluorescent row scales with the preset; a bare bulb -- the same class,
 ## wearing an incandescent costume -- does not (the walker, 2026-09-28).
 func scales_with_preset() -> bool:
-	return rig != null and String(rig.rig_name).to_lower().contains("fluorescent")
+	return rig != null and (rig.preset_scaled
+		or String(rig.rig_name).to_lower().contains("fluorescent"))
 
 
 func set_energy_scale(s: float) -> void:

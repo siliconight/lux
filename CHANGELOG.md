@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.59.0] - a warm bulb over the store's counter
+
+The walker, 2026-09-29: "add the warm counter accent and the window sign
+next", from their 1990s lighting reference on the convenience store at night
+-- cooler light on the aisles, a warmer or more saturated accent at the
+counter.
+
+`counter_accent`: Deli Counter (>= 0.160.0) hangs one over each register
+counter in a fluorescent-lit room, Zoo (>= 1.27.0) builds the pendant it
+hangs from, and this is its lamp -- a `LuxFluorescentRig` of one SpotLight3D,
+INCANDESCENT (2700 K) against the cool-white troffers, at `FLUORESCENT_ENERGY`
+with `fluorescent_range(drop)`, so its pool on the counter matches one
+troffer's and adds to the row's; a 45-degree cone, a pool and not a room
+light. No flicker, no shadow, no `_process`: a steady bulb costs one light
+and nothing per frame. It rides the marker path -- {type, id, drop} is all it
+needs -- so it is not a `MANIFEST_BAKE_TYPES` entry.
+
+`LuxLightRig.preset_scaled`: the preset's `fluorescent_energy_scale` applies
+to a rig that sets it, as well as to one whose name says "fluorescent"
+(0.55.0's rule, unchanged). The accent sets it, because at night the preset
+brightens the wash it has to hold against; the bare bulbs do not, and still
+refuse the scale.
+
+`tools/counter_accent_selftest.gd`: the lamp's class, energy, range, cone,
+warmth, no flicker, no shadow, no per-frame work; the preset scales it and a
+power cut kills it; the controls -- a bare bulb still refuses the scale, a
+fluorescent row still takes it; and the spawner makes it from a marker.
+Exits 1 on 0.58.0 (it now ends at the first missing lamp instead of erroring
+on into a hang). The canopy, club, fluorescent-scale, reach, spill and
+window-glass selftests pass unchanged.
+
 ## [0.58.0] - Delco Night's contrast leaves the dark half of the frame alone
 
 The walker, 2026-09-29: "do the night grade next" -- the last lever in

@@ -61,6 +61,12 @@ extends Resource
 ## storefront spill sets it: its lamp throws out through the glass and down
 ## onto the pavement, the window's opening turned around.
 @export_range(0.0, 89.0) var downlight_tilt_deg: float = 0.0
+## The preset's `fluorescent_energy_scale` applies to this rig (0.59.0) --
+## an interior practical that has to hold its level against the room's
+## fluorescent wash, which the preset brightens at night: a store counter's
+## warm accent. A rig whose name says "fluorescent" scales anyway (0.55.0's
+## rule); every other rig, the moody bare bulbs among them, does not.
+@export var preset_scaled: bool = false
 
 @export_group("Flicker")
 ## Subtle instability for fluorescents / failing bulbs. 0 = steady.

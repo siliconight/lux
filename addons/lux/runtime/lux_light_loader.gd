@@ -786,6 +786,34 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			_make_downlight(rb)
 			b.rig = rb
 			return b
+		"counter_accent":
+			# A STORE COUNTER'S WARM ACCENT (0.59.0). The walker's 1990s lighting
+			# reference, 2026-09-29, on the convenience store at night: "cooler
+			# light on the aisles and a warmer or more saturated accent at the
+			# counter". Deli Counter (>= 0.160.0) hangs one bulb over the register
+			# counter, Zoo's `pendant_fixture` its hardware; this is its lamp.
+			# An incandescent bulb -- the fluorescents are cool white, so the
+			# counter reads warm against them -- at a FLUORESCENT's energy with a
+			# fluorescent's range for its drop, so its pool on the counter
+			# matches one troffer's under it; and `preset_scaled`, so at night
+			# it brightens with the wash it has to hold against. A 45-degree
+			# cone: a pool on the counter, not a room light.
+			var ca := LuxFluorescentRig.new()
+			ca.name = String(a.get("id", "counter_accent"))
+			var rca := LuxLightRig.new()
+			rca.rig_name = &"Counter Accent (incandescent)"
+			rca.light_color = LuxColorTemp.kelvin(LuxColorTemp.INCANDESCENT)
+			rca.energy = FLUORESCENT_ENERGY
+			rca.light_range = fluorescent_range(float(a.get("drop", 0.0)))
+			rca.attenuation = 2.0
+			rca.downlight_angle_deg = 45.0
+			rca.downlight_rim = 1.0
+			rca.preset_scaled = true
+			rca.count = 1
+			rca.spacing = 0.0
+			rca.mount_height = 0.0
+			ca.rig = rca
+			return ca
 		"streetlight":
 			var s := LuxStreetlightRig.new()
 			s.name = String(a.get("id", "streetlight"))
