@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.58.0] - Delco Night's contrast leaves the dark half of the frame alone
+
+The walker, 2026-09-29: "do the night grade next" -- the last lever in
+docs/proposals/INTERIOR_EXTERIOR_BALANCE.md, where the store seen from the
+street at 30 m had stayed at luma 5-6 through the glass, the reach and the
+spill.
+
+THE DEFECT, derived and then measured. The post stack's contrast pivots on
+mid-grey (`col = (col - 0.5) * contrast + 0.5`, in all three post shaders),
+so every value below the pivot moves down by (c - 1) * (0.5 - v). A night
+frame sits almost wholly near zero, where that is a flat (c - 1) * 0.5 off
+the image: at Delco Night's 1.08, 0.04 -- every pixel under ten codes of 255
+went to black, and at night that is half the frame. Nobody chose 1.08: it
+arrived when the preset was written (2026-09-26) beside light levels copied
+from Gothic Street Night, and no frame measured it.
+
+THE CHANGE: `delco_night.tres` contrast 1.08 -> 1.0. Nothing else -- one
+layer, as docs/proposals/NIGHT_READABILITY.md asks.
+
+MEASURED FIRST, the grade swept one setting at a time on cold run 9108's
+walk copy (look_shots, the player's frame; the control reproduced the
+recorded figures):
+
+                          street 30 m     store 8 m   inside   darkest shot
+                          mean / black    mean        mean     mean
+    as shipped            5.5 / 50.6%     20.9        16.2     1.6
+    contrast 1.0          9.5 / 35.8%     25.3        24.1     2.1
+    tonemap Filmic        9.0 / 36.4%     24.0        23.2     2.0
+    palette pull 0        6.3 / 47.0%     25.0        19.6     1.8
+    tonemap white 3       5.6 / 49.9%     21.4        16.5     1.7
+    colour levels 48      5.5 / 49.8%     20.9        15.8     1.6
+
+Contrast is the lever; the darkest derived shot stays dark (1.6 -> 2.1), so
+it is still night. Refuted along the way and kept: an AgX variant measured
+identical to Filmic to the decimal -- `tonemap_mode` 4 is not in the
+preset's enum (Linear, Reinhard, Filmic, ACES), so it never reached the
+renderer; that row is void, not a finding.
+
+NOT CHANGED, REPORTED: the same shape in four other presets --
+gas_station_fluorescent (1.08, crushes to code 9), gothic_street_night
+(1.12, 13), ps1_storm_night and mission_goes_hot (1.18, 19). They are other
+looks, and mission_goes_hot's is an alarm's, where hard contrast may be the
+point. `tools/night_contrast_selftest.gd` prints them every run.
+
+`tools/night_contrast_selftest.gd`: the shader's own rule reproduces the
+ten-code crush at 1.08 (the control), Delco Night's contrast subtracts
+nothing below the pivot and sends only code 0 to black. Before the change it
+fails twice. Fluorescent-scale, storefront-reach, storefront-spill, canopy,
+club, colocation, light-leak, room-ambient, window-glass and rain selftests
+unchanged.
+
 ## [0.57.0] - the lit store spills out through its storefront
 
 The walker, 2026-09-29: "do the outward spill next" -- the fourth lever in
