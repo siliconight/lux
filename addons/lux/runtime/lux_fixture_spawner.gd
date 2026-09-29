@@ -75,9 +75,12 @@ static func spawn(scene_root: Node, parent: Node = null) -> Dictionary:
 		# chain carried `drop` end to end (measured on lot_demo_001: 96
 		# lamps flat at 4.5, the arena's 5.6 m hall lit-ceiling over a
 		# black floor). Zoo >= 0.50 stamps `lux_drop` on each marker.
+		# `lux_reach` (Zoo >= 1.21.0) the same way: a row facing a
+		# storefront carries it and nothing else does (0.56.0).
 		var rig := LuxLightLoader.rig_for_anchor({"type": t,
 			"id": "Spawned_" + String(mk.name).trim_prefix(MARKER_PREFIX).trim_prefix("_"),
-			"drop": float(marker_payload(mk, "lux_drop", 0.0))})
+			"drop": float(marker_payload(mk, "lux_drop", 0.0)),
+			"reach": float(marker_payload(mk, "lux_reach", 0.0))})
 		if rig == null:
 			skipped.append({"marker": String(mk.name),
 				"reason": "no rig for type '%s'" % t})

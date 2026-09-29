@@ -1,5 +1,54 @@
 # Changelog
 
+## [0.56.0] - a row that faces a storefront reaches the glass
+
+The walker, 2026-09-28: "yes, do the glass first then the troffer reach",
+after 0.55.0's night frames showed the sales floor brightening and the street
+not seeing it.
+
+A fluorescent's range is `drop + 0.75` (4.0..7.5): enough to floor a pool
+under the lamp, and deliberately no more, because a lamp claims a per-mesh
+light slot on everything within its range, through walls (roadmap 54). One
+row runs down a room's middle, so in a 12 m deep store the floor at the glass
+is 6 m off to the side, outside every pool -- and at 4.55 the range window
+also cuts the lamp's own floor value to about a fifth.
+
+THE CHANGE: an anchor may carry `reach`, the horizontal metres from the row
+to the floor it must light when that floor is not under it. Deli Counter
+(>= 0.155.0) stamps it on a ceiling row whose room is walled by storefront
+glass, and nothing else carries it. `fluorescent_range(drop, reach)` measures
+the same rule to that floor point -- `hypot(drop, reach) + 0.75` -- under the
+same clamp; at `reach` 0 it is the old rule exactly, so the club rigs and
+`office_floor_value`, which price against it, cannot move. The shipping path
+carries it: `LuxFixtureSpawner` hands the tuning table a marker's `lux_reach`
+(Zoo >= 1.21.0 stamps it) beside `lux_drop`. A bare bulb ignores it.
+
+MEASURED FIRST on cold run 9103's walk copy at night -- look_shots, the
+player's graded frame, the ranges set at runtime on gas_station_a02's sales
+floor (drop 3.8, the row 6.0 m from its storefront: 7.5, the clamp), Zoo
+1.20.0's clear storefront glass on both sides of the comparison:
+
+                                 4.55 (as shipped)    7.5
+    inside the sales floor       mean  9.4            15.7   (p95 35 -> 57)
+    through the storefront       mean  9.0            11.1   (p95 48 -> 65)
+    the store from 8 m, centre   mean 30.5 (control)  34.6
+
+and the alternative, the row moved 3.5 m toward the glass at the old range,
+measured WORSE (through the glass 8.2): the pool moved and did not grow.
+
+`tools/storefront_reach_selftest.gd`: the rule unchanged without a reach and
+at the clamp's floor; a reach at the sales floor's 6.0 m gives 7.5 and at
+2.0 m the hypot; the clubs' unit unmoved; an anchor's reach reaches its lamp
+and a bare bulb ignores it; and on the shipping path a marker with
+`lux_reach` spawns a 7.5 m lamp beside one without at 4.55 (the control).
+Without the change it does not pass (a script error on the second argument;
+it hangs to the timeout). Canopy, club, colocation, fluorescent-scale,
+light-leak, room-ambient and window-glass selftests unchanged.
+
+NOT PRICED HERE: a longer range claims light slots on more meshes. The cold
+run that ships this measures draws and frame time at the fixed stations and
+the per-mesh census, against 9103.
+
 ## [0.55.0] - the fluorescents brighten at night; the bare bulbs do not
 
 The walker, 2026-09-28, after cold run 9102 shipped a see-through storefront

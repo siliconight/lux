@@ -703,8 +703,15 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			# payable in range -- those are geometry work, not tuning. If
 			# interiors read too dark BETWEEN fixtures, raise `energy`,
 			# never this.
+			#
+			# EXCEPT TOWARD A STOREFRONT (0.56.0), where the floor the row
+			# must light is not under it: Deli Counter (>= 0.155.0) stamps
+			# `reach`, the horizontal metres from the row to the storefront
+			# glass it faces, and the range is derived to the floor THERE
+			# (see `fluorescent_range`). Only such a row carries it; every
+			# other lamp is the rule above, unchanged.
 			var drop := float(a.get("drop", 0.0))
-			r.light_range = fluorescent_range(drop)
+			r.light_range = fluorescent_range(drop, float(a.get("reach", 0.0)))
 			# Inverse-square falloff: at the default near-linear 1.0 the pool
 			# cuts to zero AT the range and rims every ceiling with a visible
 			# circle (walked 2026-08-23, zoo corridor). 2.0 fades out inside
@@ -969,8 +976,26 @@ static func _rig_for(a: Dictionary) -> Node3D:
 
 ## The fluorescent row's range rule (see its branch), as a function so the
 ## club rigs can price themselves against the same lamp.
-static func fluorescent_range(drop: float) -> float:
-	return clampf(drop + 0.75, 4.0, 7.5) if drop > 0.0 else 4.0
+##
+## `reach` (0.56.0) is the horizontal distance from the lamp to the floor it
+## must light, when that floor is not under it -- a storefront's glass line.
+## The same rule then measures to THAT floor point: `hypot(drop, reach)` in
+## place of `drop`, plus the same 0.75 trim, under the same clamp. At zero
+## it IS the rule above, so the clubs and `office_floor_value`, which never
+## pass it, cannot move.
+##
+## MEASURED on cold run 9103's walk copy at night (gas_station_a02's sales
+## floor: drop 3.8, the row 6.0 m from its storefront, so 7.5 at the clamp
+## against 4.55), the player's graded frame, clear storefront glass on both
+## sides of the comparison: the sales floor 9.4 -> 15.7, through the glass
+## 9.0 -> 11.1 (p95 48 -> 65), the store from 8 m 30.5 -> 34.6 at the frame's
+## centre. Moving the row 3.5 m toward the glass instead measured WORSE
+## (through the glass 8.2): the pool moved and did not grow.
+static func fluorescent_range(drop: float, reach: float = 0.0) -> float:
+	if drop <= 0.0:
+		return 4.0
+	var to_floor := sqrt(drop * drop + reach * reach) if reach > 0.0 else drop
+	return clampf(to_floor + 0.75, 4.0, 7.5)
 
 
 ## The attenuation window Godot multiplies every omni and spot by (see the
