@@ -368,6 +368,12 @@ const CLUB_WASH_RADIUS_PER_DROP := 1.25
 ## The fluorescent branch's energy and hang, named so the club rigs price
 ## themselves against the lamp that is actually built rather than a copy.
 const FLUORESCENT_ENERGY := 1.0
+## The counter accent's level, in troffers (0.60.0). THE WALKER'S CALL FROM
+## THE FRAME, 2026-09-29: the register counter at night, full scale, at 0x /
+## 1x / 2x / 3x (cold run 9113, `counter_accent_0x_1x_2x_3x.png`; counter
+## red 55 / 59 / 61 / 64) -- "2x". At 1x the warm band was easy to miss,
+## at 3x it read as a spotlight. One light either way: the level is free.
+const COUNTER_ACCENT_LEVEL := 2.0
 const FLUORESCENT_MOUNT := -0.25
 
 
@@ -793,9 +799,9 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			# counter". Deli Counter (>= 0.160.0) hangs one bulb over the register
 			# counter, Zoo's `pendant_fixture` its hardware; this is its lamp.
 			# An incandescent bulb -- the fluorescents are cool white, so the
-			# counter reads warm against them -- at a FLUORESCENT's energy with a
-			# fluorescent's range for its drop, so its pool on the counter
-			# matches one troffer's under it; and `preset_scaled`, so at night
+			# counter reads warm against them -- at COUNTER_ACCENT_LEVEL times a
+			# fluorescent's energy (0.60.0: twice, the walker's call from the
+			# frame), with a fluorescent's range for its drop; and `preset_scaled`, so at night
 			# it brightens with the wash it has to hold against. A 45-degree
 			# cone: a pool on the counter, not a room light.
 			var ca := LuxFluorescentRig.new()
@@ -803,7 +809,7 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			var rca := LuxLightRig.new()
 			rca.rig_name = &"Counter Accent (incandescent)"
 			rca.light_color = LuxColorTemp.kelvin(LuxColorTemp.INCANDESCENT)
-			rca.energy = FLUORESCENT_ENERGY
+			rca.energy = FLUORESCENT_ENERGY * COUNTER_ACCENT_LEVEL
 			rca.light_range = fluorescent_range(float(a.get("drop", 0.0)))
 			rca.attenuation = 2.0
 			rca.downlight_angle_deg = 45.0

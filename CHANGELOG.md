@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.60.0] - the counter accent at twice a troffer
+
+The walker, 2026-09-29, from the register counter photographed at night at
+full scale with the accent at 0x / 1x / 2x / 3x (cold run 9113; counter red
+55 / 59 / 61 / 64): "2x". `COUNTER_ACCENT_LEVEL` = 2.0, the lamp's energy
+in fluorescents. At 1x the warm band on the counter was easy to miss; at 3x
+it read as a spotlight. One light at any level, so the choice costs nothing.
+`counter_accent_selftest.gd` holds the level (fails on 0.59.0).
+
 ## [0.59.0] - a warm bulb over the store's counter
 
 The walker, 2026-09-29: "add the warm counter accent and the window sign

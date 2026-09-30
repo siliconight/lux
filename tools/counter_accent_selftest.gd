@@ -68,7 +68,8 @@ func _main() -> void:
 		print("counter accent selftest: %d FAILED" % _fails)
 		quit(1)
 		return
-	_near("at a fluorescent's energy", lamp.light_energy, loader.FLUORESCENT_ENERGY, 1e-4)
+	_near("at twice a fluorescent's energy", lamp.light_energy, loader.FLUORESCENT_ENERGY * 2.0, 1e-4)
+	_check("the level is the walker's 2x", loader.COUNTER_ACCENT_LEVEL, 2.0)
 	_near("with a fluorescent's range for its drop", (lamp as SpotLight3D).spot_range,
 		loader.fluorescent_range(3.2), 1e-4)
 	_near("a 45-degree pool", (lamp as SpotLight3D).spot_angle, 45.0, 1e-4)
@@ -80,7 +81,7 @@ func _main() -> void:
 	_check("control: a bare bulb still refuses", (bulb as LuxFluorescentRig).scales_with_preset(), false)
 	_check("control: a fluorescent row still takes it", (row as LuxFluorescentRig).scales_with_preset(), true)
 	(acc as LuxFluorescentRig).set_energy_scale(6.0)
-	_near("at Delco Night's 6.0", lamp.light_energy, loader.FLUORESCENT_ENERGY * 6.0, 1e-4)
+	_near("at Delco Night's 6.0", lamp.light_energy, loader.FLUORESCENT_ENERGY * 2.0 * 6.0, 1e-4)
 	var lighting := LuxLighting.new()
 	get_root().add_child(lighting)
 	await process_frame
