@@ -258,8 +258,27 @@ const CLUB_DEFAULT_DROP := 3.0
 ## magnitudes to guess at.
 const REFERENCE_POOL := 0.684
 
-## A forecourt under a lit canopy: half again a club floor.
-const CANOPY_WASH_LEVEL := REFERENCE_POOL * 1.5
+## A forecourt under a lit canopy: four and a half club floors (0.61.0).
+##
+## WALKED AND MEASURED, which the paragraph above asked for. 1.5 was the
+## provisional ratio; on cold run 9125's walk copy, with Deli Counter 0.167.0's
+## washes over the lanes, the four canopy washes' baked energies were scaled
+## by k and fixed forecourt stations re-shot (k = 1 twice, the control,
+## identical to the decimal). Median luminance of 255:
+##
+##     k   level   the pad under the deck   a pump's lane face   pad clipped
+##     1   1.5            10.7                    23.0               0.03%
+##     2   3.0            42.9                    44.2               0.05%
+##     3   4.5            53.8                    54.4               0.05%
+##     4   6.0            62.5                    57.7               0.06%
+##
+## At 1.5 the pad read black and the walk found the forecourt dark; the first
+## doubling is most of the gain and the returns shrink after it; nothing
+## clipped at any of them -- far under the raw 10.0 that blew out (15x a club
+## wash). The walker chose k = 3 from the frames, 2026-10-01. Energy only:
+## the range is the geometry's (`canopy_wash` below), so no light reaches any
+## further and the light count is unchanged.
+const CANOPY_WASH_LEVEL := REFERENCE_POOL * 4.5
 ## A STREETLIGHT'S POOL ON THE ROAD, in the same unit as the canopy above so
 ## the two are comparable at a glance. Half, because an open road is not a
 ## forecourt under a lit deck -- a ratio, not an independent number, so there

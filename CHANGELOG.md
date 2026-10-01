@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.61.0] - the forecourt under a lit canopy, walked and measured
+
+`CANOPY_WASH_LEVEL` has been provisional since it was written ("nobody has
+walked a lit forecourt yet ... judge it on a walk and write the measured
+value here"). Cold run 9120's FLAPPHAS walk found the forecourt dark; Deli
+Counter 0.167.0 moved the washes over the lanes, which lit the pumps' faces
+and left the pad black. Measured on cold run 9125's walk copy: the four
+canopy washes' baked energies scaled by k, fixed forecourt stations re-shot,
+k = 1 twice as the control (identical to the decimal); median luminance:
+
+    k   level   the pad under the deck   a pump's lane face   pad clipped
+    1   1.5            10.7                    23.0               0.03%
+    2   3.0            42.9                    44.2               0.05%
+    3   4.5            53.8                    54.4               0.05%
+    4   6.0            62.5                    57.7               0.06%
+
+The walker chose k = 3 from the frames: `CANOPY_WASH_LEVEL` is now
+`REFERENCE_POOL * 4.5`. Energy only -- a canopy wash's range is derived from
+its geometry, so no light reaches further and the count is unchanged; the
+draw count is confirmed on the cold run that ships it.
+
+Selftests: canopy_light, club_light, night_contrast and storefront_spill
+pass unchanged.
+
 ## [0.60.0] - the counter accent at twice a troffer
 
 The walker, 2026-09-29, from the register counter photographed at night at
