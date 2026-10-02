@@ -53,6 +53,13 @@ static func spawn(scene_root: Node, parent: Node = null) -> Dictionary:
 	if edited_root != null:
 		container.owner = edited_root
 
+	# ONE FAILING FIXTURE AN ANCHOR (0.62.0). A ceiling row is a room's
+	# anchor; its markers are its lamps. The hash of the anchor id picks one
+	# lamp of each fluorescent row to stutter and one pendant of each run
+	# to waver, so the same tube fails in every build of a seed. Everything
+	# else is steady, which is what makes the failing one read.
+	var failing: Dictionary = choose_failing(markers)
+
 	var made := 0
 	var skipped: Array = []
 	for m in markers:
@@ -85,6 +92,11 @@ static func spawn(scene_root: Node, parent: Node = null) -> Dictionary:
 			skipped.append({"marker": String(mk.name),
 				"reason": "no rig for type '%s'" % t})
 			continue
+		if failing.has(mk) and rig.get("rig") is LuxLightRig:
+			var res: LuxLightRig = rig.get("rig")
+			res.failing_kind = int(failing[mk][0])
+			res.failing_seed = int(failing[mk][1])
+			res.flicker_amount = 0.0
 		if rig is LuxAreaLightRig:
 			# The hardware IS the panel. Zoo's sign cabinet carries its own
 			# emissive face (`M_SignBox_Face`); the rig's preview quad on top
@@ -112,6 +124,35 @@ static func spawn(scene_root: Node, parent: Node = null) -> Dictionary:
 	if not skipped.is_empty():
 		msg += " (%d skipped)" % skipped.size()
 	return {"ok": true, "msg": msg, "count": made, "skipped": skipped}
+
+
+## Which markers fail, and how: ``{marker: [kind, seed]}``. One a
+## `lux_anchor_id` among the fluorescent and pendant markers, chosen by the
+## anchor id's hash -- deterministic, and an authored rename is the only
+## thing that moves it. Markers with no anchor id are grouped by their type.
+static func choose_failing(markers: Array) -> Dictionary:
+	var groups: Dictionary = {}
+	for m in markers:
+		var mk := m as Node3D
+		var t := marker_type(mk)
+		var kind := LuxFailing.NONE
+		if t == "fluorescent":
+			kind = LuxFailing.STUTTER
+		elif t == "pendant":
+			kind = LuxFailing.WAVER
+		else:
+			continue
+		var anchor := String(marker_payload(mk, "lux_anchor_id", t))
+		if not groups.has(anchor):
+			groups[anchor] = [kind, []]
+		(groups[anchor][1] as Array).append(mk)
+	var out: Dictionary = {}
+	for anchor in groups:
+		var kind: int = groups[anchor][0]
+		var lamps: Array = groups[anchor][1]
+		var seed: int = int(String(anchor).hash() & 0x7fffffff)
+		out[lamps[seed % lamps.size()]] = [kind, seed]
+	return out
 
 
 ## `base`, or `base_dup<k>` for the first k from 2 that no child of

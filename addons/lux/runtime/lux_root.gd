@@ -699,6 +699,12 @@ func set_fixtures_powered(on: bool) -> void:
 		_lighting.set_fixtures_powered(on)
 
 
+## Whether the fixtures are powered (0.62.0): a failing rig asks before it
+## writes its lens, so a cut level stays dark.
+func fixtures_powered() -> bool:
+	return _lighting == null or _lighting.fixtures_powered()
+
+
 ## Scan for Zoo fixture lit-face materials (M_*_Lens / _Diffuser / _Face)
 ## and bind them so set_fixtures_powered drives them. Call once after the
 ## level (and its fixtures GLBs) loads; safe to call again after re-imports.

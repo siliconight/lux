@@ -13,6 +13,11 @@ extends Node3D
 
 var _lights: Array[Light3D] = []
 var _flicker_phase: float = 0.0
+## A failing fixture's clock and its lenses (0.62.0): one
+## ``[MeshInstance3D, surface, material, base emission]`` a lamp, each its
+## own override so no other fixture dims with it.
+var _fail_t: float = 0.0
+var _lenses: Array = []
 ## The preset's `fluorescent_energy_scale`, handed in by LuxLighting (0.55.0):
 ## every lamp is `rig.energy * energy_scale`, flicker included. 1.0 until a
 ## preset says otherwise, and only for a rig that `scales_with_preset`.
@@ -41,7 +46,38 @@ func _ready() -> void:
 	if root != null:
 		for l in _lights:
 			root.register_lux_light(l)
-	set_process(rig != null and rig.flicker_amount > 0.0 and rig.bake_mode != 1)
+	# DEFERRED, not now: the spawner places a rig AFTER add_child, so at
+	# ready its lamps still sit at the container's origin and the nearest
+	# lens is nowhere (measured: 0 of 9 tubes bound on the first probe)
+	_bind_lenses.call_deferred()
+	set_process(rig != null and rig.bake_mode != 1
+		and (rig.flicker_amount > 0.0 or rig.failing_kind != LuxFailing.NONE))
+
+
+## A failing fixture dims the lit face nearest each of its lamps (0.62.0).
+## The lamp sits inside its own hardware, so the nearest lens within a metre
+## and a half is its own. The face gets a material of its own, so the rest of
+## the row -- which shares the lens material -- stays steady. Once, at ready.
+func _bind_lenses() -> void:
+	_lenses.clear()
+	if rig == null or rig.failing_kind == LuxFailing.NONE or rig.bake_mode == 1:
+		return
+	var scene: Node = owner if owner != null else get_tree().current_scene
+	if scene == null:
+		scene = get_tree().root
+	for l in _lights:
+		var hit: Array = LuxFailing.find_lens(scene, l.global_position, 1.5)
+		if hit.is_empty():
+			continue
+		var mi: MeshInstance3D = hit[0]
+		var s: int = hit[1]
+		var mat: BaseMaterial3D = mi.get_active_material(s) as BaseMaterial3D
+		if mat == null:
+			continue
+		var own: BaseMaterial3D = mat.duplicate() as BaseMaterial3D
+		own.resource_name = mat.resource_name
+		mi.set_surface_override_material(s, own)
+		_lenses.append([mi, s, own, own.emission_energy_multiplier])
 
 
 func _rebuild() -> void:
@@ -100,7 +136,22 @@ func _rebuild() -> void:
 
 func _process(delta: float) -> void:
 	var r := rig if rig != null else null
-	if r == null or r.flicker_amount <= 0.0 or r.bake_mode == 1:
+	if r == null or r.bake_mode == 1:
+		return
+	if r.failing_kind != LuxFailing.NONE:
+		_fail_t += delta
+		var lvl := LuxFailing.level(r.failing_kind, r.failing_seed, _fail_t)
+		for l in _lights:
+			if is_instance_valid(l):
+				l.light_energy = r.energy * energy_scale * lvl
+		# the lens follows the lamp -- unless the level's power is cut, when
+		# the binder has zeroed it and it stays zeroed
+		var root := _find_lux_root()
+		if root == null or root.fixtures_powered():
+			for e in _lenses:
+				(e[2] as BaseMaterial3D).emission_energy_multiplier = float(e[3]) * lvl
+		return
+	if r.flicker_amount <= 0.0:
 		return
 	_flicker_phase += delta * r.flicker_speed
 	# Two-tone noise for that ballast-buzz instability.

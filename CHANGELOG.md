@@ -1,5 +1,73 @@
 # Changelog
 
+## [0.62.0] - one failing fixture a room, and the lens goes with it
+
+The walker, 2026-10-02, on levels whose every fluorescent row already
+"flickered" at 12 % and 9 Hz: the lights feel frozen. Three reasons, all in
+the code. The flicker was a sum of two sines, a smooth hum of at most 6 %
+(measured 5.2-5.3 % on a till's display before it was removed from Level
+Factory 0.128.0), and the eye ignores a hum. The fixture's own lens stayed
+constant while its lamp wavered, and a light that moves without its source
+reads as nothing. And every fixture in a building did it in step, which is
+the authorship guide's uniform irregularity. The design was shown to the
+walker; their calls: "one per room is fine, go with cycling streetlights".
+
+What ships:
+
+- `runtime/lux_failing.gd`, the model: pure functions of (kind, seed, t).
+  STUTTER is a fluorescent with a tired ballast: steady for its own 4-15 s,
+  then two to four drops to 60-75 % a few frames long. CYCLING is a sodium
+  streetlight at the end of its life: over 40-70 s it dims to 70 %, the arc
+  gives up, it sits dark, restrikes dim and warms back up. WAVER is a
+  filament's slow 4 % sway, the one character that is a wobble.
+- `LuxLightRig.failing_kind` / `failing_seed`. `flicker_amount` stays for
+  scenes that tuned it by hand; the loader now sets it to 0 everywhere.
+- `LuxFluorescentRig` and `LuxStreetlightRig`: a failing rig drives its
+  lamps' energy AND its lens: the nearest lit face to each lamp within
+  1.5 m, found once (deferred past the spawner's placement), given a
+  material override of its own so the rest of the row stays steady. A
+  powered-off level (the heist's cut) is left alone.
+- `LuxFixtureSpawner.choose_failing`: ONE fixture an anchor (a ceiling row
+  is a room's), chosen by the anchor id's hash: a fluorescent stutters, a
+  pendant wavers. `LuxLightLoader`: the every-third streetlight that buzzed
+  now cycles. `LuxRoot.fixtures_powered()`.
+
+Measured on a scratch copy of cold run 9137's walk export (gas_block_001),
+`patches/lux_failing/failing_probe.gd`, windowed, after the warm-up:
+
+    rigs 146, failing 12 (9 tubes stutter, 3 bulbs waver), lenses bound 12
+    one tube watched 24.0 s (3946 frames): energy 6.0 -> 3.65 at the
+      floor, 10 drops; its diffuser's emission 1.86 followed every one
+    one pole made to cycle: energy 0.46 .. 2.50 across the watch
+
+The first probe bound 0 of 9 tubes' lenses: `_bind_lenses` ran at ready,
+and the spawner sets a rig's transform AFTER `add_child`, so the search
+began at the container's origin. Deferred, it binds 12 of 12. The probe's
+own drop counter then read 0 against a 3.65 minimum, because it compared
+the lamp with the rig resource's `energy` (2.2) rather than the preset-
+scaled lamp (6.0); fixed, it read 10. Frames of the tube at full and in a
+drop: `docs/findings/failing_fixtures/`.
+
+Priced (`_runs/perf_inner/run.py`, run 9137's package re-exported with this
+Lux against the package as shipped, 53 fixed views, the shipped package
+run twice as the control; nothing else running):
+
+    draws: identical in every one of the 53 views (mean 1079.2)
+    median ms, new minus the control's second pass: mean -0.01, max |1.69|
+    median ms, the control's first pass minus its second: mean +0.68, max |2.35|
+
+So the cost is below what the instrument can see: the first pass of a
+session is slower by more than the change is. A lens surface is one draw
+whatever material it wears, so its override adds none. The script tick is
+paid by the failing fixtures only (12 here), where every rig ticked before.
+
+`tools/failing_fixtures_selftest.gd` (55 checks) holds the model's bounds,
+the loader's choices, the spawner's one-an-anchor, and a stuttering rig in a
+tree moving its own lamp and its own lens while a shared material and a
+steady rig stay put. It dies on 0.61.0 at the loader (no `failing_kind`).
+canopy_light, club_light, counter_accent, fluorescent_scale, light_leak,
+night_contrast, room_ambient and storefront_spill pass unchanged.
+
 ## [0.61.0] - the forecourt under a lit canopy, walked and measured
 
 `CANOPY_WASH_LEVEL` has been provisional since it was written ("nobody has

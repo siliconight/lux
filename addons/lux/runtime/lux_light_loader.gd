@@ -780,8 +780,11 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			# glancing angles and a scorched ring around the fixture (same
 			# walk). Real tubes hang; ours do now too.
 			r.mount_height = FLUORESCENT_MOUNT
-			r.flicker_amount = 0.12
-			r.flicker_speed = 9.0
+			# STEADY (0.62.0). Every row hummed at 12 % and 9 Hz and the walker
+			# called the lights frozen: a smooth hum is invisible and a whole
+			# building in step is uniform. ONE tube a room fails instead --
+			# `LuxFixtureSpawner` chooses it and sets `failing_kind`.
+			r.flicker_amount = 0.0
 			_make_downlight(r)
 			f.rig = r
 			return f
@@ -806,8 +809,8 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			rb.count = int(row.get("count", 1))
 			rb.spacing = float(row.get("spacing", 0.0))
 			rb.mount_height = 0.0
-			rb.flicker_amount = 0.06
-			rb.flicker_speed = 2.5
+			# steady (0.62.0): one bulb an anchor wavers, by the spawner's choice
+			rb.flicker_amount = 0.0
 			_make_downlight(rb)
 			b.rig = rb
 			return b
@@ -878,8 +881,11 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			# rename is the only thing that moves it. Position would drift
 			# with layout; ids are the stable name for a place.
 			if String(a.get("id", "")).hash() % 3 == 0:
-				rs.flicker_amount = 0.22
-				rs.flicker_speed = 7.0
+				# 0.62.0: it CYCLES rather than buzzes -- dims, cuts out, sits
+				# dark, restrikes -- and its lens goes with it (the walker's
+				# call, 2026-10-02: "go with cycling streetlights")
+				rs.failing_kind = LuxFailing.CYCLING
+				rs.failing_seed = int(String(a.get("id", "")).hash() & 0x7fffffff)
 			s.rig = rs
 			return s
 		"canopy_lights":

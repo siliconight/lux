@@ -69,9 +69,21 @@ extends Resource
 @export var preset_scaled: bool = false
 
 @export_group("Flicker")
-## Subtle instability for fluorescents / failing bulbs. 0 = steady.
+## Subtle instability for fluorescents / failing bulbs. 0 = steady. The
+## sum-of-sines hum every rig carried before 0.62.0; the loader sets it to 0
+## now and a FAILING fixture uses `failing_kind` instead. Kept for scenes
+## that tuned it by hand.
 @export_range(0.0, 1.0) var flicker_amount: float = 0.0
 @export_range(0.1, 30.0) var flicker_speed: float = 8.0
+
+@export_group("Failing")
+## How this fixture fails (0.62.0, `LuxFailing`): 0 steady, 1 a fluorescent's
+## stutter, 2 a sodium lamp's cycling, 3 a filament's waver. A failing rig
+## moves its lamps AND the lit face nearest each lamp. One fixture a room
+## fails; the spawner and the loader choose which.
+@export_enum("Steady", "Stutter", "Cycling", "Waver") var failing_kind: int = 0
+## Its own clock: two failing tubes in one building never stutter together.
+@export var failing_seed: int = 0
 
 @export_group("Lightmap Baking")
 ## How spawned lights participate in a LightmapGI bake (pc2000 family):

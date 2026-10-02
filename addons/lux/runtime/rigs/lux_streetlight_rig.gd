@@ -43,6 +43,9 @@ const _CONE_SHADER := preload("res://addons/lux/shaders/spatial/lux_light_cone.g
 var _lights: Array[SpotLight3D] = []
 var _cones: Array[MeshInstance3D] = []
 var _flicker_phase: float = 0.0
+## A failing pole's clock and its lenses (0.62.0): see LuxFluorescentRig.
+var _fail_t: float = 0.0
+var _lenses: Array = []
 
 
 func _ready() -> void:
@@ -52,6 +55,33 @@ func _ready() -> void:
 	if root != null:
 		for l in _lights:
 			root.register_lux_light(l)
+	_bind_lenses.call_deferred()        # after the spawner has placed the rig
+	if rig != null and rig.failing_kind != LuxFailing.NONE and rig.bake_mode != 1:
+		set_process(true)
+
+
+## A cycling pole dims its own lens with its lamp (0.62.0): the nearest lit
+## face to each lamp within a metre and a half, given a material of its own.
+func _bind_lenses() -> void:
+	_lenses.clear()
+	if rig == null or rig.failing_kind == LuxFailing.NONE or rig.bake_mode == 1:
+		return
+	var scene: Node = owner if owner != null else get_tree().current_scene
+	if scene == null:
+		scene = get_tree().root
+	for l in _lights:
+		var hit: Array = LuxFailing.find_lens(scene, l.global_position, 1.5)
+		if hit.is_empty():
+			continue
+		var mi: MeshInstance3D = hit[0]
+		var s: int = hit[1]
+		var mat: BaseMaterial3D = mi.get_active_material(s) as BaseMaterial3D
+		if mat == null:
+			continue
+		var own: BaseMaterial3D = mat.duplicate() as BaseMaterial3D
+		own.resource_name = mat.resource_name
+		mi.set_surface_override_material(s, own)
+		_lenses.append([mi, s, own, own.emission_energy_multiplier])
 
 
 func _rebuild() -> void:
@@ -146,7 +176,18 @@ func _process(_delta: float) -> void:
 	# sodium lamp warming and cutting is THE 90s parking-lot sound made
 	# visible. Only poles the loader tuned with flicker_amount > 0 pay.
 	var fr := rig if rig != null else null
-	if fr != null and fr.flicker_amount > 0.0 and fr.bake_mode != 1:
+	if fr != null and fr.failing_kind != LuxFailing.NONE and fr.bake_mode != 1:
+		# a sodium lamp at the end of its life: dims, cuts out, restrikes
+		_fail_t += _delta
+		var lvl := LuxFailing.level(fr.failing_kind, fr.failing_seed, _fail_t)
+		for fl in _lights:
+			if is_instance_valid(fl):
+				fl.light_energy = fr.energy * lvl
+		var root := _find_lux_root()
+		if root == null or root.fixtures_powered():
+			for e in _lenses:
+				(e[2] as BaseMaterial3D).emission_energy_multiplier = float(e[3]) * lvl
+	elif fr != null and fr.flicker_amount > 0.0 and fr.bake_mode != 1:
 		_flicker_phase += _delta * fr.flicker_speed
 		var n := sin(_flicker_phase) * 0.5 + sin(_flicker_phase * 3.7) * 0.5
 		var flick := 1.0 - maxf(0.0, n) * fr.flicker_amount * 0.5
