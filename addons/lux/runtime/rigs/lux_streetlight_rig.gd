@@ -40,6 +40,36 @@ extends Node3D
 
 const _CONE_SHADER := preload("res://addons/lux/shaders/spatial/lux_light_cone.gdshader")
 
+## THE LAMP HANGS BELOW ITS MOUNT (0.64.0). The mount is where the anchor
+## puts the rig: for a Lot pole it is the lens point, 0.175 m under the
+## module's top (Lot's `STREETLIGHT_LENS_DROP`), and in Zoo's recipe that
+## is 5 mm above the shaft's top cap. A spot's shadow map is a perspective
+## camera at the light's origin, and a disc of radius r at depth d in front
+## of it subtends atan(r / d): the 0.06 m cap 5 mm under the lamp subtends
+## 85 degrees, the whole 55-degree cone, and every pixel under the pole
+## compares as shadowed. At or below the cap the disc is behind the camera.
+## (The first reading was the shaft's SIDES filling the frustum from a
+## camera on the axis; a clean cylinder with the lamp on its cap lit the
+## ground fully and refuted it.)
+##
+## MEASURED on cold run 9139's gas station lot (survey, every other light
+## off, the ground's luminance 9 m from the foot), the pole's own lamp
+## against a fresh unshadowed spot on its transform:
+##
+##     at the lens point, shadowed   0.001     (12 of 17 poles shipped so)
+##     fresh, unshadowed             0.305
+##     0.02 m lower, shadowed        0.282
+##     0.05 m lower, shadowed        0.239
+##     0.10 m lower, shadowed        0.282     (the unshadowed figure: 0.286)
+##
+## And with Zoo's shapes in this project (`tools/streetlight_shadow_
+## selftest.gd`): 5 mm over the cap 0.002; at or under it 0.742 whatever
+## the body's cull mode; the shaft hidden 0.745; the head or the lens
+## hidden, no change. The figure stops moving at 0.02; 0.10 keeps the cap
+## a hand's width behind the camera. The five poles the shadow budget had
+## not reached were the ones the walker saw working.
+const LAMP_HANG_M := 0.10
+
 var _lights: Array[SpotLight3D] = []
 var _cones: Array[MeshInstance3D] = []
 var _flicker_phase: float = 0.0
@@ -119,7 +149,7 @@ func _rebuild() -> void:
 		lamp.spot_angle = 55.0
 		lamp.spot_angle_attenuation = 1.2
 		lamp.shadow_enabled = r.shadows_enabled
-		lamp.position = Vector3(start + i * r.spacing, r.mount_height, 0.0)
+		lamp.position = Vector3(start + i * r.spacing, r.mount_height - LAMP_HANG_M, 0.0)
 		lamp.rotation_degrees = Vector3(-90.0, 0.0, 0.0)  # point straight down
 		r.apply_bake_mode(lamp)
 		add_child(lamp)

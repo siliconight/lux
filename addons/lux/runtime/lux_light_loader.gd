@@ -922,7 +922,8 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			# its pole is already standing.
 			var pole_h := 6.0
 			if typeof(a.get("pos")) == TYPE_ARRAY and (a.get("pos") as Array).size() >= 3:
-				pole_h = maxf(float(a.get("pos")[2]), 0.5)
+				# the lamp hangs LAMP_HANG_M under the lens (0.64.0): solve for where it is
+				pole_h = maxf(float(a.get("pos")[2]) - LuxStreetlightRig.LAMP_HANG_M, 0.5)
 			rs.energy = energy_for(STREETLIGHT_LEVEL, pole_h, rs.light_range,
 				String(a.get("id", "streetlight")))
 			rs.count = int(row.get("count", 1))
