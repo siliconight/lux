@@ -393,6 +393,41 @@ const FLUORESCENT_ENERGY := 1.0
 ## red 55 / 59 / 61 / 64) -- "2x". At 1x the warm band was easy to miss,
 ## at 3x it read as a spotlight. One light either way: the level is free.
 const COUNTER_ACCENT_LEVEL := 2.0
+## THE HEAT LAMP (0.63.0). The walker, 2026-10-03, on the roller grill at
+## night: "a dim but warm warming light to bring a bit more light to the
+## dogs". Zoo 1.57.0 hangs an infrared element under the grill's hood and
+## emits `LuxEmit_heat_lamp` just below it; this is its lamp. An OMNI, not
+## a downlight: the rod hangs under the hood's top above the bun shelf,
+## and the buns under it and the dogs through the glass shelf both get it
+## (the walker, on the first cut: "light should show the buns too"). A
+## fraction of a fluorescent -- a glow, not a room light -- in a reach that
+## ends at the hood. 1,900 K: an infrared element glows red-orange, redder
+## than any bulb. Not preset scaled: it is its own source and does not
+## brighten with the wash.
+##
+## MEASURED on the rebuilt gas station lot, the grill shot from the
+## customer's side, the pan's three columns' luminance left / middle /
+## right. First with the rod 16 cm over the dogs, a downlight (the first
+## cut), then with the rod under the hood's top, 36 cm over the dogs and
+## 12 over the buns, an omni (this one):
+##
+##     under the shelf, level 0.35, falloff 2      blown out: the dogs white
+##     under the shelf, level 0.035, falloff 2     0.106 / 0.216 / 0.084
+##     under the shelf, level 0.035, falloff 1     0.095 / 0.131 / 0.080
+##     under the hood,  level 0.08,  falloff 1     0.096 / 0.136 / 0.079
+##     under the hood,  level 0.16,  falloff 1     0.100 / 0.154 / 0.077
+##     under the hood,  level 0.16,  falloff 0.6   0.115 / 0.140 / 0.084
+##     under the hood,  level 0.24,  falloff 0.6   0.109 / 0.162 / 0.090
+##     off                                         0.089 / 0.104 / 0.072
+##
+## A third of a troffer at a hand's width is a floodlight. Under the hood,
+## 0.16 with the falloff flattened to 0.6 is the evenest: the outer columns
+## up a quarter, the middle a third, the buns under the rod warmed, and
+## nothing white. The walker's eye sets it from here.
+const HEAT_LAMP_LEVEL := 0.16
+const HEAT_LAMP_RANGE_M := 0.9
+const HEAT_LAMP_KELVIN := 1900.0
+const HEAT_LAMP_ATTENUATION := 0.6
 const FLUORESCENT_MOUNT := -0.25
 
 
@@ -814,6 +849,24 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			_make_downlight(rb)
 			b.rig = rb
 			return b
+		"heat_lamp":
+			var hl := LuxFluorescentRig.new()
+			hl.name = String(a.get("id", "heat_lamp"))
+			var rhl := LuxLightRig.new()
+			rhl.rig_name = &"Heat Lamp (infrared)"
+			rhl.light_color = LuxColorTemp.kelvin(HEAT_LAMP_KELVIN)
+			rhl.energy = FLUORESCENT_ENERGY * HEAT_LAMP_LEVEL
+			rhl.light_range = HEAT_LAMP_RANGE_M
+			rhl.attenuation = HEAT_LAMP_ATTENUATION
+			rhl.preset_scaled = false
+			rhl.count = 1
+			rhl.spacing = 0.0
+			rhl.mount_height = 0.0
+			rhl.flicker_amount = 0.0
+			# no `_make_downlight`: an omni, so the buns above the shelf and the
+			# dogs below it both see it
+			hl.rig = rhl
+			return hl
 		"counter_accent":
 			# A STORE COUNTER'S WARM ACCENT (0.59.0). The walker's 1990s lighting
 			# reference, 2026-09-29, on the convenience store at night: "cooler
