@@ -70,6 +70,55 @@ const _CONE_SHADER := preload("res://addons/lux/shaders/spatial/lux_light_cone.g
 ## not reached were the ones the walker saw working.
 const LAMP_HANG_M := 0.10
 
+## THE POLE'S LAMP SITS BESIDE THE POLE (0.65.0), and `LAMP_HANG_M` above
+## is a wall pack's now. 0.64.0 hung a pole's lamp 0.10 below its mount to
+## clear its own shadow map; the mount is 5 mm above the shaft's cap, so the
+## lamp sat 9.5 cm INSIDE the steel. A shadow map culls the shaft's inside
+## faces and drew the pool. The light bake ray-traces, and measured on one
+## closed 6 m pole and one static spot (`patches/lightbake_probe/
+## make_pole_control.py`, Godot 4.7's lightmapper, quality Low):
+##
+##     lamp inside the shaft (0.64.0)             0 lit texels   max 0.005
+##     on the axis at the lens point (to 0.63.0)  2,815          max 0.039
+##     0.2 m along the head, 1 cm under the lens  5,581          max 20.9
+##     no pole at all                             5,605          max 3.0
+##
+## So the lamp sits POLE_LAMP_ALONG_M along the head from the pole's axis,
+## and POLE_LAMP_DROP_M under the lens: clear of the 0.06 m shaft by 0.14,
+## under the lens at the genome's narrowest head (0.5 m wide, a 0.4 m lens,
+## so 0.2 is its end), and above nothing but the ground. The pole now
+## shadows a wedge of its own pool -- 2 atan(0.06 / 0.2), 33 degrees, on
+## the far side -- which a real pole does.
+const POLE_LAMP_ALONG_M := 0.2
+const POLE_LAMP_DROP_M := 0.01
+## AND ITS SHADOW BIAS (0.65.0). A shadowed pole's lamp reads lit for about
+## 30 frames, then the renderer moves it to a smaller slot of the 16-bit
+## positional atlas and, at the engine's 0.03, the ground shadows itself
+## (acne). Measured on the gas station lot's side-street pole, settled,
+## every other light off, the ground under it (unshadowed 0.201):
+##
+##     bias 0.03 (default)   0.085      normal bias 2    0.157
+##     bias 0.1              0.183      normal bias 4    0.178
+##     bias 0.3              0.183      24-bit atlas     0.183
+##
+## 0.1 is where it stops moving; a 6 m pole's shadow detaches by a few cm.
+## Every steady pole on the lot lit after a 90-frame settle at 0.1; one of
+## 17 was dark at the default.
+const POLE_SHADOW_BIAS := 0.1
+
+## Where each lamp sits from its row point at the mount, in the rig's frame
+## (x along the head, y up). The default is 0.64.0's, which a wall pack
+## keeps; the loader's `streetlight` branch puts a pole's lamp beside the
+## pole (`POLE_LAMP_ALONG_M`, `POLE_LAMP_DROP_M`).
+@export var lamp_offset: Vector3 = Vector3(0.0, -LAMP_HANG_M, 0.0):
+	set(value):
+		lamp_offset = value
+		if is_inside_tree():
+			_rebuild()
+## Each lamp's shadow bias; negative leaves the engine's. The loader's
+## `streetlight` branch sets `POLE_SHADOW_BIAS`.
+@export var lamp_shadow_bias: float = -1.0
+
 var _lights: Array[SpotLight3D] = []
 var _cones: Array[MeshInstance3D] = []
 var _flicker_phase: float = 0.0
@@ -149,7 +198,9 @@ func _rebuild() -> void:
 		lamp.spot_angle = 55.0
 		lamp.spot_angle_attenuation = 1.2
 		lamp.shadow_enabled = r.shadows_enabled
-		lamp.position = Vector3(start + i * r.spacing, r.mount_height - LAMP_HANG_M, 0.0)
+		if lamp_shadow_bias >= 0.0:
+			lamp.shadow_bias = lamp_shadow_bias
+		lamp.position = Vector3(start + i * r.spacing, r.mount_height, 0.0) + lamp_offset
 		lamp.rotation_degrees = Vector3(-90.0, 0.0, 0.0)  # point straight down
 		r.apply_bake_mode(lamp)
 		add_child(lamp)
@@ -176,7 +227,7 @@ func _spawn_cone(index: int, r: LuxLightRig) -> void:
 	# Cylinder is centered on its origin: offset down so the apex sits at the
 	# lamp — whose row is centered on the node (see _rebuild).
 	var start := -(r.count - 1) * 0.5 * r.spacing
-	mi.position = Vector3(start + index * r.spacing, r.mount_height * 0.5, 0.0)
+	mi.position = Vector3(start + index * r.spacing + lamp_offset.x, r.mount_height * 0.5, lamp_offset.z)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var mat := ShaderMaterial.new()
 	mat.shader = _CONE_SHADER
