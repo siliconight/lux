@@ -87,3 +87,12 @@ static func player_damage(tree: SceneTree, value: float) -> void:
 	var r := get_root(tree)
 	if r != null:
 		r.set_player_damage_intensity(value)
+
+
+## Whether a baked level draws its lightmap, and switch it (0.66.0). Off is
+## real time for every steady light; on is refused under a preset other
+## than the one it was baked with.
+static func baked_lighting(tree: SceneTree, on: bool) -> void:
+	var r := get_root(tree)
+	if r != null:
+		r.set_baked_lighting(on)

@@ -275,6 +275,10 @@ func _ready() -> void:
 		var bound: Dictionary = bind_fixture_emissives()
 		print("[lux] %s (searched %s)" % [String(bound.get("msg", "")),
 			String(bound.get("search_root", "?"))])
+	# THE BAKED LIGHTMAPS (0.66.0), deferred: a LightmapGI beside the site in
+	# the level's scene is in the tree by now, but a level built in code may
+	# add it after this node is ready.
+	_bind_lightmaps.call_deferred()
 
 
 ## Resolves which DirectionalLight3D drives the vertex-lighting key. Priority:
@@ -467,6 +471,10 @@ func apply_preset(preset: LuxPreset, blend_time: float = 0.0) -> void:
 		# Called from the setter before _ready; defer.
 		active_preset = preset
 		return
+	# a preset the lightmap was not baked under falls back to real time (0.66.0)
+	if preset != _baked_preset and _lighting != null and _lighting.baked_lighting():
+		push_warning("Lux: preset changed on a baked level; lighting falls back to real time.")
+		_lighting.set_baked_lighting(false)
 	if blend_time <= 0.0:
 		_apply_immediate(preset)
 	else:
@@ -697,6 +705,41 @@ func register_fixture_emissive(mat: BaseMaterial3D) -> void:
 func set_fixtures_powered(on: bool) -> void:
 	if _lighting != null:
 		_lighting.set_fixtures_powered(on)
+
+
+## The preset the level's lightmap was baked under, by identity: a weather,
+## time-of-day or mission-phase change builds a NEW preset and falls back to
+## real time; re-applying the same one (a quality change) does not.
+var _baked_preset: LuxPreset = null
+
+
+func _bind_lightmaps() -> void:
+	if _lighting == null:
+		return
+	var top: Node = self
+	while top.get_parent() != null and top.get_parent() != get_tree().root:
+		top = top.get_parent()
+	var n: int = _lighting.bind_lightmaps(top)
+	_baked_preset = _current
+	if n > 0:
+		print("[lux] baked lighting: %d lightmap(s) bound under %s" % [n, String(top.name)])
+
+
+## Whether the level is drawing its baked lightmap (0.66.0).
+func baked_lighting() -> bool:
+	return _lighting != null and _lighting.baked_lighting()
+
+
+## Switch a baked level between its lightmap and real-time lighting. Off
+## costs the frame what the bake saved; on is valid only under the preset it
+## was baked with, so turning it on under another one is refused.
+func set_baked_lighting(on: bool) -> void:
+	if _lighting == null:
+		return
+	if on and _current != _baked_preset:
+		push_warning("Lux: baked lighting not restored: the preset in force is not the one it was baked under.")
+		return
+	_lighting.set_baked_lighting(on)
 
 
 ## Whether the fixtures are powered (0.62.0): a failing rig asks before it

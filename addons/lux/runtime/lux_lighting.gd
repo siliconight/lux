@@ -12,6 +12,17 @@ var _registered: Array[Node3D] = []
 var _emissives: Array[BaseMaterial3D] = []
 var _fixtures_powered: bool = true
 
+## THE BAKED LIGHTMAPS (0.66.0). A LightmapGI's data holds the steady lights'
+## effect on the level as it was baked; a static light no longer lights the
+## lightmapped surfaces in real time. So the lightmap is level STATE, and two
+## things change it: the power cut (the lamps hide, so the lightmap goes off
+## with them) and a preset other than the baked one (`set_baked_lighting
+## (false)`: the lightmap off and every static rig light handed back to real
+## time). [[LightmapGI, its LightmapGIData], ...]
+var _lightmaps: Array = []
+var _baked_on: bool = false
+var _flipped: Array[Light3D] = []
+
 # Alarm pulse state
 var _alarm_active: bool = false
 var _alarm_intensity: float = 0.0
@@ -235,6 +246,72 @@ func set_fixtures_powered(on: bool) -> void:
 	for m in _emissives:
 		if m != null:
 			_apply_emissive_power(m)
+	_sync_lightmaps()
+
+
+## Find every LightmapGI under `search_root` that carries baked data and hold
+## it; baked lighting is on when there is one. Returns how many were bound.
+func bind_lightmaps(search_root: Node) -> int:
+	_lightmaps.clear()
+	if search_root == null:
+		return 0
+	for n in search_root.find_children("*", "LightmapGI", true, false):
+		var lm := n as LightmapGI
+		if lm != null and lm.light_data != null:
+			_lightmaps.append([lm, lm.light_data])
+	_baked_on = not _lightmaps.is_empty()
+	_sync_lightmaps()
+	return _lightmaps.size()
+
+
+func has_lightmaps() -> bool:
+	return not _lightmaps.is_empty()
+
+
+func baked_lighting() -> bool:
+	return _baked_on
+
+
+## Baked (the lightmap on, the steady lights static) or real time (the
+## lightmap off, every static rig light dynamic). A level with no lightmap
+## ignores this.
+##
+## THE RE-ADD IS THE STEP THAT WORKS. Measured on the baked gas station lot in
+## GL Compatibility: clearing the lightmap alone left the static lights
+## excluded from the surfaces it had covered (2,614 draws, the level darker),
+## and flipping their bake mode alone did too. Hiding and showing each light
+## again re-pairs it with the geometry: 3,253 draws against the never-baked
+## build's 3,252, the same luminance at three stations.
+func set_baked_lighting(on: bool) -> void:
+	if _lightmaps.is_empty() or on == _baked_on:
+		return
+	_baked_on = on
+	if on:
+		for l in _flipped:
+			if is_instance_valid(l):
+				l.light_bake_mode = Light3D.BAKE_STATIC
+		_flipped.clear()
+	else:
+		for n in _registered:
+			if is_instance_valid(n) and n is Light3D and (n as Light3D).light_bake_mode == Light3D.BAKE_STATIC:
+				var l := n as Light3D
+				l.light_bake_mode = Light3D.BAKE_DYNAMIC
+				_flipped.append(l)
+	_sync_lightmaps()
+	for n in _registered:
+		if is_instance_valid(n) and n is Light3D and (n as Light3D).visible:
+			(n as Light3D).visible = false
+			(n as Light3D).visible = true
+
+
+## The lightmap shows while baked lighting is on AND the power is: a cut
+## hides the lamps, and their baked light goes with them.
+func _sync_lightmaps() -> void:
+	var show: bool = _baked_on and _fixtures_powered
+	for pair in _lightmaps:
+		var lm: LightmapGI = pair[0]
+		if is_instance_valid(lm):
+			lm.light_data = pair[1] if show else null
 
 
 func fixtures_powered() -> bool:
