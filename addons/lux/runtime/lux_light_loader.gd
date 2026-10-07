@@ -705,10 +705,19 @@ static func room_probe_for(a: Dictionary) -> ReflectionProbe:
 ## `add_bake_fills` puts the floor back as light that exists only while the
 ## lightmapper runs: static omnis over every UNTINTED room probe (a tinted
 ## probe is a club room, dark by design -- the walker's dens of sin), which a
-## bake lays before it bakes and frees before it saves. The container has no
-## owner, so even a save that forgot to free it cannot keep it, and a level
-## carries no fill at runtime: nothing to draw, nothing to price. Dynamic
-## objects see it through the lightmap's own probes.
+## bake lays before it bakes and frees before it saves, so a level carries no
+## fill at runtime: nothing to draw, nothing to price. Dynamic objects see it
+## through the lightmap's own probes.
+##
+## OWNED, AND THE BAKE MUST FREE IT (0.68.1). 0.68.0 left the fill unowned "so
+## even a save that forgot to free it cannot keep it". LightmapGI skips any
+## child with no owner when it collects lights ("maybe a helper", Godot's
+## `_find_meshes_and_lights`), so the first real bake -- Level Factory
+## 0.151.0's, 267 fills laid on cold run 9190's level -- baked none: every
+## room read the control's number. The experiments that chose the layout
+## had written their fills into the bake scene, owned, which is why they lit.
+## Every fill is owned by the scene's owner now, and freeing it before the
+## save is the bake's job.
 ##
 ## FOUR LAYOUTS WERE BAKED ON THAT LEVEL; THE FIRST THREE ARE KEPT HERE AS
 ## REFUTATIONS. Mean luma of 255, 16 fluorescent rooms / 8 bulb-lit rooms:
@@ -765,6 +774,8 @@ static func add_bake_fills(scene_root: Node, energy: float = -1.0) -> Node3D:
 		if n is LuxFluorescentRig and (n as LuxFluorescentRig).rig != null \
 				and String((n as LuxFluorescentRig).rig.rig_name).begins_with("Bare Bulb"):
 			bulbs.append((n as Node3D).global_position)
+	# owned, or LightmapGI passes the fill by as a helper (0.68.1)
+	var owner_node: Node = scene_root if scene_root.owner == null else scene_root.owner
 	var container: Node3D = null
 	for n in scene_root.find_children("*", "ReflectionProbe", true, false):
 		var p := n as ReflectionProbe
@@ -790,6 +801,7 @@ static func add_bake_fills(scene_root: Node, energy: float = -1.0) -> Node3D:
 			container = Node3D.new()
 			container.name = BAKE_FILL_CONTAINER
 			scene_root.add_child(container)
+			container.owner = owner_node
 		for i in nx:
 			for k in nz:
 				var local := Vector3(room.x * ((i + 0.5) / float(nx) - 0.5), y,
@@ -801,6 +813,7 @@ static func add_bake_fills(scene_root: Node, energy: float = -1.0) -> Node3D:
 				omni.omni_range = BAKE_FILL_REACH_CELLS * BAKE_FILL_CELL_M
 				omni.omni_attenuation = 0.0
 				container.add_child(omni)
+				omni.owner = owner_node
 				omni.global_position = xf * local
 	return container
 

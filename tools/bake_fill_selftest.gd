@@ -10,8 +10,8 @@ extends SceneTree
 ## over the room's floor and inside the room even when the probe is turned;
 ## a tinted probe (a club room) gets none; a room a Bare Bulb rig hangs in
 ## gets BAKE_FILL_BULB_SHARE of the energy; every fill reaches
-## BAKE_FILL_REACH_CELLS cells, flat; the container has no owner, so a save
-## cannot keep it; a second call replaces it; and with no energy given it
+## BAKE_FILL_REACH_CELLS cells, flat; every node is owned by the scene, which
+## the lightmapper needs (0.68.1); a second call replaces it; and with no energy given it
 ## reads the scene's LuxRoot preset, `bake_room_fill`. What the bake makes of
 ## it is measured on a level (`docs/findings/night_interiors/`).
 
@@ -121,7 +121,13 @@ func _main() -> void:
 		_fail_out("add_bake_fills laid nothing over four probes")
 		return
 	_check("the container's name", String(fills.name), String(k["BAKE_FILL_CONTAINER"]))
-	_check("the container has no owner, so a save cannot keep it", fills.owner == null, true)
+	# OWNED (0.68.1). 0.68.0 held the opposite -- "no owner, so a save cannot
+	# keep it" -- and LightmapGI skips an unowned child as a helper: a real
+	# bake laid 267 unowned fills and baked none of them.
+	var owned := fills.owner == level
+	for c in fills.get_children():
+		owned = owned and c.owner == level
+	_check("the fills are owned by the scene, so the lightmapper takes them", owned, true)
 	_check("a 12 x 8 room gets 2 x 2 fills", _fills_of(fills, "shop_floor").size(), 4)
 	_check("a turned 7 x 5 room gets 2 x 1", _fills_of(fills, "turned_room").size(), 2)
 	_check("a club room gets none", _fills_of(fills, "club_floor").size(), 0)
