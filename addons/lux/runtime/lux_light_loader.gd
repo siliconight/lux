@@ -430,6 +430,29 @@ const HEAT_LAMP_KELVIN := 1900.0
 const HEAT_LAMP_ATTENUATION := 0.6
 const FLUORESCENT_MOUNT := -0.25
 
+## A BARE BULB'S LAMP HANGS UNDER ITS GLASS (0.67.0). A pendant's anchor is
+## the BULB point, and Zoo's `pendant_fixture` mounts 'above' it: the bulb is
+## an ellipsoid whose centre sits one radius over the anchor, stretched 1.15x
+## upright, so its glass reaches 0.15 of a radius BELOW the anchor -- 6 to
+## 12 mm over the genome's 0.08-0.16 m bulbs. The lamp hung AT the anchor
+## sat inside that closed glass. Real time draws an unshadowed lamp straight
+## through it, so nobody saw; the lightmapper ray-traces, and every steady
+## bulb baked to nothing -- the pole's disease (0.65.0), one fixture down.
+## A counter accent wears the same hardware and had the same lamp.
+##
+## Measured on cold run 9190's restaurant row, re-baked by Level Factory's
+## own bake with only the 33 bulb lamps moved, one station a room
+## (`docs/findings/night_interiors/`): the eight bulb-lit rooms' mean luma
+## 3.8 -> 9.6 of 255, cold storage 0.8 -> 15.1, the deli counter room
+## 6.6 -> 12.4. The sixteen fluorescent rooms 15.5 -> 15.7, all of it the
+## customer floor (12.8 -> 15.1), whose register has the counter accent.
+##
+## DERIVED: the widest bulb's reach under its anchor, 0.15 x 0.08 = 0.012,
+## plus the centimetre the pole's lamp keeps under its lens
+## (`LuxStreetlightRig.POLE_LAMP_DROP_M`). Zoo owns the first number: a
+## wider bulb or a longer stretch moves it.
+const BULB_LAMP_DROP_M := 0.022
+
 
 ## Bake ONLY the daylight anchors of `path` under a `LuxDaylight` container,
 ## leaving whatever the marker path spawned alone. Returns {ok, msg, count,
@@ -843,7 +866,8 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			rb.light_range = clampf(bdrop + 1.0, 3.5, 6.5) if bdrop > 0.0 else 4.0
 			rb.count = int(row.get("count", 1))
 			rb.spacing = float(row.get("spacing", 0.0))
-			rb.mount_height = 0.0
+			# under the glass, not inside it (0.67.0): see BULB_LAMP_DROP_M
+			rb.mount_height = -BULB_LAMP_DROP_M
 			# steady (0.62.0): one bulb an anchor wavers, by the spawner's choice
 			rb.flicker_amount = 0.0
 			_make_downlight(rb)
@@ -892,7 +916,8 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			rca.preset_scaled = true
 			rca.count = 1
 			rca.spacing = 0.0
-			rca.mount_height = 0.0
+			# the pendant's hardware, so the pendant's clearance (0.67.0)
+			rca.mount_height = -BULB_LAMP_DROP_M
 			ca.rig = rca
 			return ca
 		"streetlight":
