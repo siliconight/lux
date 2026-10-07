@@ -153,6 +153,24 @@ func _main() -> void:
 			0.025 * share, 1e-6)
 		_near("over the basement's own floor", (vf[0] as Node3D).global_position.y, -3.2 + height, 1e-4)
 
+	# DENS OF SIN ARE BUILDINGS (0.68.2): Lot ids every anchor `<building>/<id>`
+	# and a probe is named for its room with "/" made "_". A club building's
+	# back room keeps no fill; an ordinary building beside it keeps its own.
+	var den_floor := _probe("b5_main_floor_ambient", Vector3(60.0, 1.6, 0.0), Vector3(10.0, 3.2, 10.0),
+		0.0, Color(1.0, 0.55, 0.08))
+	var den_back := _probe("b5_back_rooms_ambient", Vector3(60.0, 1.6, 12.0), Vector3(10.0, 3.2, 6.0),
+		0.0, white)
+	var plain := _probe("b6_office_ambient", Vector3(80.0, 1.6, 0.0), Vector3(6.0, 3.2, 6.0), 0.0, white)
+	for p in [den_floor, den_back, plain]:
+		level.add_child(p)
+	var dens: Node3D = loader.add_bake_fills(level, 0.025)
+	_check("a club building's back room keeps no fill", _fills_of(dens, "b5_back_rooms_ambient").size(), 0)
+	_check("...nor its tinted floor", _fills_of(dens, "b5_main_floor_ambient").size(), 0)
+	_check("an ordinary building beside it keeps its own", _fills_of(dens, "b6_office_ambient").size(), 1)
+	_check("control: a probe naming no building stands alone", _fills_of(dens, "shop_floor").size(), 4)
+	for p in [den_floor, den_back, plain]:
+		p.free()
+
 	var again: Node3D = loader.add_bake_fills(level, 0.025)
 	var containers := 0
 	for c in level.get_children():

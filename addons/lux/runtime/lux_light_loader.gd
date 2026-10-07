@@ -747,6 +747,14 @@ const BAKE_FILL_HEIGHT_M := 1.7
 const BAKE_FILL_CELL_M := 6.0
 ## Each fill reaches this many cells, flat inside it (attenuation 0).
 const BAKE_FILL_REACH_CELLS := 1.5
+## DENS OF SIN ARE BUILDINGS, NOT ROOMS (0.68.2). The walker, 2026-10-07: "the
+## 'dens of sin' buildings that we can keep a bit dark". 0.68.0 skipped only
+## the tinted probe -- a strip club's floor -- and filled the rest of the
+## building: on club_block_014 at night strip_club_a02's back rooms went
+## 19.5 -> 52.3, the brightest room in the level, while its floor stayed 2.8.
+## A building with ANY tinted probe now keeps every room unfilled.
+## `_probe_building` says which building a probe is in.
+##
 ## A room a bare bulb lights keeps this share of the floor: "keep pendants
 ## moody" (the walker, 2026-09-28). 22.8 against the fluorescent rooms'
 ## 39.1 on the level above.
@@ -776,11 +784,20 @@ static func add_bake_fills(scene_root: Node, energy: float = -1.0) -> Node3D:
 			bulbs.append((n as Node3D).global_position)
 	# owned, or LightmapGI passes the fill by as a helper (0.68.1)
 	var owner_node: Node = scene_root if scene_root.owner == null else scene_root.owner
-	var container: Node3D = null
+	# the room probes, and the buildings any tinted one makes a den
+	var probes: Array[ReflectionProbe] = []
+	var dens := {}
 	for n in scene_root.find_children("*", "ReflectionProbe", true, false):
-		var p := n as ReflectionProbe
-		if not p.interior or p.ambient_mode != ReflectionProbe.AMBIENT_COLOR \
-				or not p.ambient_color.is_equal_approx(ROOM_AMBIENT_DERIVED_COLOR):
+		var rp := n as ReflectionProbe
+		if not rp.interior or rp.ambient_mode != ReflectionProbe.AMBIENT_COLOR:
+			continue
+		probes.append(rp)
+		if not rp.ambient_color.is_equal_approx(ROOM_AMBIENT_DERIVED_COLOR):
+			dens[_probe_building(rp)] = true
+	var container: Node3D = null
+	for p in probes:
+		if not p.ambient_color.is_equal_approx(ROOM_AMBIENT_DERIVED_COLOR) \
+				or dens.has(_probe_building(p)):
 			continue
 		var room := p.size - Vector3.ONE * 2.0 * ROOM_AMBIENT_MARGIN
 		if room.x <= 0.0 or room.y <= 0.0 or room.z <= 0.0:
@@ -816,6 +833,15 @@ static func add_bake_fills(scene_root: Node, energy: float = -1.0) -> Node3D:
 				omni.owner = owner_node
 				omni.global_position = xf * local
 	return container
+
+
+## The site building a room probe stands in. Lot's `merge_lights` ids every
+## anchor `<building>/<id>` (lot.py) and a probe is named after its anchor's
+## room with "/" made "_", so `b2_banking_hall_ambient` is building b2. A
+## name without that prefix is a building of its own.
+static func _probe_building(p: ReflectionProbe) -> String:
+	var m := RegEx.create_from_string("^(b[0-9]+)_").search(String(p.name))
+	return m.get_string(1) if m != null else "probe:" + String(p.name)
 
 
 ## The `bake_room_fill` of the preset the scene's LuxRoot starts with (its
