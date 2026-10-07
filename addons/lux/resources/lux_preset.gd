@@ -152,6 +152,24 @@ extends Resource
 ## pendants moody". It moves no derived energy: `FLUORESCENT_ENERGY` is the
 ## unit the loader solves every other light in, and stays 1.0.
 @export_range(0.0, 16.0) var fluorescent_energy_scale: float = 1.0
+## THE ROOMS' FLOOR IN A BAKED LEVEL (0.68.0): the energy of each bake-only
+## fill `LuxLightLoader.add_bake_fills` lays -- the light a room's corners
+## get that no lamp reaches, which a room probe's ambient gave them until
+## the light bake made every wall and floor take its light from the
+## lightmap alone. MEASURED on cold run 9190's restaurant row (Blue Hour),
+## re-baked, mean luma of 255 over 16 fluorescent rooms and 8 bulb-lit ones:
+##
+##     no floor (Lux 0.67.0)     15.7    9.6
+##     0.025                     39.1   22.8
+##     the level lit live, before the bake  24.3  17.5
+##
+## (`docs/findings/night_interiors/`). A preset that wants darker rooms
+## lowers it, and 0.0 bakes no floor. A room lit by bare bulbs takes
+## BAKE_FILL_BULB_SHARE of it. Chosen by eye from the frames, not derived:
+## the walker's "enough light to signify the surroundings" (2026-10-07).
+## Per time of day is the next step -- a level is set at one of five times
+## and its preset is the place each one's light lives.
+@export_range(0.0, 0.2, 0.005) var bake_room_fill: float = 0.025
 
 @export_group("Tonemap & Grade")
 @export_enum("Linear", "Reinhard", "Filmic", "ACES") var tonemap_mode: int = 2

@@ -694,6 +694,134 @@ static func room_probe_for(a: Dictionary) -> ReflectionProbe:
 	return probe
 
 
+## THE ROOMS' FLOOR, IN THE BAKE (0.68.0). A lightmapped surface takes its
+## light from the lightmap alone, so once Level Factory baked (0.131.0, on by
+## default since 0.144.0) a room probe's ambient -- the floor
+## ROOM_AMBIENT_DERIVED_ENERGY was put there to be -- reached no wall and no
+## floor: raised five-fold on cold run 9190's level it moved nothing, and a
+## corner no lamp reaches baked to black. The bake is baked with the
+## environment off, which is right for a sealed room and leaves it nothing.
+##
+## `add_bake_fills` puts the floor back as light that exists only while the
+## lightmapper runs: static omnis over every UNTINTED room probe (a tinted
+## probe is a club room, dark by design -- the walker's dens of sin), which a
+## bake lays before it bakes and frees before it saves. The container has no
+## owner, so even a save that forgot to free it cannot keep it, and a level
+## carries no fill at runtime: nothing to draw, nothing to price. Dynamic
+## objects see it through the lightmap's own probes.
+##
+## FOUR LAYOUTS WERE BAKED ON THAT LEVEL; THE FIRST THREE ARE KEPT HERE AS
+## REFUTATIONS. Mean luma of 255, 16 fluorescent rooms / 8 bulb-lit rooms:
+##
+##     no floor                                     15.7   9.6   85 s
+##     1 fill a room, centre, 2.3 m, 0.08           32.9  19.4   86 s
+##     6 m cells, 1.7 m, 0.08 a room split          32.0  28.1  172 s
+##     8 m cells, the same, bulb rooms half         32.0  18.7  132 s
+##     6 m cells, 1.7 m, 0.025 each, 9 m, half      39.1  22.8   94 s
+##
+## (the last column is the bake's time in the editor). The centre fill hung
+## a quarter of the storey over the middle -- 2.3 m, where a bare bulb hangs,
+## at the room's centre, where a row's middle bulb hangs: deli_a01's deli
+## counter fill stood exactly on its centre bulb's anchor, inside the glass,
+## and four rooms did not move. A room's energy split between its cells, each
+## reaching the whole room, left a big room dark: a floor point is lit by the
+## fills near it, so the split falls as 1/size (the office lobby, 34 x 12 m,
+## 10.0). A fixed energy a fill, each reaching 1.5 cells and flat inside it,
+## lights a floor the same whatever the room's size -- about 1.3x under a
+## fill against the point between four -- and bakes nearly as fast as none.
+const BAKE_FILL_CONTAINER := "LuxBakeFill"
+## A person's head height over the room's floor: under every ceiling fixture
+## (a bulb hangs 0.6 m under a 3.2 m storey's ceiling, a tube 0.25 under its
+## lens). A low room takes 0.6 of its height instead.
+const BAKE_FILL_HEIGHT_M := 1.7
+## One fill per cell this wide at most, the room's cells equal.
+const BAKE_FILL_CELL_M := 6.0
+## Each fill reaches this many cells, flat inside it (attenuation 0).
+const BAKE_FILL_REACH_CELLS := 1.5
+## A room a bare bulb lights keeps this share of the floor: "keep pendants
+## moody" (the walker, 2026-09-28). 22.8 against the fluorescent rooms'
+## 39.1 on the level above.
+const BAKE_FILL_BULB_SHARE := 0.5
+
+
+## Lay the bake-only room fills under `scene_root` and return their
+## container, or null when nothing asks for one. Clears an earlier call's
+## fill first, always. `energy` is each fill's; negative reads the scene's
+## LuxRoot preset (`bake_fill_energy`). For a light bake to call before it
+## bakes and to free before it saves; `scene_root` must be in the tree.
+static func add_bake_fills(scene_root: Node, energy: float = -1.0) -> Node3D:
+	if scene_root == null or not scene_root.is_inside_tree():
+		return null
+	var old := scene_root.get_node_or_null(NodePath(BAKE_FILL_CONTAINER))
+	if old != null:
+		old.free()
+	if energy < 0.0:
+		energy = bake_fill_energy(scene_root)
+	if energy <= 0.0:
+		return null
+	# the rooms a bare bulb lights, by where their rigs hang
+	var bulbs: Array[Vector3] = []
+	for n in scene_root.find_children("*", "Node3D", true, false):
+		if n is LuxFluorescentRig and (n as LuxFluorescentRig).rig != null \
+				and String((n as LuxFluorescentRig).rig.rig_name).begins_with("Bare Bulb"):
+			bulbs.append((n as Node3D).global_position)
+	var container: Node3D = null
+	for n in scene_root.find_children("*", "ReflectionProbe", true, false):
+		var p := n as ReflectionProbe
+		if not p.interior or p.ambient_mode != ReflectionProbe.AMBIENT_COLOR \
+				or not p.ambient_color.is_equal_approx(ROOM_AMBIENT_DERIVED_COLOR):
+			continue
+		var room := p.size - Vector3.ONE * 2.0 * ROOM_AMBIENT_MARGIN
+		if room.x <= 0.0 or room.y <= 0.0 or room.z <= 0.0:
+			continue
+		var xf := p.global_transform
+		var inv := xf.affine_inverse()
+		var share := 1.0
+		for b in bulbs:
+			var l: Vector3 = inv * b
+			if absf(l.x) <= p.size.x * 0.5 and absf(l.y) <= p.size.y * 0.5 \
+					and absf(l.z) <= p.size.z * 0.5:
+				share = BAKE_FILL_BULB_SHARE
+				break
+		var nx := maxi(1, ceili(room.x / BAKE_FILL_CELL_M))
+		var nz := maxi(1, ceili(room.z / BAKE_FILL_CELL_M))
+		var y := -room.y * 0.5 + minf(BAKE_FILL_HEIGHT_M, room.y * 0.6)
+		if container == null:
+			container = Node3D.new()
+			container.name = BAKE_FILL_CONTAINER
+			scene_root.add_child(container)
+		for i in nx:
+			for k in nz:
+				var local := Vector3(room.x * ((i + 0.5) / float(nx) - 0.5), y,
+					room.z * ((k + 0.5) / float(nz) - 0.5))
+				var omni := OmniLight3D.new()
+				omni.name = "%s_%d" % [String(p.name), i * nz + k]
+				omni.light_energy = energy * share
+				omni.light_bake_mode = Light3D.BAKE_STATIC
+				omni.omni_range = BAKE_FILL_REACH_CELLS * BAKE_FILL_CELL_M
+				omni.omni_attenuation = 0.0
+				container.add_child(omni)
+				omni.global_position = xf * local
+	return container
+
+
+## The `bake_room_fill` of the preset the scene's LuxRoot starts with (its
+## `local_override`, else its `active_preset`), or 0.0 when the scene has no
+## LuxRoot or its preset predates the field (0.68.0).
+static func bake_fill_energy(scene_root: Node) -> float:
+	if scene_root == null or not scene_root.is_inside_tree():
+		return 0.0
+	for n in scene_root.get_tree().get_nodes_in_group(&"lux_root"):
+		if n != scene_root and not scene_root.is_ancestor_of(n):
+			continue
+		var preset: Variant = n.get("local_override")
+		if preset == null:
+			preset = n.get("active_preset")
+		if preset is Resource and "bake_room_fill" in preset:
+			return float(preset.get("bake_room_fill"))
+	return 0.0
+
+
 ## Read `path`, replace any previous bake, and spawn a rig per anchor under a
 ## `LuxLights` container. Returns {ok, msg, count}.
 ##
