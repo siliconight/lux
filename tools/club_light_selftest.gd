@@ -439,6 +439,35 @@ func _main() -> void:
 			near_stage]:
 		n.free()
 
+	print("case M -- a cycling stage lamp bakes no bounce; the stage outshines the room (0.69.0)")
+	# A baked bounce cannot cycle: LightmapGI bakes a live (BAKE_DYNAMIC) lamp's
+	# indirect light at the colour it shows at bake time, so a cycling stage
+	# would ship a bounce frozen on one colour under a lamp that keeps
+	# changing. Its lamps carry no indirect energy; a still rig, and a
+	# cycling rig whose resource is baked, keep theirs -- neither cycles.
+	var cyc_live: Node3D = Loader.rig_for_anchor({"type": "stage_light", "id": "cyc_live",
+		"color": "red", "pos": [0, 0, 3.0], "target": [0, 0, 0.9], "cycle_s": 4.0,
+		"row": {"count": 2, "spacing": 0.6}})
+	var still: Node3D = Loader.rig_for_anchor({"type": "stage_light", "id": "still",
+		"color": "red", "pos": [0, 0, 3.0], "target": [0, 0, 0.9]})
+	var cyc_baked: Node3D = Loader.rig_for_anchor({"type": "stage_light", "id": "cyc_baked",
+		"color": "red", "pos": [0, 0, 3.0], "target": [0, 0, 0.9], "cycle_s": 4.0})
+	cyc_baked.get("rig").bake_mode = 1
+	for n in [cyc_live, still, cyc_baked]:
+		root.add_child(n)
+	await process_frame
+	var lamps_live: Array = _lights_of(cyc_live)
+	_check("a cycling rig builds its two lamps", lamps_live.size(), 2)
+	for l in lamps_live:
+		_near("...and neither bakes a bounce", (l as Light3D).light_indirect_energy, 0.0, 1e-6)
+	_near("a still rig keeps its bounce",
+		(_lights_of(still)[0] as Light3D).light_indirect_energy, 1.0, 1e-6)
+	_near("a baked cycling rig keeps its bounce",
+		(_lights_of(cyc_baked)[0] as Light3D).light_indirect_energy, 1.0, 1e-6)
+	_check("the stage outshines the room's wash", stage_level > wash_level, true)
+	for n in [cyc_live, still, cyc_baked]:
+		n.free()
+
 	print("")
 	if _fails == 0:
 		print("  club light selftest ok: derived reach and energy, stable colours,")

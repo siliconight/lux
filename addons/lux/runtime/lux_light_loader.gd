@@ -327,7 +327,17 @@ const SPILL_FRAME_MATCH := 8.4
 const SPILL_HEAD_FALLBACK := 3.0
 
 const CLUB_WASH_LEVEL := 12.0
-const CLUB_STAGE_LEVEL := 3.0
+## THE STAGE IS WHERE A CLUB'S LIGHT GOES (0.69.0, roadmap 213). *As first
+## set:* 3, which read on the grand-lounge tuning frames above. In cold run
+## 9204's club it read as a dim platform, baked or live -- a stage lit at a
+## quarter of the room's own wash pools. The walker, 2026-10-08: "Stage can
+## be brighter". Live frames of that stage at 4x, 8x and 10x the old level
+## (`docs/findings/club_stage_live_price/` at the factory root):
+##   4x (12) -- lit, but no brighter than the room;
+##   8x (24) -- the brightest thing in the room, the pole lit, no clipping;
+##   10x (30) -- hardly different from 8x, the tonemapper's shoulder.
+## So 24, twice the wash: chosen against frames, not derived.
+const CLUB_STAGE_LEVEL := 24.0
 const CLUB_NEON_LEVEL := 1.5
 ## The back bar's practical, priced the same way. Between the neon's spill
 ## (1.5) and the stage's throw (3.0): it has to put a bartender's face and

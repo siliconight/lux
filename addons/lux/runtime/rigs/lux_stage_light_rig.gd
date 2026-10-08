@@ -87,6 +87,13 @@ func _rebuild() -> void:
 			else r.light_color
 		spot.shadow_enabled = r.shadows_enabled
 		r.apply_bake_mode(spot)
+		# A BAKED BOUNCE CANNOT CYCLE (0.69.0). LightmapGI bakes a live lamp's
+		# indirect light -- BAKE_DYNAMIC, the engine default a Realtime rig
+		# leaves -- at the colour the lamp shows at bake time, so a cycling
+		# stage would ship a bounce frozen on one colour under a lamp that keeps
+		# changing. A cycling rig's lamps put no light into the bake at all.
+		if _cycles():
+			spot.light_indirect_energy = 0.0
 		add_child(spot)
 		if Engine.is_editor_hint() and get_tree() != null:
 			spot.owner = get_tree().edited_scene_root
