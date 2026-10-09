@@ -291,6 +291,44 @@ const CANOPY_WASH_LEVEL := REFERENCE_POOL * 4.5
 ## forecourt. It replaces a flat `energy = 6.0` that delivered 0.156 -- and
 ## then, briefly, a raw 5.0 that delivered thirty times that.
 const STREETLIGHT_LEVEL := REFERENCE_POOL * 0.75
+## THE PAYPHONE'S HOOD LAMP (0.70.0, roadmap 210). Zoo 1.89.0 hangs a tube's
+## diffuser under a payphone's roof, just behind its header, and
+## `LuxEmit_payphone_hood` under it carrying `lux_drop`, the lamp's height
+## above the ground the payphone stands on. Cold run 9212 stood a booth at a
+## bus stop, and at midnight it was a silhouette. The walker, 2026-10-09:
+## "yes light it".
+##
+## In the outdoor unit -- the value on the ground straight under the lamp --
+## and NOT preset scaled: a street fixture, like the pole and the canopy, not
+## a room that has to out-shine the dark (`fluorescent_energy_scale`).
+##
+## MEASURED with a lamp stood live in cold run 9212's package (club_block_014,
+## midnight) where Zoo 1.89.0 hangs it in the bus-stop booth: drop 2.211,
+## range 4.0, the caller's view of the instrument, mean luma of 255 over the
+## frame's middle third (`docs/findings/payphone_light/` at the factory root):
+##
+##     level, x REFERENCE_POOL    lamp mid-hood    lamp behind the header
+##     0 (the control)                20.6                 --
+##     0.375                           --                 68.5
+##     0.75                           89.2                94.8
+##     1.5                           118.4               123.9
+##     3.0                           146.7                 --
+##     6.0                           170.4                 --
+##
+## Nothing clipped at any of them. At 0.75 every word on the instrument reads
+## -- the card, the digits, the stickers -- and the back panel's top, a hand's
+## width from the tube, is pale; from 1.5 it washes toward white while the
+## instrument gains less with each doubling. So 0.75: the pavement under a
+## booth's tube reads as the road under a streetlight. That is the same ratio
+## as STREETLIGHT_LEVEL by a different road, and it is NOT that constant, so
+## tuning one does not move the other. The probe's lamp was live and
+## unshadowed; this one bakes, so the booth's own parts shadow it and its
+## walls bounce it. Cold run 9213 measures the residue.
+const PAYPHONE_HOOD_LEVEL := REFERENCE_POOL * 0.75
+## A hood lamp whose marker carries no drop hangs at the default booth's:
+## Zoo 1.89.0's 2.3 m slot, less the 45 mm roof, the diffuser's 14 mm and the
+## marker's 30 mm under it.
+const PAYPHONE_DEFAULT_DROP := 2.211
 ## The pool one wash owns when the anchor names none, metres. DC always sends
 ## `size`; this is the floor under a hand-authored anchor.
 const CANOPY_POOL_FALLBACK := 6.0
@@ -1097,6 +1135,37 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			rca.mount_height = -BULB_LAMP_DROP_M
 			ca.rig = rca
 			return ca
+		"payphone_hood":
+			# THE PAYPHONE'S HOOD LAMP (0.70.0): one tube's downlight under a
+			# booth's roof, behind its header (Zoo >= 1.89.0's marker). The
+			# fluorescent rig's machinery, as the counter accent and the heat
+			# lamp use it -- a power cut kills it with every spawned light --
+			# but not preset scaled and not named "fluorescent", so the time of
+			# day leaves it at its outdoor level (PAYPHONE_HOOD_LEVEL).
+			var ph := LuxFluorescentRig.new()
+			ph.name = String(a.get("id", "payphone_hood"))
+			var rph := LuxLightRig.new()
+			rph.rig_name = &"Payphone Hood (baked)"
+			rph.light_color = LuxColorTemp.cool_fluorescent()
+			# THE DROP IS THE MARKER'S: its height above the ground the booth
+			# stands on, which the slot's height moves. The range is a ceiling
+			# lamp's for that drop, and the energy puts PAYPHONE_HOOD_LEVEL on
+			# the ground under it, so a taller booth is no dimmer.
+			var pdrop := float(a.get("drop", 0.0))
+			if pdrop <= 0.0:
+				pdrop = PAYPHONE_DEFAULT_DROP
+			rph.light_range = fluorescent_range(pdrop)
+			rph.attenuation = 2.0
+			rph.energy = energy_for(PAYPHONE_HOOD_LEVEL, pdrop, rph.light_range,
+				String(a.get("id", "payphone_hood")))
+			rph.preset_scaled = false
+			rph.count = 1
+			rph.spacing = 0.0
+			rph.mount_height = 0.0
+			rph.flicker_amount = 0.0
+			_make_downlight(rph)
+			ph.rig = rph
+			return ph
 		"streetlight":
 			var s := LuxStreetlightRig.new()
 			s.name = String(a.get("id", "streetlight"))
