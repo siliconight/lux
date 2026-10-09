@@ -954,6 +954,8 @@ func _lerp_preset(a: LuxPreset, b: LuxPreset, k: float) -> LuxPreset:
 		else a.room_probes_replace_ambient)
 	# the practicals' scale interpolates, so dusk brightens a store gradually
 	p.fluorescent_energy_scale = lerpf(a.fluorescent_energy_scale, b.fluorescent_energy_scale, k)
+	# a lamp on a photocell snaps with the preset it blends toward (0.71.0)
+	p.street_lamps_lit = b.street_lamps_lit if k >= 0.5 else a.street_lamps_lit
 
 	p.tonemap_mode = b.tonemap_mode if k >= 0.5 else a.tonemap_mode
 	p.exposure = lerpf(a.exposure, b.exposure, k)

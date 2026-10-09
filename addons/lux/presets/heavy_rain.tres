@@ -35,6 +35,7 @@ rain_fixed_fps = 30
 
 [resource]
 script = ExtResource("1_preset")
+street_lamps_lit = false
 preset_name = &"Heavy Rain"
 description = "Overcast storm: flat gray light, dense fog, wet surfaces, low saturation."
 sky_top_color = Color(0.3, 0.32, 0.36, 1)

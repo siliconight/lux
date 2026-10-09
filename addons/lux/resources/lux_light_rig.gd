@@ -67,6 +67,10 @@ extends Resource
 ## warm accent. A rig whose name says "fluorescent" scales anyway (0.55.0's
 ## rule); every other rig, the moody bare bulbs among them, does not.
 @export var preset_scaled: bool = false
+## A DUSK-TO-DAWN FIXTURE (0.71.0): it lights only while the preset in force
+## has `street_lamps_lit` (LuxPreset). The loader's `streetlight` and
+## `wall_pack` rows set it; a rig that is not one ignores the switch.
+@export var dusk_to_dawn: bool = false
 
 @export_group("Flicker")
 ## Subtle instability for fluorescents / failing bulbs. 0 = steady. The

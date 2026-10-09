@@ -45,8 +45,10 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 	# the practicals first: a scene with no sun still has its fluorescents
 	if preset != null:
 		_fluorescent_scale = preset.fluorescent_energy_scale
+		_street_lamps_lit = preset.street_lamps_lit
 		for n in _registered:
 			_scale_practical(n)
+			_switch_dusk_to_dawn(n)
 	if preset == null or sun == null:
 		return
 	sun.visible = preset.sun_enabled
@@ -87,6 +89,8 @@ static func _shadow_mode(mode: int) -> int:
 ## registered lamp's rig. A rig registers from its own _ready, which can come
 ## after the preset was applied, so registration scales it too.
 var _fluorescent_scale: float = 1.0
+## The preset's `street_lamps_lit` (0.71.0); true until a preset says.
+var _street_lamps_lit: bool = true
 
 
 func _scale_practical(light: Node) -> void:
@@ -97,10 +101,22 @@ func _scale_practical(light: Node) -> void:
 		(rig_node as LuxFluorescentRig).set_energy_scale(_fluorescent_scale)
 
 
+## The preset's `street_lamps_lit` (0.71.0), handed to the lamp's rig. Duck
+## typed: a rig class without the switch is left alone, and the rig itself
+## decides by its resource whether it is a dusk-to-dawn fixture.
+func _switch_dusk_to_dawn(light: Node) -> void:
+	if not is_instance_valid(light):
+		return
+	var rig_node := light.get_parent()
+	if rig_node != null and rig_node.has_method(&"set_lamps_lit"):
+		rig_node.call(&"set_lamps_lit", _street_lamps_lit)
+
+
 func register_light(light: Node3D) -> void:
 	if light != null and not _registered.has(light):
 		_registered.append(light)
 		_scale_practical(light)
+		_switch_dusk_to_dawn(light)
 		# A rig registers from its own _ready, which can come AFTER the
 		# preset was applied (LuxRoot is an earlier sibling in a packed
 		# scene), so the policy is re-run once the frame settles.

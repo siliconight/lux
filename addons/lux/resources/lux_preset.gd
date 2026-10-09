@@ -171,6 +171,18 @@ extends Resource
 ## and its preset is the place each one's light lives.
 @export_range(0.0, 0.2, 0.005) var bake_room_fill: float = 0.025
 
+## THE DUSK-TO-DAWN FIXTURES (0.71.0). The walker, 2026-10-09: "street lamps
+## aren't usually on during the day". A street pole and a wall pack -- on a
+## home, its porch light -- switch on a photocell in the world: when the sky
+## goes dark the lamp comes on. A DAY preset sets this false, and both stand
+## dark with their lens (`LuxStreetlightRig.set_lamps_lit`); dusk and night
+## leave it true. Everything else a level lights keeps its light by day: a
+## fuel canopy, a lit sign, a store's glass, a payphone, every room. A level
+## never changes its time of day (LEVEL_STANDARD section 17), and this is
+## read wherever a preset is applied -- the export, the editor's bake, a
+## re-bake under another slot -- so a day level bakes no street lamp.
+@export var street_lamps_lit: bool = true
+
 @export_group("Tonemap & Grade")
 @export_enum("Linear", "Reinhard", "Filmic", "ACES") var tonemap_mode: int = 2
 @export_range(0.25, 4.0) var exposure: float = 1.0

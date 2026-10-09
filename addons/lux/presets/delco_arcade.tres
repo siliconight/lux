@@ -14,6 +14,7 @@ accent = Color(1, 0.55, 0.2, 1)
 
 [resource]
 script = ExtResource("1_preset")
+street_lamps_lit = false
 preset_name = &"Delco Arcade"
 description = "Punchy saturated near vs washed-out far — arcade/PS2 plane-separation pop. Bright HDR key, cool light haze building with distance."
 sky_top_color = Color(0.32, 0.52, 0.82, 1)

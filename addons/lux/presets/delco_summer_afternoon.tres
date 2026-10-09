@@ -14,6 +14,7 @@ accent = Color(1, 0.55, 0.2, 1)
 
 [resource]
 script = ExtResource("1_preset")
+street_lamps_lit = false
 preset_name = &"Delco Summer Afternoon"
 description = "Hazy, warm suburban afternoon. The neutral, readable daytime baseline."
 sky_top_color = Color(0.34, 0.52, 0.78, 1)

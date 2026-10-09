@@ -126,6 +126,15 @@ var _flicker_phase: float = 0.0
 var _fail_t: float = 0.0
 var _lenses: Array = []
 
+## THE DUSK-TO-DAWN SWITCH (0.71.0). A rig whose resource is `dusk_to_dawn`
+## goes dark under a preset with `street_lamps_lit` false: the rig hidden, so
+## its lamps neither draw nor bake, and the lens nearest each lamp given a
+## dark copy of its material, so a dark lamp does not glow. LuxLighting calls
+## `set_lamps_lit` when a preset is applied and when a lamp registers.
+var _lamps_lit: bool = true
+## [mesh, surface, the override it had]
+var _dark_lenses: Array = []
+
 
 func _ready() -> void:
 	add_to_group(&"lux_light_rig")
@@ -145,6 +154,9 @@ func _bind_lenses() -> void:
 	_lenses.clear()
 	if rig == null or rig.failing_kind == LuxFailing.NONE or rig.bake_mode == 1:
 		return
+	# a dark dusk-to-dawn pole binds no failing lens; it binds when it relights
+	if not _lamps_lit:
+		return
 	var scene: Node = owner if owner != null else get_tree().current_scene
 	if scene == null:
 		scene = get_tree().root
@@ -161,6 +173,62 @@ func _bind_lenses() -> void:
 		own.resource_name = mat.resource_name
 		mi.set_surface_override_material(s, own)
 		_lenses.append([mi, s, own, own.emission_energy_multiplier])
+
+
+## Light or darken a dusk-to-dawn rig (0.71.0). A rig that is not one keeps
+## its light: the switch is the resource's (`LuxLightRig.dusk_to_dawn`), not
+## the class's, because a canopy wash is this class too.
+func set_lamps_lit(lit: bool) -> void:
+	if rig == null or not rig.dusk_to_dawn:
+		return
+	if lit == _lamps_lit and visible == lit:
+		return
+	_lamps_lit = lit
+	visible = lit
+	if lit:
+		_restore_lenses()
+		_bind_lenses.call_deferred()
+	else:
+		_darken_lenses.call_deferred()
+
+
+func lamps_lit() -> bool:
+	return _lamps_lit
+
+
+## Deferred, as `_bind_lenses` is: the spawner places a rig after adding it,
+## so when the switch first runs its lamps may still stand at the container's
+## origin. The lens nearest each lamp within a metre and a half takes a dark
+## copy of its material; the material it had is kept to put back.
+func _darken_lenses() -> void:
+	if _lamps_lit or not _dark_lenses.is_empty():
+		return
+	var scene: Node = owner if owner != null else get_tree().current_scene
+	if scene == null:
+		scene = get_tree().root
+	for l in _lights:
+		if not is_instance_valid(l):
+			continue
+		var hit: Array = LuxFailing.find_lens(scene, l.global_position, 1.5)
+		if hit.is_empty():
+			continue
+		var mi: MeshInstance3D = hit[0]
+		var s: int = hit[1]
+		var mat: BaseMaterial3D = mi.get_active_material(s) as BaseMaterial3D
+		if mat == null:
+			continue
+		var dark: BaseMaterial3D = mat.duplicate() as BaseMaterial3D
+		dark.resource_name = mat.resource_name
+		dark.emission_energy_multiplier = 0.0
+		_dark_lenses.append([mi, s, mi.get_surface_override_material(s)])
+		mi.set_surface_override_material(s, dark)
+
+
+func _restore_lenses() -> void:
+	for e in _dark_lenses:
+		if is_instance_valid(e[0]):
+			(e[0] as MeshInstance3D).set_surface_override_material(int(e[1]), e[2])
+	_dark_lenses.clear()
 
 
 func _rebuild() -> void:

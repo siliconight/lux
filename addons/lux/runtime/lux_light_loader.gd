@@ -1175,6 +1175,8 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			s.lamp_shadow_bias = LuxStreetlightRig.POLE_SHADOW_BIAS
 			var rs := LuxLightRig.new()
 			rs.rig_name = &"Streetlight (baked)"
+			# a photocell's lamp: dark under a day preset (0.71.0)
+			rs.dusk_to_dawn = true
 			rs.light_color = LuxColorTemp.kelvin(LuxColorTemp.SODIUM_VAPOR)
 			rs.light_range = 14.0
 			# DERIVED, NOT FLAT. This was `energy = 6.0`, a constant, while
@@ -1277,6 +1279,8 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			wp.name = String(a.get("id", "wall_pack"))
 			var rw := LuxLightRig.new()
 			rw.rig_name = &"Wall Pack (baked)"
+			# a photocell's lamp -- on a home, the porch light: dark by day (0.71.0)
+			rw.dusk_to_dawn = true
 			rw.light_color = LuxColorTemp.kelvin(LuxColorTemp.HALOGEN)
 			rw.energy = 2.5
 			# 5.5, down from 7.0 — same per-mesh budget law as the
