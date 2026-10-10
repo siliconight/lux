@@ -12,6 +12,15 @@ extends Resource
 @export var sky_horizon_color: Color = Color(0.78, 0.72, 0.62)
 @export var ground_color: Color = Color(0.28, 0.24, 0.2)
 @export_range(0.0, 2.0) var sky_energy: float = 1.0
+## THE GLOW AT THE HORIZON (0.73.0, roadmap 228): a town's light over dark
+## land, past the plate's edge, drawn by LuxHorizonGlow as one unshaded ring
+## around the LuxRoot. Energy 0 draws nothing. The top is where the glow has
+## faded out, in degrees above a standing eye's horizon: a town's climbs 10
+## to 20, and from 26 m a 3 m wall hides the first 3, so 4 showed in no frame.
+@export var horizon_glow_color: Color = Color(0.78, 0.47, 0.26)
+@export_range(0.0, 2.0) var horizon_glow_energy: float = 0.0
+@export_range(1.0, 45.0) var horizon_glow_top_deg: float = 20.0
+@export_range(50.0, 2000.0) var horizon_glow_radius_m: float = 380.0
 
 @export_group("Sun / Moon")
 @export var sun_enabled: bool = true

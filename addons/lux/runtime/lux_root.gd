@@ -205,6 +205,8 @@ func _apply_shadow_override() -> void:
 
 # Modules
 var _env: LuxEnvironment
+## The glow at the horizon (0.73.0); hidden when the preset's energy is 0.
+var _glow: LuxHorizonGlow = null
 var _sky_provider: LuxSkyProvider = null
 var _sky_provider_node: WorldEnvironment = null
 var _lighting: LuxLighting
@@ -348,7 +350,7 @@ func _build_modules() -> void:
 		if child is DirectionalLight3D or child is CanvasLayer \
 				or child is WorldEnvironment or child is LuxEnvironment \
 				or child is LuxLighting or child is LuxPostFX \
-				or child is LuxRain or child is LuxSkyProvider \
+				or child is LuxRain or child is LuxSkyProvider or child is LuxHorizonGlow \
 			or child == _sky_provider_node:
 			remove_child(child)
 			child.queue_free()
@@ -356,6 +358,7 @@ func _build_modules() -> void:
 	# or an editor reload leaves two of these writing the same parameters
 	_sky_provider = null
 	_sky_provider_node = null
+	_glow = null
 
 	# THE SKY PROVIDER GOES IN FIRST, as a child of this node, so that
 	# `ensure_world_environment` finds it among the parent's children rather
@@ -367,6 +370,10 @@ func _build_modules() -> void:
 	_env.name = &"LuxEnvironment"
 	add_child(_env)
 	_env.ensure_world_environment(self)
+	# THE GLOW AT THE HORIZON (0.73.0) hangs from this node, so the ring is
+	# centred where the level is; `apply` tunes it, and energy 0 hides it.
+	_glow = LuxHorizonGlow.new()
+	add_child(_glow)
 	# If the environment Lux adopted is a sky provider (SkyMint — duck-typed on
 	# its sun_light property), defer the sky to it: Lux writes only the grade,
 	# SkyMint keeps the panorama/clouds/day-night. auto_find_skymint gates it.
@@ -789,6 +796,8 @@ func _apply_immediate(preset: LuxPreset) -> void:
 		_env.apply(preset, _quality)
 	if _lighting != null:
 		_lighting.apply(preset, _quality)
+	if _glow != null:
+		_glow.apply(preset)
 	if _post != null:
 		_post_apply(preset)
 		_sync_film_precision()
@@ -933,6 +942,10 @@ func _lerp_preset(a: LuxPreset, b: LuxPreset, k: float) -> LuxPreset:
 	p.sky_horizon_color = a.sky_horizon_color.lerp(b.sky_horizon_color, k)
 	p.ground_color = a.ground_color.lerp(b.ground_color, k)
 	p.sky_energy = lerpf(a.sky_energy, b.sky_energy, k)
+	p.horizon_glow_color = a.horizon_glow_color.lerp(b.horizon_glow_color, k)
+	p.horizon_glow_energy = lerpf(a.horizon_glow_energy, b.horizon_glow_energy, k)
+	p.horizon_glow_top_deg = lerpf(a.horizon_glow_top_deg, b.horizon_glow_top_deg, k)
+	p.horizon_glow_radius_m = lerpf(a.horizon_glow_radius_m, b.horizon_glow_radius_m, k)
 
 	p.sun_enabled = b.sun_enabled if k >= 0.5 else a.sun_enabled
 	p.sun_elevation_deg = lerpf(a.sun_elevation_deg, b.sun_elevation_deg, k)
