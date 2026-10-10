@@ -809,8 +809,89 @@ const BAKE_FILL_REACH_CELLS := 1.5
 const BAKE_FILL_BULB_SHARE := 0.5
 
 
+## A DEN IS LIT AT ITS WALLS, AND IN ITS OWN COLOUR (0.72.0, roadmap 219
+## note 1). The walker, 2026-10-09, walking club_block_014's strip club at
+## midnight (cold run 9213): "still a tad too dark... still be dark and moody,
+## but lit enough for a player to see and experience it". Their comps -- a
+## VtMB bar and the Asylum's hall, a KOTOR 2 cantina -- measured a median
+## luma of 15 to 39, with 19 to 40% of each frame under 10. The club measured
+## a median of 1, 98% of the frame under 10.
+##
+## WHY IT WAS DARK, MEASURED on cold run 9217's walk copy (the factory root's
+## docs/findings/club_light_trials/):
+## - the club's light was almost all baked -- frame mean 3.7 on the main
+##   floor, 1.6 with the bake off -- and 0.68.2 laid no fill in a den;
+## - its carpet's albedo is 0.036 linear, so the washes' pools land on black;
+## - its ceiling is the office tile, 0.545, so anything that throws light up
+##   lights the ceiling: the stage lip's and the back bar's omnis made the
+##   only bright pools in the room, overhead.
+## Neither a fill nor brighter pools got there alone: a white den fill at the
+## bulb share reached a median of 3, the washes x3 a median of 1.
+##
+## WHAT THE COMPS DO, and what a den's bake now does: coloured washes on the
+## walls, and a room whose ceiling and floor carry its colour. Both are laid
+## by `add_bake_fills` and freed before the save, like the room fills, so a
+## level carries nothing of them at run time:
+## - every wall of a TINTED den room takes a row of washers, about
+##   DEN_WASH_PITCH_M apart, each in the colour of the nearest club wash in
+##   the room (`_lay_den_washers`);
+## - the tinted room is filled at DEN_FILL_SHARE of the preset's room fill,
+##   in its probe's own colour. A WHITE fill was tried first and refused on
+##   the frames: it turned the office tile overhead into a grey grid and read
+##   as a hall. Tinted, the ceiling carries the room's colour instead;
+## - an untinted room in a den -- a back room, the cash office -- is filled
+##   white at DEN_BACK_SHARE, the bulb rooms' share: 0.68.2 kept dens unfilled
+##   after strip_club_a02's back rooms became the brightest room in a level
+##   (52.3) at a full share.
+##
+## CHOSEN AGAINST FRAMES, not derived (re-baked copies of 9217's walk copy,
+## light_check's room stations, mean / p50 of 255, Delco Night):
+##
+##     what one washer puts on the wall,    main floor   VIP wing
+##     x REFERENCE_POOL; the fill's share
+##     0.71.0                                  3.7 / 1      2.2 / 0
+##     no washers, white fill 0.5              7.5 / 3      4.6 / 1
+##     washers 1.56, no fill                   6.9 / 2      7.9 / 2
+##     washers 3.12, no fill                   9.4 / 3     12.6 / 4
+##     washers 1.56, white fill 2             24.9 / 11    21.3 / 8
+##     washers 1.56, tinted fill 2            13.2 / 7     10.5 / 5
+##     washers 2.34, tinted fill 2            14.5 / 8     13.0 / 7
+##     washers 2.34, tinted fill 4            21.3 / 10    15.2 / 9
+##
+## So washers at 2.34 and a tinted fill at 2: in the frames the club reads as
+## coloured walls over dark furniture, under an amber or pink ceiling, and
+## half of each frame stays under 10. The fill at 4 is brighter and shows
+## more of the office grid overhead -- the walker's call, framed in the
+## findings. Not the comps' median yet: the carpet and the ceiling are
+## Deli Counter's, not light's.
+const DEN_WASH_LEVEL := 2.34
+const DEN_FILL_SHARE := 2.0
+const DEN_BACK_SHARE := BAKE_FILL_BULB_SHARE
+## THE WASHER'S GEOMETRY, as the trials laid it -- chosen, not derived; the
+## level above was set against frames of exactly this. A washer every
+## DEN_WASH_PITCH_M of wall, the wall's spaced evenly; DEN_WASH_INSET_M in
+## from it, about a quarter of a 3.3 m storey, close enough that each leaves
+## a scallop on the wall rather than an even wash, which is the comps'
+## look; DEN_WASH_DROP_M under the ceiling, a tube's hang. A room narrower
+## than four insets takes a quarter of its width instead.
+const DEN_WASH_PITCH_M := 3.0
+const DEN_WASH_INSET_M := 0.8
+const DEN_WASH_DROP_M := 0.25
+## Where on the wall it aims, over the floor, and its cone's half-angle.
+const DEN_WASH_AIM_M := 1.0
+const DEN_WASH_ANGLE_DEG := 50.0
+## Its reach: the foot of a 3.3 m storey's wall is 3.15 m from a washer, and
+## the range window is 0.38 there, so the pool's tail reaches the floor.
+const DEN_WASH_RANGE_M := 4.0
+## The washers' names begin with this, so a fill's count by probe name never
+## takes them in.
+const DEN_WASH_PREFIX := "DenWash"
+
+
 ## Lay the bake-only room fills under `scene_root` and return their
-## container, or null when nothing asks for one. Clears an earlier call's
+## container, or null when nothing asks for one. A den's rooms are filled
+## too since 0.72.0, and its tinted rooms washed at their walls (DEN_WASH_LEVEL).
+## Clears an earlier call's
 ## fill first, always. `energy` is each fill's; negative reads the scene's
 ## LuxRoot preset (`bake_fill_energy`). For a light bake to call before it
 ## bakes and to free before it saves; `scene_root` must be in the tree.
@@ -843,22 +924,38 @@ static func add_bake_fills(scene_root: Node, energy: float = -1.0) -> Node3D:
 		if not rp.ambient_color.is_equal_approx(ROOM_AMBIENT_DERIVED_COLOR):
 			dens[_probe_building(rp)] = true
 	var container: Node3D = null
+	# the club washes, whose colours a den's walls take (0.72.0)
+	var washes: Array = []
+	for n in scene_root.find_children("*", "Node3D", true, false):
+		if n is LuxFluorescentRig and (n as LuxFluorescentRig).rig != null \
+				and String((n as LuxFluorescentRig).rig.rig_name).begins_with("Club Wash"):
+			washes.append([(n as Node3D).global_position,
+				(n as LuxFluorescentRig).rig.light_color])
 	for p in probes:
-		if not p.ambient_color.is_equal_approx(ROOM_AMBIENT_DERIVED_COLOR) \
-				or dens.has(_probe_building(p)):
-			continue
+		# A DEN IS FILLED TOO (0.72.0): a tinted room -- a club's floor -- in
+		# its own colour at DEN_FILL_SHARE, with washers on its walls; an
+		# untinted one -- a den's back room -- white, at DEN_BACK_SHARE. Until
+		# 0.72.0 a den's every room was skipped here (0.68.2).
+		var den := dens.has(_probe_building(p))
+		var tinted := not p.ambient_color.is_equal_approx(ROOM_AMBIENT_DERIVED_COLOR)
 		var room := p.size - Vector3.ONE * 2.0 * ROOM_AMBIENT_MARGIN
 		if room.x <= 0.0 or room.y <= 0.0 or room.z <= 0.0:
 			continue
 		var xf := p.global_transform
 		var inv := xf.affine_inverse()
 		var share := 1.0
-		for b in bulbs:
-			var l: Vector3 = inv * b
-			if absf(l.x) <= p.size.x * 0.5 and absf(l.y) <= p.size.y * 0.5 \
-					and absf(l.z) <= p.size.z * 0.5:
-				share = BAKE_FILL_BULB_SHARE
-				break
+		var colour := Color(1.0, 1.0, 1.0)
+		if den:
+			share = DEN_FILL_SHARE if tinted else DEN_BACK_SHARE
+			if tinted:
+				colour = p.ambient_color
+		else:
+			for b in bulbs:
+				var l: Vector3 = inv * b
+				if absf(l.x) <= p.size.x * 0.5 and absf(l.y) <= p.size.y * 0.5 \
+						and absf(l.z) <= p.size.z * 0.5:
+					share = BAKE_FILL_BULB_SHARE
+					break
 		var nx := maxi(1, ceili(room.x / BAKE_FILL_CELL_M))
 		var nz := maxi(1, ceili(room.z / BAKE_FILL_CELL_M))
 		var y := -room.y * 0.5 + minf(BAKE_FILL_HEIGHT_M, room.y * 0.6)
@@ -873,6 +970,7 @@ static func add_bake_fills(scene_root: Node, energy: float = -1.0) -> Node3D:
 					room.z * ((k + 0.5) / float(nz) - 0.5))
 				var omni := OmniLight3D.new()
 				omni.name = "%s_%d" % [String(p.name), i * nz + k]
+				omni.light_color = colour
 				omni.light_energy = energy * share
 				omni.light_bake_mode = Light3D.BAKE_STATIC
 				omni.omni_range = BAKE_FILL_REACH_CELLS * BAKE_FILL_CELL_M
@@ -880,7 +978,85 @@ static func add_bake_fills(scene_root: Node, energy: float = -1.0) -> Node3D:
 				container.add_child(omni)
 				omni.owner = owner_node
 				omni.global_position = xf * local
+		if den and tinted:
+			_lay_den_washers(container, p, room, washes, owner_node)
 	return container
+
+
+## Lay DEN_WASH_LEVEL's washers along every wall of the den room `p` stands
+## for (0.72.0) into `container`, and return how many. `room` is the probe's
+## box less its margin. Each washer hangs DEN_WASH_INSET_M in from its wall,
+## DEN_WASH_DROP_M under the ceiling, the wall's washers spaced evenly at
+## about DEN_WASH_PITCH_M, and aims at the wall DEN_WASH_AIM_M over the
+## floor. It takes the colour of the nearest club wash standing in the room
+## (`washes`, [position, colour] pairs), or the room's own tint when none
+## does. Static and owned, like the fills: the bake keeps their light, and
+## frees them before it saves.
+##
+## THE ENERGY PUTS THE LEVEL ON THE WALL, NOT ON THE AXIS. The ray to the aim
+## point meets the wall's horizontal normal at cos = inset / d, so the value
+## asked of `energy_for` (which solves on the axis) is the level over that
+## cosine. RETRACTED, kept: the trials that chose the level
+## (`docs/findings/club_light_trials/` at the factory root) took the cosine
+## as the ray's VERTICAL share, drop / d, and so labelled every washer 2.56x
+## brighter than it put on the wall. Their energies were exact; the level
+## below is theirs, re-derived with the right cosine.
+static func _lay_den_washers(container: Node3D, p: ReflectionProbe, room: Vector3,
+		washes: Array, owner_node: Node) -> int:
+	var xf := p.global_transform
+	var inv := xf.affine_inverse()
+	var head := room.y * 0.5 - DEN_WASH_DROP_M
+	var aim_y := -room.y * 0.5 + minf(DEN_WASH_AIM_M, room.y * 0.5)
+	var dx := minf(DEN_WASH_INSET_M, minf(room.x, room.z) * 0.25)
+	var dy := head - aim_y
+	if dx <= 0.0 or dy <= 0.0:
+		return 0
+	var d := sqrt(dx * dx + dy * dy)
+	var energy := energy_for(DEN_WASH_LEVEL * REFERENCE_POOL * d / dx, d,
+		DEN_WASH_RANGE_M, String(p.name))
+	var laid := 0
+	for side in 4:
+		# sides 0 and 1 are the walls at +x and -x, which run along z;
+		# 2 and 3 the walls at +z and -z, which run along x
+		var on_x := side < 2
+		var sgn := 1.0 if side % 2 == 0 else -1.0
+		var length := room.z if on_x else room.x
+		var half := (room.x if on_x else room.z) * 0.5
+		var count := maxi(1, int(round(length / DEN_WASH_PITCH_M)))
+		for i in count:
+			var along := length * ((float(i) + 0.5) / float(count) - 0.5)
+			var at := Vector3(along, head, sgn * (half - dx))
+			var aim := Vector3(along, aim_y, sgn * half)
+			if on_x:
+				at = Vector3(sgn * (half - dx), head, along)
+				aim = Vector3(sgn * half, aim_y, along)
+			var gpos: Vector3 = xf * at
+			var col := p.ambient_color
+			var best := INF
+			for w in washes:
+				var wp: Vector3 = w[0]
+				var lw: Vector3 = inv * wp
+				if absf(lw.x) > p.size.x * 0.5 or absf(lw.z) > p.size.z * 0.5:
+					continue
+				var dd := Vector2(wp.x - gpos.x, wp.z - gpos.z).length()
+				if dd < best:
+					best = dd
+					col = w[1]
+			var spot := SpotLight3D.new()
+			spot.name = "%s_%s_%d_%d" % [DEN_WASH_PREFIX, String(p.name), side, i]
+			spot.light_color = col
+			spot.light_energy = energy
+			spot.light_bake_mode = Light3D.BAKE_STATIC
+			spot.spot_range = DEN_WASH_RANGE_M
+			spot.spot_attenuation = 2.0
+			spot.spot_angle = DEN_WASH_ANGLE_DEG
+			spot.spot_angle_attenuation = 0.5
+			container.add_child(spot)
+			spot.owner = owner_node
+			spot.global_position = gpos
+			spot.look_at(xf * aim, Vector3.UP)
+			laid += 1
+	return laid
 
 
 ## The site building a room probe stands in. Lot's `merge_lights` ids every

@@ -130,9 +130,11 @@ func _main() -> void:
 	_check("the fills are owned by the scene, so the lightmapper takes them", owned, true)
 	_check("a 12 x 8 room gets 2 x 2 fills", _fills_of(fills, "shop_floor").size(), 4)
 	_check("a turned 7 x 5 room gets 2 x 1", _fills_of(fills, "turned_room").size(), 2)
-	_check("a club room gets none", _fills_of(fills, "club_floor").size(), 0)
+	# 0.72.0: a club room is filled too, in its own colour, and washed at its
+	# walls (tools/den_light_selftest.gd holds what each of those is)
+	_check("a club room is filled, 2 x 2", _fills_of(fills, "club_floor").size(), 4)
 	_check("a 6 x 6 basement gets 1", _fills_of(fills, "vault").size(), 1)
-	_check("seven in all", fills.get_child_count(), 7)
+	_check("eleven fills and the club's twelve washers", fills.get_child_count(), 23)
 	var shop_ok := true
 	for f in _fills_of(fills, "shop_floor"):
 		var o := f as OmniLight3D
@@ -164,8 +166,11 @@ func _main() -> void:
 	for p in [den_floor, den_back, plain]:
 		level.add_child(p)
 	var dens: Node3D = loader.add_bake_fills(level, 0.025)
-	_check("a club building's back room keeps no fill", _fills_of(dens, "b5_back_rooms_ambient").size(), 0)
-	_check("...nor its tinted floor", _fills_of(dens, "b5_main_floor_ambient").size(), 0)
+	# 0.72.0: a den's back room is filled at DEN_BACK_SHARE, its tinted floor
+	# at DEN_FILL_SHARE -- 0.68.2 held both at none
+	_check("a club building's back room is filled at the den's back share",
+		_fills_of(dens, "b5_back_rooms_ambient").size(), 2)
+	_check("...and its tinted floor", _fills_of(dens, "b5_main_floor_ambient").size(), 4)
 	_check("an ordinary building beside it keeps its own", _fills_of(dens, "b6_office_ambient").size(), 1)
 	_check("control: a probe naming no building stands alone", _fills_of(dens, "shop_floor").size(), 4)
 	for p in [den_floor, den_back, plain]:
@@ -177,7 +182,7 @@ func _main() -> void:
 		if String(c.name).begins_with(String(k["BAKE_FILL_CONTAINER"])):
 			containers += 1
 	_check("a second call replaces the fill, not adds to it", containers, 1)
-	_check("...and lays the same seven", again.get_child_count() if again != null else -1, 7)
+	_check("...and lays the same twenty-three", again.get_child_count() if again != null else -1, 23)
 	again.free()
 
 	# with no energy given: the scene's LuxRoot preset decides
