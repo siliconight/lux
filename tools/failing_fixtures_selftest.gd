@@ -160,6 +160,31 @@ func _main() -> void:
 	for mk in markers:
 		mk.free()
 
+	# --- one a room across its rows (0.74.0) ----------------------------------
+	var rows: Array = [
+		_marker("LuxEmit_fluorescent_21", "sales_floor_ceiling"),
+		_marker("LuxEmit_fluorescent_22", "sales_floor_ceiling"),
+		_marker("LuxEmit_fluorescent_23", "sales_floor_ceiling_r1"),
+		_marker("LuxEmit_fluorescent_24", "sales_floor_ceiling_r1"),
+		_marker("LuxEmit_fluorescent_25", "sales_floor_ceiling_r2"),
+		_marker("LuxEmit_fluorescent_26", "sales_floor_ceiling_r2_0"),
+		_marker("LuxEmit_fluorescent_27", "sales_floor_ceiling_r2_1"),
+		_marker("LuxEmit_fluorescent_28", "stockroom_ceiling"),
+		_marker("LuxEmit_pendant_21", "vault_bulbs"),
+		_marker("LuxEmit_pendant_22", "vault_bulbs_1"),
+	]
+	var by_room: Dictionary = spawner.choose_failing(rows)
+	_check("a room is its anchor up to _ceiling", spawner.room_of("sales_floor_ceiling_r2_1"), "sales_floor_ceiling")
+	_check("a bulb run's room is its anchor up to _bulbs", spawner.room_of("vault_bulbs_1"), "vault_bulbs")
+	_check("an anchor named otherwise is its own room", spawner.room_of("room_a"), "room_a")
+	_check("three rooms, three failing lamps across their rows", by_room.size(), 3)
+	var rooms: Dictionary = {}
+	for mk in by_room:
+		rooms[spawner.room_of(String(mk.get_meta("lux_anchor_id")))] = true
+	_check("one each in the sales floor, the stockroom and the vault", rooms.size(), 3)
+	for mk in rows:
+		mk.free()
+
 	# --- a failing rig in a tree moves its lamp and its own lens ---------------
 	var tube: Node = loader.rig_for_anchor({"id": "stockroom_ceiling", "type": "fluorescent",
 		"pos": [0.0, 0.0, 3.8], "rot_y": 0.0, "drop": 3.8, "row": {"count": 1, "spacing": 0.0}})

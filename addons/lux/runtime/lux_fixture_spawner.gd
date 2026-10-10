@@ -126,10 +126,26 @@ static func spawn(scene_root: Node, parent: Node = null) -> Dictionary:
 	return {"ok": true, "msg": msg, "count": made, "skipped": skipped}
 
 
-## Which markers fail, and how: ``{marker: [kind, seed]}``. One a
-## `lux_anchor_id` among the fluorescent and pendant markers, chosen by the
-## anchor id's hash -- deterministic, and an authored rename is the only
-## thing that moves it. Markers with no anchor id are grouped by their type.
+## ONE BAD TUBE A ROOM, NOT A ROW (0.74.0, roadmap 229). Deli Counter 0.206.0
+## lays a wide room's ceiling in two or three row anchors, `<room>_ceiling`,
+## `<room>_ceiling_r1`, `_r2`, each split run `_<i>`; one failing lamp an
+## anchor would stutter three tubes in one sales floor, a fault rather than
+## the tell one bad tube is. An anchor's room is everything up to and
+## including its `_ceiling` or `_bulbs`; an anchor named otherwise is its
+## own group, as before.
+static func room_of(anchor: String) -> String:
+	for stem: String in ["_ceiling", "_bulbs"]:
+		var k: int = anchor.rfind(stem)
+		if k >= 0:
+			return anchor.substr(0, k + stem.length())
+	return anchor
+
+
+## Which markers fail, and how: ``{marker: [kind, seed]}``. One a ROOM
+## (`room_of`, 0.74.0) among the fluorescent and pendant markers, chosen by
+## the room's hash among every lamp of every row -- deterministic, and an
+## authored rename is the only thing that moves it. Markers with no anchor
+## id are grouped by their type.
 static func choose_failing(markers: Array) -> Dictionary:
 	var groups: Dictionary = {}
 	for m in markers:
@@ -142,7 +158,7 @@ static func choose_failing(markers: Array) -> Dictionary:
 			kind = LuxFailing.WAVER
 		else:
 			continue
-		var anchor := String(marker_payload(mk, "lux_anchor_id", t))
+		var anchor := room_of(String(marker_payload(mk, "lux_anchor_id", t)))
 		if not groups.has(anchor):
 			groups[anchor] = [kind, []]
 		(groups[anchor][1] as Array).append(mk)
