@@ -210,7 +210,8 @@ static func shadow_rank_of_name(name: String) -> int:
 		return 0
 	if name.contains("window"):
 		return 1
-	if name.contains("bulb") or name.contains("pendant"):
+	# a home's dome (0.75.0) is a bulb behind glass, ranked with the bulbs
+	if name.contains("bulb") or name.contains("pendant") or name.contains("dome"):
 		return 2
 	if name.contains("fluorescent") or name.contains("ceiling"):
 		return 3

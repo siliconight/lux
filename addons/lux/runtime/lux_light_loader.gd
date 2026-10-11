@@ -501,6 +501,30 @@ const FLUORESCENT_MOUNT := -0.25
 ## wider bulb or a longer stretch moves it.
 const BULB_LAMP_DROP_M := 0.022
 
+## A HOME'S DOME (0.75.0, roadmap 229's species step). Deli Counter 0.208.0
+## writes a home's room as `dome` anchors -- a fixture a `HOME_BAY_M` bay
+## (its 0.207.1) at the ceiling plane -- and Zoo 1.98.0's `dome_fixture` is
+## the hardware: a canopy on the ceiling, a frosted bowl under it. Until
+## then a bedroom hung a 2 x 4 office troffer and its cool row.
+##
+## Two incandescent bulbs behind frosted glass, the one light of the room:
+## warm, the pendant's colour, and brighter than its bare bulb (1.3) by the
+## second bulb less what the glass keeps. Steady, so it bakes; never chosen
+## to fail (`LuxFixtureSpawner.choose_failing` reads fluorescents and
+## pendants), because a home's bad bulb gets changed.
+const DOME_ENERGY := 1.6
+## The lamp hangs UNDER the glass, for the pendant's reason (BULB_LAMP_DROP_M:
+## a lamp inside a closed shell bakes to nothing). Zoo's deepest dome is its
+## genome's 0.16 m height -- canopy, bowl and the finial's exposed half --
+## below the anchor, plus the centimetre the pole's lamp keeps under its
+## lens. Zoo owns the first number: a deeper bowl moves this.
+const DOME_LAMP_DROP_M := 0.17
+## Deli Counter's `_HOME_SPACING`: a home's fixtures stand a bay apart, and
+## the dome's pool reaches its bay's corner -- range = sqrt(drop^2 +
+## (HOME_BAY_M / sqrt 2)^2) -- so two neighbours' pools meet and no corner
+## of a bay is outside both. Deli Counter owns the number.
+const HOME_BAY_M := 7.0
+
 
 ## Bake ONLY the daylight anchors of `path` under a `LuxDaylight` container,
 ## leaving whatever the marker path spawned alone. Returns {ok, msg, count,
@@ -1264,6 +1288,26 @@ static func _rig_for(a: Dictionary) -> Node3D:
 			_make_downlight(rb)
 			b.rig = rb
 			return b
+		"dome":
+			# A HOME'S DOME (0.75.0): the pendant's machinery and colour, the
+			# lamp under the bowl, the pool to the bay's corner (see DOME_*).
+			var dm := LuxFluorescentRig.new()
+			dm.name = String(a.get("id", "dome"))
+			var rdm := LuxLightRig.new()
+			rdm.rig_name = &"Dome (incandescent, baked)"
+			rdm.light_color = LuxColorTemp.kelvin(LuxColorTemp.INCANDESCENT)
+			rdm.energy = DOME_ENERGY
+			var ddrop := float(a.get("drop", 0.0))
+			var half_diag := HOME_BAY_M / sqrt(2.0)
+			rdm.light_range = clampf(sqrt(ddrop * ddrop + half_diag * half_diag), 4.0, 7.5) \
+					if ddrop > 0.0 else 5.5
+			rdm.count = int(row.get("count", 1))
+			rdm.spacing = float(row.get("spacing", 0.0))
+			rdm.mount_height = -DOME_LAMP_DROP_M
+			rdm.flicker_amount = 0.0
+			_make_downlight(rdm)
+			dm.rig = rdm
+			return dm
 		"heat_lamp":
 			var hl := LuxFluorescentRig.new()
 			hl.name = String(a.get("id", "heat_lamp"))

@@ -304,7 +304,7 @@ static func _summarise(rows: Array, shadow_budget: int) -> Dictionary:
 ## Coarse class for the summary, from the rig label -- same words
 ## LuxLighting.shadow_rank_of_name reads.
 static func class_of(label: String) -> String:
-	for w in ["sign", "pack", "street", "window", "bulb", "pendant", "fluorescent", "ceiling"]:
+	for w in ["sign", "pack", "street", "window", "bulb", "pendant", "dome", "fluorescent", "ceiling"]:
 		if label.contains(w):
 			return w
 	return "other"
