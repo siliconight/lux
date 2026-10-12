@@ -6,6 +6,9 @@ extends Node
 ## and runs the alarm pulse. Child of LuxRoot.
 
 var sun: DirectionalLight3D
+## What the preset and the tier want of the sun's shadow; `_apply_sun_mode`
+## decides whether it is drawn live (0.76.0).
+var _sun_shadows_wanted: bool = false
 var _registered: Array[Node3D] = []
 # Fixture lit-face materials bound by LuxEmissiveBinder (v0.14), and the
 # building-power state that gates them together with the non-alarm lights.
@@ -63,7 +66,9 @@ func apply(preset: LuxPreset, quality: LuxQualityProfile) -> void:
 	sun.transform.basis = basis
 	sun.light_color = preset.sun_color
 	sun.light_energy = preset.sun_energy
-	sun.shadow_enabled = preset.sun_shadows and quality.allow_sun_shadows
+	# THE SUN IS BAKED WHILE THE LIGHTMAP SHOWS (0.76.0): `_apply_sun_mode`
+	_sun_shadows_wanted = preset.sun_shadows and quality.allow_sun_shadows
+	_apply_sun_mode()
 	# The preset prices its own sun shadow (0.38.0): one orthogonal split
 	# over a short reach is what an interior needs from it, and the tier's
 	# 100 m 4-split cascade is what it used to be charged. 0 keeps the tier's
@@ -329,6 +334,37 @@ func _sync_lightmaps() -> void:
 		var lm: LightmapGI = pair[0]
 		if is_instance_valid(lm):
 			lm.light_data = pair[1] if show else null
+	_apply_sun_mode()
+
+
+## THE SUN IS BAKED WHILE THE LIGHTMAP SHOWS (0.76.0, factory roadmap 243).
+## The sun was a dynamic light: the lightmap held only its bounce, and its
+## light and shadows were drawn live every frame. Measured in the factory
+## (`docs/findings/lux_tiers/`, Level Factory's 53 station headings, GL
+## Compatibility): its live shadows were 1,854 of a heading's 2,642 draws and
+## 3.56 ms of an 8.0 ms median p95. Baked with its shadows and drawn without
+## them, 788 draws and 4.42 ms, the look kept but for what moves -- it casts
+## and takes no sun shadow -- and shadows as soft as the lightmap's texels.
+## So: in the editor, where Level Factory bakes, the sun is STATIC with the
+## preset's shadows, so the bake traces them (a static sun baked unshadowed
+## bakes flat); at run time it is static and unshadowed while a lightmap
+## shows, and dynamic with the preset's shadows whenever none does -- no
+## lightmap, the power cut (daylight must not go out with the lamps), or
+## baked lighting switched off.
+func _apply_sun_mode() -> void:
+	if sun == null or not is_instance_valid(sun):
+		return
+	var editor: bool = Engine.is_editor_hint()
+	var shown: bool = _baked_on and _fixtures_powered and not _lightmaps.is_empty()
+	var mode: Light3D.BakeMode = Light3D.BAKE_STATIC if editor or shown else Light3D.BAKE_DYNAMIC
+	var changed: bool = sun.light_bake_mode != mode
+	sun.light_bake_mode = mode
+	sun.shadow_enabled = _sun_shadows_wanted and (editor or not shown)
+	# a bake mode changed at run time pairs again with the geometry only once
+	# the light is hidden and shown (`set_baked_lighting`'s finding)
+	if changed and not editor and sun.visible:
+		sun.visible = false
+		sun.visible = true
 
 
 func fixtures_powered() -> bool:
