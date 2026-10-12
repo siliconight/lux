@@ -343,12 +343,18 @@ func _sync_lightmaps() -> void:
 ## (`docs/findings/lux_tiers/`, Level Factory's 53 station headings, GL
 ## Compatibility): its live shadows were 1,854 of a heading's 2,642 draws and
 ## 3.56 ms of an 8.0 ms median p95. Baked with its shadows and drawn without
-## them, 788 draws and 4.42 ms, the look kept but for what moves -- it casts
-## and takes no sun shadow -- and shadows as soft as the lightmap's texels.
-## So: in the editor, where Level Factory bakes, the sun is STATIC with the
-## preset's shadows, so the bake traces them (a static sun baked unshadowed
-## bakes flat); at run time it is static and unshadowed while a lightmap
-## shows, and dynamic with the preset's shadows whenever none does -- no
+## them, 788 draws and 4.42 ms, the look kept but for what the lightmap does
+## not hold -- what moves, and anything a level loads outside the baked scene
+## (the factory's backdrop) -- which takes the sun with no shadow, and shadows
+## as soft as the lightmap's texels.
+## So: in the editor, where Level Factory bakes, the sun is STATIC, so the
+## bake carries its light; its shadow flag stays as the preset and the tier
+## ask, and the bake traces the sun's occlusion either way (0.76.1: the
+## factory's arms B and B2, baked with the flag off and on, read the same
+## frames -- 0.76.0 said a static sun baked unshadowed bakes flat, which was
+## never measured and is not so). At run time it is static and unshadowed
+## while a lightmap shows, and dynamic with the preset's shadows whenever
+## none does -- no
 ## lightmap, the power cut (daylight must not go out with the lamps), or
 ## baked lighting switched off.
 func _apply_sun_mode() -> void:

@@ -21,9 +21,11 @@ extends SceneTree
 ##       lightmap does, and the sun still follows the lightmap's mode;
 ##   [6] the CONTROL: a preset asking no sun shadows gets none in either mode.
 ##
-## What it cannot hold: the editor, where the sun is static WITH its shadows
-## so Level Factory's bake traces them (`Engine.is_editor_hint()` cannot be
-## set from a script). A cold run's bake proves that case.
+## What it cannot hold: the editor, where the sun is static so Level
+## Factory's bake carries its light (`Engine.is_editor_hint()` cannot be set
+## from a script). The factory's cold run 9265 proves that case: 0.76.0 in a
+## real drive, its frames reading as the re-baked arm it was written from,
+## inside a re-bake's own noise.
 
 var _fails: int = 0
 
