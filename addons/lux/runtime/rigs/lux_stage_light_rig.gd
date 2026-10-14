@@ -51,6 +51,22 @@ func _ready() -> void:
 	set_process(_cycles())
 
 
+## Every lamp at the colour its cycle starts in, and the clock at zero
+## (0.77.0): see LuxFluorescentRig.rest. A cycling rig's colours are a
+## function of its clock, so a scene packed after some frames kept wherever
+## the clock had reached.
+func rest() -> void:
+	_t = 0.0
+	var r := rig if rig != null else _default_rig()
+	for i in _lights.size():
+		if not is_instance_valid(_lights[i]):
+			continue
+		if colors.size() > 0:
+			_lights[i].light_color = colour_at(colors, i, 0.0, cycle_period_s)
+		else:
+			_lights[i].light_color = r.light_color
+
+
 func _cycles() -> bool:
 	return cycle_period_s > 0.0 and colors.size() > 1 \
 		and not (rig != null and rig.bake_mode == 1)

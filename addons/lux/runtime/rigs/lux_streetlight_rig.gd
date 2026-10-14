@@ -148,6 +148,24 @@ func _ready() -> void:
 		set_process(true)
 
 
+## Every lamp at its steady energy, every failing lens at its steady glow, and
+## the clocks at zero (0.77.0): see LuxFluorescentRig.rest -- across the
+## factory's cold runs 9295 to 9300 three poles' energies moved from run to
+## run. A dark dusk-to-dawn rig stays dark: its switch is `visible` and its
+## lenses' dark copies, which this does not touch.
+func rest() -> void:
+	_fail_t = 0.0
+	_flicker_phase = 0.0
+	var r := rig if rig != null else _default_rig()
+	for l in _lights:
+		if is_instance_valid(l):
+			l.light_energy = r.energy
+	var root := _find_lux_root()
+	if root == null or root.fixtures_powered():
+		for e in _lenses:
+			(e[2] as BaseMaterial3D).emission_energy_multiplier = float(e[3])
+
+
 ## A cycling pole dims its own lens with its lamp (0.62.0): the nearest lit
 ## face to each lamp within a metre and a half, given a material of its own.
 func _bind_lenses() -> void:

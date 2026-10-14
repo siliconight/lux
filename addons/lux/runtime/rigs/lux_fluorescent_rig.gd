@@ -39,6 +39,27 @@ func set_energy_scale(s: float) -> void:
 			l.light_energy = r.energy * energy_scale
 
 
+## Every lamp at its steady energy, every failing lens at its steady glow, and
+## the clocks at zero (0.77.0, the factory's roadmap 247): the state a scene
+## should be SAVED in. The rig animates from its own clocks whenever it
+## processes, and a scene packed after some frames of that -- the factory's
+## Lux apply awaits seven -- kept whatever they had reached: across its cold
+## runs 9295 to 9300 seven flickering pendants' energies moved by about one
+## part in 10,000 a run, and a failing tube read 2.618 or 3.7. Called by the
+## packer; at run time the clocks start from zero as they always did.
+func rest() -> void:
+	_fail_t = 0.0
+	_flicker_phase = 0.0
+	var r := rig if rig != null else _default_rig()
+	for l in _lights:
+		if is_instance_valid(l):
+			l.light_energy = r.energy * energy_scale
+	var root := _find_lux_root()
+	if root == null or root.fixtures_powered():
+		for e in _lenses:
+			(e[2] as BaseMaterial3D).emission_energy_multiplier = float(e[3])
+
+
 func _ready() -> void:
 	add_to_group(&"lux_light_rig")
 	_rebuild()
