@@ -85,6 +85,18 @@ func _apply_shadow_override() -> void:
 	if _quality != null and shadow_caster_budget >= 0:
 		_quality.max_shadow_casters = shadow_caster_budget
 
+@export_group("Editor")
+## KEEP LUX'S RUNTIME SCAFFOLDING WHEN THE SCENE IS SAVED IN THE EDITOR (0.78.0,
+## the factory's roadmap 24). Off by default: the WorldEnvironment, sun and post
+## stack this node builds on ready are runtime scaffolding, and owned to the
+## edited scene one Ctrl+S kept all seven of those nodes in it -- measured by
+## opening a shipped `lux.applied.tscn` in the editor and saving it (the
+## factory's docs/findings/lux_owner_24/). Off, the editor still draws them and
+## no save keeps them. On, they are owned again and shown in the Scene dock,
+## for a level that wants them as its own nodes. A call made 2026-10-19 and
+## meant to be changed.
+@export var persist_scaffolding_in_editor: bool = false
+
 @export_group("Startup")
 @export var apply_on_ready: bool = true
 

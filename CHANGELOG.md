@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.78.0] - runtime scaffolding stays ownerless in the editor, unless a LuxRoot asks
+
+**The factory's roadmap 24, measured.** Opening cold run 9323's shipped `lux.applied.tscn` in Godot's headless
+editor and saving it ADDED 7 nodes: `LuxSun`, `LuxWorldEnvironment`, and the post stack's CanvasLayer with its
+BackBufferCopy, LuxPostRect, LuxCRTBackBuffer and LuxCRTRect. A second save added the same 7, not 14, because
+`_build_modules` clears its own scaffolding first, so a clean editor keeps it without multiplying it. Every one was
+owned to `edited_scene_root` under `if Engine.is_editor_hint()` in the environment, lighting and post-FX modules,
+and ownership is all that separates scaffolding from a member a save keeps.
+
+**The rule, a call made 2026-10-19 and meant to be changed:** runtime scaffolding is ownerless in the editor too.
+The editor still draws it, and no save keeps it. A LuxRoot that wants it kept sets `persist_scaffolding_in_editor`,
+default off. The light loader and fixture spawner own what the apply step persists, and are unchanged.
+
+### Added
+- `LuxRoot.persist_scaffolding_in_editor` (an Editor group), asked by the four editor-time owner sites.
+- `tools/scaffold_owner_selftest.gd`, which fails on 0.77.0.
+
+### Proven
+The factory's `docs/findings/lux_owner_24/owner_probe.py`, re-run on a copy of the same package carrying this
+runtime: a save adds nothing.
+
 ## [0.77.0] - a rig at rest before its scene is packed
 
 **The factory's roadmap 247.** Two cold runs of one command built Lux's applied scene with eleven lights' energies

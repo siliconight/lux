@@ -40,7 +40,10 @@ func ensure_sun(parent: Node) -> void:
 	sun = DirectionalLight3D.new()
 	sun.name = &"LuxSun"
 	parent.add_child(sun)
-	if Engine.is_editor_hint() and parent.get_tree() != null:
+	# Ownerless in the editor too unless the LuxRoot asks (0.78.0, factory roadmap 24):
+	# owned, one Ctrl+S kept this runtime scaffolding in the scene.
+	if Engine.is_editor_hint() and parent.get_tree() != null \
+			and parent.get("persist_scaffolding_in_editor") == true:
 		sun.owner = parent.get_tree().edited_scene_root
 
 

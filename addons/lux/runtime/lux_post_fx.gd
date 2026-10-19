@@ -93,7 +93,10 @@ func ensure_pass(parent: Node) -> void:
 	rect.color = Color(0, 0, 0, 0)
 	layer.add_child(rect)
 
-	if Engine.is_editor_hint() and parent.get_tree() != null:
+	# Ownerless in the editor too unless the LuxRoot asks (0.78.0, factory roadmap 24):
+	# owned, one Ctrl+S kept this runtime scaffolding in the scene.
+	if Engine.is_editor_hint() and parent.get_tree() != null \
+			and parent.get("persist_scaffolding_in_editor") == true:
 		var root := parent.get_tree().edited_scene_root
 		layer.owner = root
 		back_buffer.owner = root
@@ -120,7 +123,10 @@ func ensure_pass(parent: Node) -> void:
 	crt_rect.color = Color(0, 0, 0, 0)
 	layer.add_child(crt_rect)
 
-	if Engine.is_editor_hint() and parent.get_tree() != null:
+	# Ownerless in the editor too unless the LuxRoot asks (0.78.0, factory roadmap 24):
+	# owned, one Ctrl+S kept this runtime scaffolding in the scene.
+	if Engine.is_editor_hint() and parent.get_tree() != null \
+			and parent.get("persist_scaffolding_in_editor") == true:
 		var root2 := parent.get_tree().edited_scene_root
 		crt_back_buffer.owner = root2
 		crt_rect.owner = root2
