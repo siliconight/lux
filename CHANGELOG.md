@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.79.0] - a morning and a high noon
+
+**The factory's roadmap 217.** The walker, 2026-10-07: a level is set at one of five times -- morning, high noon,
+afternoon, evening, midnight. Three had a preset (Delco Summer Afternoon, Blue Hour, Delco Night), so Level Factory
+sent a brief asking for morning or noon to Gas Station Fluorescent, an interior look. The walker's look review,
+2026-10-19, on the morning and noon presets: "Build both".
+
+### Added
+- `presets/delco_morning.tres`, **Delco Morning**: the afternoon baseline with the fields the hour moves. The sun is
+  28 degrees up from the east-southeast (azimuth 100), golden-white (1, 0.9, 0.76) at 1.3. The sky is paler at the
+  top over a warm, hazy horizon, with a little more fog (0.0045, against the afternoon's 0.0035). The ambient is
+  cooler (0.56, 0.6, 0.68) at 1.0, and the palette's shadow is bluer.
+- `presets/delco_high_noon.tres`, **Delco High Noon**: the sun is 70 degrees up from due south (Delaware County's
+  midsummer noon is about 73), near white (1, 0.98, 0.93) at 1.8. The sky is a deeper blue at the top, and clearer
+  (fog 0.0025, sky energy 1.2). The ambient is 1.15, with less warmth (0.12) and a little more contrast (1.04).
+- Both are days: the sun is on and casting, the street lamps dark, and the fluorescents at the daylight scale 1.0
+  that `fluorescent_scale_selftest.gd` derives from each sky. Neither hands the sky to a provider; Lux draws it.
+- `tools/day_presets_selftest.gd`. Both presets load and register under their display names. Each is a day. The sun
+  climbs morning < afternoon < noon (28 < 46 < 70), the morning well above Blue Hour's 4 degrees (the walker: that
+  angle is "very hard for lighting"), and each sun stands in its quarter of the sky. It fails on 0.78.0, where
+  neither preset exists.
+
+### Not measured here
+Headless draws nothing, so whether a morning reads as a morning is the frames' to show and the walker's to say. The
+factory's cold runs that first set a level at each are where that is recorded.
+
 ## [0.78.0] - runtime scaffolding stays ownerless in the editor, unless a LuxRoot asks
 
 **The factory's roadmap 24, measured.** Opening cold run 9323's shipped `lux.applied.tscn` in Godot's headless
